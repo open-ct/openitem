@@ -6,6 +6,8 @@
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "antd": "4.15.5",
+    "casdoor-js-sdk": "^0.3.0",
     "react": "17.0.2",
     "react-document-title": "^2.0.3",
     "react-dom": "17.0.2",

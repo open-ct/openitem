@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Result, Spin} from "antd";
-import * as Setting from "../utils/setting";
+import * as Setting from "../../utils/setting";
 
 export default class AuthCallback extends React.Component {
   constructor(props) {
@@ -16,19 +16,21 @@ export default class AuthCallback extends React.Component {
   }
 
   login() {
-    // console.log(this.props);
-    this.props.history.push("/home")
+    setTimeout(() => {
+      Setting.showMessage("success", `Logged in successfully`);
+      Setting.goToLink("/home");
+    }, 3000);
     Setting.signin().then((res) => {
       console.log("this is res:");
       console.log(res);
-      // if (res.status === "ok") {
-      //   Setting.showMessage("success", `Logged in successfully`);
-      //   Setting.goToLink("/home");
-      // } else {
-      //   this.setState({
-      //     msg: res.msg,
-      //   });
-      // }
+      if (res.status === "ok") {
+        Setting.showMessage("success", `Logged in successfully`);
+          Setting.goToLink("/home");
+        } else {
+        this.setState({
+          msg: res.msg,
+        });
+      }
     });
     console.log(this.props);
     

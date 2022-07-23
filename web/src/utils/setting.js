@@ -1,7 +1,9 @@
 import Sdk from "casdoor-js-sdk";
+import {message} from 'antd'
+
 import {loginURL} from '../config/index'
 
-var CasdoorSdk,message,ServerUrl
+var CasdoorSdk,ServerUrl
 export function initCasdoorSdk(config) {
   CasdoorSdk = new Sdk(config);
   ServerUrl=config.ServerUrl

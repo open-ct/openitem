@@ -8,19 +8,19 @@ import Forbid from './views/errors/402'
 import AuthCallback from './views/Login/AuthCallback'
 
 export default class App extends Component {
-  // getRemSize = ()=>{
-  //   let whdef = 100/1920
-  //   let wW = window.innerWidth
-  //   let rem = wW * whdef
-  //   document.documentElement.style.fontSize = rem + 'px'
-  // }
+  getRemSize = ()=>{
+    let whdef = 100/1920
+    let wW = window.innerWidth
+    let rem = wW * whdef
+    document.documentElement.style.fontSize = rem + 'px'
+  }
 
-  // componentDidMount = ()=>{
-  //   window.resize = ()=>{
-  //     this.getRemSize()
-  //   }
-  //   this.getRemSize()
-  // }
+  componentDidMount = ()=>{
+    window.resize = ()=>{
+      this.getRemSize()
+    }
+    this.getRemSize()
+  }
 
   render() {
     return (

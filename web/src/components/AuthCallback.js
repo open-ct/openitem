@@ -26,11 +26,15 @@ class AuthCallback extends React.Component {
 
   login() {
     Setting.signin().then((res) => {
+      console.log(res);
       if (res.status === "ok") {
         Setting.showMessage("success", `Logged in successfully`)
 
         const link = this.getFromLink();
-        Setting.goToLink(link);
+        console.log(link);
+        debugger
+        // Setting.goToLink(link);
+        Setting.goToLink('/home')
       } else {
         this.setState({
           msg: res.msg,

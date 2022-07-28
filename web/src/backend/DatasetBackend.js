@@ -1,4 +1,4 @@
-import * as Setting from "../Setting";
+import * as Setting from "../utils/Setting";
 
 export function getGlobalDatasets() {
   return fetch(`${Setting.ServerUrl}/api/get-global-datasets`, {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Result, Spin } from "antd";
 import { withRouter } from "react-router-dom";
-import * as Setting from "./Setting";
+import * as Setting from "../utils/Setting";
 
 class AuthCallback extends React.Component {
   constructor(props) {

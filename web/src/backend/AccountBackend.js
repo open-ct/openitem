@@ -1,4 +1,4 @@
-import * as Setting from "../Setting";
+import * as Setting from "../utils/Setting";
 
 export function getAccount() {
     return fetch(`${Setting.ServerUrl}/api/get-account`, {

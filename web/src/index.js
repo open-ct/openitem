@@ -8,12 +8,12 @@ import 'react-app-polyfill/stable';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import './font.css';
+import './conf/font.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
+import * as serviceWorker from './utils/serviceWorker';
 import 'antd/dist/antd.min.css';
 import {BrowserRouter} from 'react-router-dom';
-import './i18n';
+import './utils/i18n';
 
 ReactDOM.render((
   <BrowserRouter>

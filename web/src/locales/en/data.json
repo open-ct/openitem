@@ -27,6 +27,7 @@
     "Home": "Home",
     "Name": "Name",
     "Save": "Save",
-    "Status": "Status"
+    "Status": "Status",
+    "Pendingtasks":"Pendingtasks"
   }
 }

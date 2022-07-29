@@ -12,6 +12,7 @@ import DatasetListPage from "./DatasetListPage";
 import DatasetEditPage from "./DatasetEditPage";
 import SigninPage from "./SigninPage";
 import i18next from "i18next";
+import PendingTaskPage from './PendingTaskPage';
 
 const {Header, Footer} = Layout;
 
@@ -56,6 +57,8 @@ class App extends Component {
       this.setState({selectedMenuKey: '/'});
     } else if (uri.includes('/datasets')) {
       this.setState({ selectedMenuKey: '/datasets' });
+    } else if (uri.includes('/pendingtasks')){
+      this.setState({selectedMenuKey: '/pendingtasks'})
     } else {
       this.setState({selectedMenuKey: 'null'});
     }
@@ -223,6 +226,14 @@ class App extends Component {
       </Menu.Item>
     );
 
+    res.push(
+      <Menu.Item key="/pendingtasks">
+        <Link to="/pendingtasks">
+          {i18next.t("general:Pendingtasks")}
+        </Link>
+      </Menu.Item>
+    );
+
     return res;
   }
 
@@ -289,6 +300,7 @@ class App extends Component {
           <Route exact path="/callback" component={AuthCallback}/>
           <Route exact path="/" render={(props) => <HomePage account={this.state.account} {...props} />}/>
           <Route exact path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)}/>
+          <Route exact path="/pendingtasks" render={(props)=> this.renderSigninIfNotSignedIn(<PendingTaskPage account={this.state.account} {...props} />)}/>
           <Route exact path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)}/>
           <Route exact path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)}/>
         </Switch>

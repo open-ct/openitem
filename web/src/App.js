@@ -3,14 +3,15 @@ import {Switch, Redirect, Route, withRouter, Link} from 'react-router-dom';
 import {Avatar, BackTop, Dropdown, Layout, Menu} from 'antd';
 import {createFromIconfontCN, DownOutlined, LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import './App.less';
-import * as Setting from "./Setting";
+import * as Setting from "./utils/Setting";
 import * as AccountBackend from "./backend/AccountBackend";
-import AuthCallback from "./AuthCallback";
-import * as Conf from "./Conf";
-import HomePage from "./HomePage";
-import DatasetListPage from "./DatasetListPage";
-import DatasetEditPage from "./DatasetEditPage";
-import SigninPage from "./SigninPage";
+import AuthCallback from "./components/AuthCallback";
+import * as Conf from "./conf/Conf";
+import LandingPage from "./pages/LandingPage";
+import HomePage from "./pages/HomePage"
+import DatasetListPage from "./pages/DatasetListPage";
+import DatasetEditPage from "./pages/DatasetEditPage";
+import SigninPage from "./pages/SigninPage";
 import i18next from "i18next";
 
 const {Header, Footer} = Layout;
@@ -205,8 +206,8 @@ class App extends Component {
     }
 
     res.push(
-      <Menu.Item key="/">
-        <a href="/">
+      <Menu.Item key="/home">
+        <a href="/home">
           {i18next.t("general:Home")}
         </a>
         {/*<Link to="/">*/}
@@ -249,9 +250,9 @@ class App extends Component {
   renderContent() {
     return (
       <div>
-        <Header style={{padding: '0', marginBottom: '3px'}}>
+        <Header style={{padding: '0', marginBottom: '3px',position:'fixed'}}>
           {
-            Setting.isMobile() ? null : <a className="logo" href={"/"}/>
+            Setting.isMobile() ? null : <a className="logo" href="./"/>
           }
           <Menu
             // theme="dark"
@@ -285,13 +286,16 @@ class App extends Component {
             </Menu.Item>
           </Menu>
         </Header>
+        <div style={{marginTop:'67px'}}>
         <Switch>
           <Route exact path="/callback" component={AuthCallback}/>
-          <Route exact path="/" render={(props) => <HomePage account={this.state.account} {...props} />}/>
+          <Route exact path="/" render={(props) => <LandingPage account={this.state.account} {...props} />}/>
+          <Route exact path="/home" render={(props)=><HomePage/>}></Route>
           <Route exact path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)}/>
           <Route exact path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)}/>
           <Route exact path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)}/>
         </Switch>
+        </div>
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import i18n from "i18next";
-import zh from "./locales/zh/data.json";
-import en from "./locales/en/data.json";
-import * as Conf from "./Conf";
+import zh from "../locales/zh/data.json";
+import en from "../locales/en/data.json";
+import * as Conf from "../conf/Conf";
 import * as Setting from "./Setting";
 
 const resources = {

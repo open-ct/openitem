@@ -34,6 +34,20 @@ class App extends Component {
     Setting.initCasdoorSdk(Conf.AuthConfig);
   }
 
+  getRemSize = ()=>{
+    let whdef = 100/1920
+    let wW = window.innerWidth
+    let rem = wW * whdef
+    document.documentElement.style.fontSize = rem + 'px'
+  }
+
+  componentDidMount = ()=>{
+    window.resize = ()=>{
+      this.getRemSize()
+    }
+    this.getRemSize()
+  }
+
   componentWillMount() {
     this.updateMenuKey();
     this.getAccount();

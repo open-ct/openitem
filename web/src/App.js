@@ -13,6 +13,7 @@ import DatasetEditPage from "./DatasetEditPage";
 import SigninPage from "./SigninPage";
 import i18next from "i18next";
 import PendingTaskPage from './PendingTaskPage';
+import ProjectManagementPage  from './ProjectManagementPage';
 
 const {Header, Footer} = Layout;
 
@@ -73,6 +74,8 @@ class App extends Component {
       this.setState({ selectedMenuKey: '/datasets' });
     } else if (uri.includes('/pendingtasks')){
       this.setState({selectedMenuKey: '/pendingtasks'})
+    } else if (uri.includes('/projectmanagements')){
+      this.setState({selectedMenuKey:'/projectmanagements'})
     } else {
       this.setState({selectedMenuKey: 'null'});
     }
@@ -316,6 +319,7 @@ class App extends Component {
           <Route exact path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)}/>
           <Route exact path="/pendingtasks" render={(props)=> this.renderSigninIfNotSignedIn(<PendingTaskPage account={this.state.account} {...props} />)}/>
           <Route exact path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)}/>
+          <Route exact path="/projectmanagements/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)}/>
           <Route exact path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)}/>
         </Switch>
       </div>

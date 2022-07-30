@@ -196,8 +196,66 @@ export default class PeddingTasks extends Component {
       // }
 
       getProjectList=()=>{
+        var res1={
+          "operation_code": 1000,
+          "message": "",
+          "data": [
+            {
+              "Id": "62e4b170b686c0cf874cf17c",
+              "CreateAt": "2022-07-30T04:20:00.138Z",
+              "UpdateAt": "2022-07-30T04:20:00.138Z",
+              "uuid": "28dc2172-292a-45c0-9cdd-7c74b7cae5db",
+              "user_id": "2ab2770e-b6e7-476b-969c-2db815e878e6",
+              "project_id": "5677cb5a-e047-4be4-9d40-718a6c9371ef",
+              "role": 1,
+              "operator": "system",
+              "is_confirmed": true,
+              "status": 0
+            }
+          ]
+        }
+          let id_list = res1.data.map(item=>item.project_id)
+          let role_lits = res1.data.map(item=>item.role)
+          let project_id_list = res1.data.map(item=>item.project_id)
 
-      }
+        var res2={
+          "operation_code": 1000,
+          "message": "",
+          "data": {
+            "5677cb5a-e047-4be4-9d40-718a6c9371ef": {
+              "Id": "62e4b170b686c0cf874cf17b",
+              "CreateAt": "2022-07-30T04:20:00.137Z",
+              "UpdateAt": "2022-07-30T04:20:00.137Z",
+              "uuid": "5677cb5a-e047-4be4-9d40-718a6c9371ef",
+              "creator": "2ab2770e-b6e7-476b-969c-2db815e878e6",
+              "status": 0,
+              "basic_info": {
+                "name": "demo",
+                "description": "无",
+                "requirement": "无",
+                "target": "无",
+                "grade_range": [
+                  "大一"
+                ],
+                "subjects": [
+                  "数学"
+                ],
+                "summary": "无"
+              }
+            }
+          }
+        }
+                let data = Object.values(res2.data)
+                data = data.map((item,index)=>{
+                  item.role = role_lits[index]
+                  item.project_id = project_id_list[index]
+                  return item
+                })
+                this.setState({
+                  data,
+                  loadingState:false
+                })
+    }
 
       render() {
         return (

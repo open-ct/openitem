@@ -146,7 +146,7 @@ export default class PeddingTasks extends Component {
         this.getProjectList()
       }
       seekProjectManagement = (state)=>{
-        this.props.history.push(`/home/project-management/${state.project_id}/${state.role}`)
+        this.props.history.push(`/projectmanagements/${state.project_id}/${state.role}`)
       }
   
       dateFilter(time){

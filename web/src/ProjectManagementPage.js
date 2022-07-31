@@ -3,7 +3,7 @@ import {Switch, Route, Redirect} from "react-router-dom";
 import {PageHeader, Tabs, Button, Descriptions, Spin, message} from "antd";
 // import Step from '../../components/Step'
 // import BuildTeam from '../../components/BuildTeam'
-// import './index.less'
+import "./ProjectManagementPage.less";
 
 const {TabPane} = Tabs;
 
@@ -284,7 +284,7 @@ export default class ProjectManagementPage extends Component {
                                     //     <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
                                     // ))
                                 }
-                                {/* <Route component={NotFound} key="404"></Route> */}
+                                {/* <Route component={<BuildTeam/>} key="404"></Route> */}
                             </Switch>
                         )
                     }

@@ -4,12 +4,12 @@ import i18next from "i18next";
 import moment from "moment";
 import Sdk from "casdoor-js-sdk";
 
-export let ServerUrl = '';
+export let ServerUrl = "";
 export let CasdoorSdk;
 
 export function initServerUrl() {
   const hostname = window.location.hostname;
-  if (hostname === 'localhost') {
+  if (hostname === "localhost") {
     ServerUrl = `http://${hostname}:8300`;
   }
 }
@@ -61,7 +61,7 @@ export function myParseInt(i) {
 
 export function openLink(link) {
   // this.props.history.push(link);
-  const w = window.open('about:blank');
+  const w = window.open("about:blank");
   w.location.href = link;
 }
 
@@ -122,8 +122,8 @@ export function getFormattedDate(date) {
     return null;
   }
 
-  date = date.replace('T', ' ');
-  date = date.replace('+08:00', ' ');
+  date = date.replace("T", " ");
+  date = date.replace("+08:00", " ");
   return date;
 }
 
@@ -132,7 +132,7 @@ export function getFormattedDateShort(date) {
 }
 
 export function getShortName(s) {
-  return s.split('/').slice(-1)[0];
+  return s.split("/").slice(-1)[0];
 }
 
 export function getShortText(s, maxLength=35) {
@@ -157,7 +157,7 @@ function getRandomInt(s) {
 }
 
 export function getAvatarColor(s) {
-  const colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
+  const colorList = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae"];
   let random = getRandomInt(s);
   if (random < 0) {
     random = -random;
@@ -184,24 +184,24 @@ export function changeLanguage(language) {
 
 export function changeMomentLanguage(lng) {
   return;
-  if (lng === "zh") {
-    moment.locale("zh", {
-      relativeTime: {
-        future: "%s内",
-        past: "%s前",
-        s: "几秒",
-        ss: "%d秒",
-        m: "1分钟",
-        mm: "%d分钟",
-        h: "1小时",
-        hh: "%d小时",
-        d: "1天",
-        dd: "%d天",
-        M: "1个月",
-        MM: "%d个月",
-        y: "1年",
-        yy: "%d年",
-      },
-    });
-  }
+  // if (lng === "zh") {
+  //   moment.locale("zh", {
+  //     relativeTime: {
+  //       future: "%s内",
+  //       past: "%s前",
+  //       s: "几秒",
+  //       ss: "%d秒",
+  //       m: "1分钟",
+  //       mm: "%d分钟",
+  //       h: "1小时",
+  //       hh: "%d小时",
+  //       d: "1天",
+  //       dd: "%d天",
+  //       M: "1个月",
+  //       MM: "%d个月",
+  //       y: "1年",
+  //       yy: "%d年",
+  //     },
+  //   });
+  // }
 }

@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
-import { Button, Table, Tag, Space, Pagination, Menu, Layout, Dropdown, Input, Modal, Form, message,Spin } from 'antd';
-import { DownOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import React, {Component} from "react";
+import {Button, Table, Tag, Space, Pagination, Menu, Layout, Dropdown, Input, Modal, Form, message, Spin} from "antd";
+import {DownOutlined, PlusCircleOutlined} from "@ant-design/icons";
 
-import ChangeTags from './ChangeTags'
-import './PendingTaskPage.less'
+import ChangeTags from "./ChangeTags";
+import "./PendingTaskPage.less";
 
-const { Header, Footer, Content } = Layout;
-const { Search, TextArea } = Input;
+const {Header, Footer, Content} = Layout;
+const {Search, TextArea} = Input;
 
 export default class PeddingTasks extends Component {
     constructor(props) {
@@ -21,7 +21,7 @@ export default class PeddingTasks extends Component {
           form:{
             current:1,
             pageSize:10,
-            pageSizeOptions:[5,10,15,20],
+            pageSizeOptions:[5, 10, 15, 20],
             showSizeChanger:true,
             total:50
           },
@@ -41,11 +41,11 @@ export default class PeddingTasks extends Component {
 
       columns = [
           {
-            title: '项目名称',
-            key: 'name',
-            align: 'center',
+            title: "项目名称",
+            key: "name",
+            align: "center",
             width: 210,
-            render: (text,record) => (
+            render: (text, record) => (
               // <Space size="middle">
               //   <Button type="link" onClick={this.seekProjectManagement.bind(this,record)}>{
               //     record.basic_info.name
@@ -55,15 +55,15 @@ export default class PeddingTasks extends Component {
             )
           },
           {
-            title: '学科',
-            key: 'subject',
-            dataIndex: 'subject',
-            align: 'center',
+            title: "学科",
+            key: "subject",
+            dataIndex: "subject",
+            align: "center",
             width: 210,
-            render: (text,record) => (
+            render: (text, record) => (
               <>
                 {
-                  record.basic_info.subjects.map((item,index)=>(
+                  record.basic_info.subjects.map((item, index) => (
                     <Tag key={index} color="green">
                       {
                         item
@@ -75,13 +75,13 @@ export default class PeddingTasks extends Component {
             )
           },
           {
-              title: '学段',
-              key: 'period',
-              align: 'center',
-              render: (text,record) => (
+              title: "学段",
+              key: "period",
+              align: "center",
+              render: (text, record) => (
                 <>
                   {
-                    record.basic_info.grade_range.map((item,index)=>(
+                    record.basic_info.grade_range.map((item, index) => (
                       <Tag key={index} color="green">
                         {
                           item
@@ -93,46 +93,46 @@ export default class PeddingTasks extends Component {
               ),
           },
           {
-              title: '试卷',
-              key: 'paper',
-              align: 'center',
+              title: "试卷",
+              key: "paper",
+              align: "center",
               width: 142,
               render: record => (
                 <span>0</span>
               )
           },
           {
-              title: '试题',
-              key: 'questions',
-              align: 'center',
+              title: "试题",
+              key: "questions",
+              align: "center",
               width: 121,
               render: record => (
                 <span>0</span>
               )
           },
           {
-              title: '创建时间',
-              dataIndex: 'CreateAt',
-              key: 'create-time',
-              align: 'center',
+              title: "创建时间",
+              dataIndex: "CreateAt",
+              key: "create-time",
+              align: "center",
               width: 342,
-              render: (text,record) => (
+              render: (text, record) => (
                 <span>{this.dateFilter(record.CreateAt)}</span>
               )
           },
           {
             title:"操作",
-            key:'title',
-            align: 'center',
+            key:"title",
+            align: "center",
             render: (text, record) => (
               <Space size="middle">
-                <Button type="link" onClick={this.seekProjectManagement.bind(this,record)}>访问项目</Button>
+                <Button type="link" onClick={this.seekProjectManagement.bind(this, record)}>访问项目</Button>
                 <Button type="link" danger>删除</Button>
               </Space>
             )
           }
       ]
-      pendingTaskMenu = ()=>{
+      pendingTaskMenu = () => {
         return (
             <Menu>
                 <Menu.Item key="1">任务1</Menu.Item>
@@ -140,20 +140,20 @@ export default class PeddingTasks extends Component {
                 <Menu.Item disabled key="3">任务3</Menu.Item>
                 <Menu.Item key="4">任务4</Menu.Item>
             </Menu>
-        )
+        );
       }
-      componentDidMount = ()=>{
-        this.getProjectList()
+      componentDidMount = () => {
+        this.getProjectList();
       }
-      seekProjectManagement = (state)=>{
-        this.props.history.push(`/projectmanagements/${state.project_id}/${state.role}`)
+      seekProjectManagement = (state) => {
+        this.props.history.push(`/projectmanagements/${state.project_id}/${state.role}`);
       }
-  
-      dateFilter(time){
-        let date = new Date(time)
-        return `${date.getFullYear()}-${date.getMonth().toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+
+      dateFilter(time) {
+        let date = new Date(time);
+        return `${date.getFullYear()}-${date.getMonth().toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
       }
-  
+
       // getProjectList = ()=>{
       //   this.setState({
       //     loadingState:true
@@ -195,7 +195,7 @@ export default class PeddingTasks extends Component {
       //   })
       // }
 
-      getProjectList=()=>{
+      getProjectList=() => {
         var res1={
           "operation_code": 1000,
           "message": "",
@@ -213,10 +213,10 @@ export default class PeddingTasks extends Component {
               "status": 0
             }
           ]
-        }
-          let id_list = res1.data.map(item=>item.project_id)
-          let role_lits = res1.data.map(item=>item.role)
-          let project_id_list = res1.data.map(item=>item.project_id)
+        };
+          let id_list = res1.data.map(item => item.project_id);
+          let role_lits = res1.data.map(item => item.role);
+          let project_id_list = res1.data.map(item => item.project_id);
 
         var res2={
           "operation_code": 1000,
@@ -244,17 +244,17 @@ export default class PeddingTasks extends Component {
               }
             }
           }
-        }
-                let data = Object.values(res2.data)
-                data = data.map((item,index)=>{
-                  item.role = role_lits[index]
-                  item.project_id = project_id_list[index]
-                  return item
-                })
+        };
+                let data = Object.values(res2.data);
+                data = data.map((item, index) => {
+                  item.role = role_lits[index];
+                  item.project_id = project_id_list[index];
+                  return item;
+                });
                 this.setState({
                   data,
                   loadingState:false
-                })
+                });
     }
 
       render() {
@@ -263,27 +263,27 @@ export default class PeddingTasks extends Component {
                   <Header>
                     <span className="title">项目列表/待处理任务</span>
                     <div className="right-box">
-                      <Search placeholder="input search text" style={{width:'2.64rem',height:'.32rem'}}/>
+                      <Search placeholder="input search text" style={{width:"2.64rem", height:".32rem"}} />
                       <Dropdown overlay={this.pendingTaskMenu()}>
                           <span>待处理任务<DownOutlined /></span>
                       </Dropdown>
-                      <Button type="primary" icon={<PlusCircleOutlined />} onClick={()=>{
+                      <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => {
                         this.setState({
                           isCreateProjectVisible:true
-                        })
+                        });
                       }}>添加项目</Button>
                     </div>
                   </Header>
                   <Content>
-                    <Table 
+                    <Table
                       loading={this.state.loadingState}
-                      columns={this.columns} 
-                      dataSource={this.state.data} 
-                      rowSelection={{}} 
-                      size="small" 
+                      columns={this.columns}
+                      dataSource={this.state.data}
+                      rowSelection={{}}
+                      size="small"
                       rowKey="Id"
                       pagination={false}
-                      scroll={{ y: 'calc(100vh - 2.2rem)'}}
+                      scroll={{y: "calc(100vh - 2.2rem)"}}
                     />
                   </Content>
                   <Footer>
@@ -293,9 +293,9 @@ export default class PeddingTasks extends Component {
                       showSizeChanger
                       showQuickJumper
                     />
-                    <Modal 
-                      title="创建项目" 
-                      visible={this.state.isCreateProjectVisible} 
+                    <Modal
+                      title="创建项目"
+                      visible={this.state.isCreateProjectVisible}
                       cancelText="取消创建"
                       okText="创建项目"
                       closable={!this.state.createLoading}
@@ -327,75 +327,75 @@ export default class PeddingTasks extends Component {
                       //     message.warning("请按要求填写表单项！")
                       //   })
                       // }} 
-                      onOk={()=>{
+                      onOk={() => {
 
                       }}
-                      onCancel={()=>{
-                        if(this.state.createLoading){
-                          message.error("项目创建中，不可阻断！")
+                      onCancel={() => {
+                        if(this.state.createLoading) {
+                          message.error("项目创建中，不可阻断！");
                         }else{
-                          this.createFormRef.current.resetFields()
+                          this.createFormRef.current.resetFields();
                           this.setState({
                             isCreateProjectVisible:false
-                          })
+                          });
                         }
                       }}
                     >
                       <Spin spinning={this.state.createLoading} tip="项目创建中，请等待！">
-                        <Form labelCol={{span: 4 }}  wrapperCol={{span: 20}} ref={this.createFormRef} name="createForm"  initialValues={this.state.createForm}>
-                          <Form.Item name="name" label="项目名称" rules={[{ required: true,message: '项目名称不能为空！' }]}>
+                        <Form labelCol={{span: 4}}  wrapperCol={{span: 20}} ref={this.createFormRef} name="createForm"  initialValues={this.state.createForm}>
+                          <Form.Item name="name" label="项目名称" rules={[{required: true, message: "项目名称不能为空！"}]}>
                             <Input placeholder="请输入项目名称" />
                           </Form.Item>
-                          <Form.Item name="grade_range" label="年级范围" rules={[{ required: true,message:"请至少创建一个年级" }]}>
-                            <ChangeTags onChange={grade_range=>{
-                              let createForm = Object.assign(this.state.createForm,{
+                          <Form.Item name="grade_range" label="年级范围" rules={[{required: true, message:"请至少创建一个年级"}]}>
+                            <ChangeTags onChange={grade_range => {
+                              let createForm = Object.assign(this.state.createForm, {
                                 grade_range
-                              })
+                              });
                               this.setState({
                                 createForm
-                              })
+                              });
                             }}></ChangeTags>
                           </Form.Item>
-                          <Form.Item name="subjects" label="涉及学科" rules={[{ required: true,message:"请至少创建一个学科！" }]}>
-                            <ChangeTags onChange={subjects=>{
-                              let createForm = Object.assign(this.state.createForm,{
+                          <Form.Item name="subjects" label="涉及学科" rules={[{required: true, message:"请至少创建一个学科！"}]}>
+                            <ChangeTags onChange={subjects => {
+                              let createForm = Object.assign(this.state.createForm, {
                                 subjects
-                              })
+                              });
                               this.setState({
                                 createForm
-                              })
+                              });
                             }}></ChangeTags>
                           </Form.Item>
-                          <Form.Item name="target" label="目标说明" rules={[{ required: true,message:"目标说明不能为空！" }]}>
+                          <Form.Item name="target" label="目标说明" rules={[{required: true, message:"目标说明不能为空！"}]}>
                             <TextArea
                               placeholder="请输入项目目标说明，若无，请填写无"
-                              autoSize={{ minRows: 3, maxRows: 5 }}
+                              autoSize={{minRows: 3, maxRows: 5}}
                             />
                           </Form.Item>
-                          <Form.Item name="summary" label="项目摘要" rules={[{ required: true,message:"项目摘要不能为空！" }]}>
+                          <Form.Item name="summary" label="项目摘要" rules={[{required: true, message:"项目摘要不能为空！"}]}>
                             <TextArea
                               placeholder="请输入项目摘要，若无，请填写无"
-                              autoSize={{ minRows: 3, maxRows: 5 }}
+                              autoSize={{minRows: 3, maxRows: 5}}
                             />
                           </Form.Item>
-                          <Form.Item name="description" label="项目描述" rules={[{ required: true,message:"项目描述不能为空！" }]}>
+                          <Form.Item name="description" label="项目描述" rules={[{required: true, message:"项目描述不能为空！"}]}>
                             <TextArea
                               placeholder="请输入项目描述，若无，请填写无"
-                              autoSize={{ minRows: 3, maxRows: 5 }}
+                              autoSize={{minRows: 3, maxRows: 5}}
                             />
                           </Form.Item>
-                          <Form.Item name="requirement" label="项目要求" rules={[{ required: true,message:"项目要求不能为空！" }]}>
+                          <Form.Item name="requirement" label="项目要求" rules={[{required: true, message:"项目要求不能为空！"}]}>
                             <TextArea
                               placeholder="请输入项目要求，若无，请填写无"
-                              autoSize={{ minRows: 3, maxRows: 5 }}
+                              autoSize={{minRows: 3, maxRows: 5}}
                             />
                           </Form.Item>
                         </Form>
                       </Spin>
-                      
+
                     </Modal>
                   </Footer>
                 </Layout>
-        )
+        );
     }
 }

@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
-import { PageHeader, Tabs, Button, Descriptions, Spin, message } from 'antd';
+import React, {Component} from "react";
+import {Switch, Route, Redirect} from "react-router-dom";
+import {PageHeader, Tabs, Button, Descriptions, Spin, message} from "antd";
 // import Step from '../../components/Step'
 // import BuildTeam from '../../components/BuildTeam'
 // import './index.less'
 
-const { TabPane } = Tabs;
+const {TabPane} = Tabs;
 
 export default class ProjectManagementPage extends Component {
     constructor(props) {
@@ -18,7 +18,7 @@ export default class ProjectManagementPage extends Component {
     }
 
     componentDidMount() {
-        this.getProjectBaseInfo()
+        this.getProjectBaseInfo();
     }
 
     getProjectBaseInfo() {
@@ -203,21 +203,21 @@ export default class ProjectManagementPage extends Component {
                     }
                 ]
             }
-        }
+        };
         this.setState({
             projectBaseInfo: res.data,
             loadingState: false
-        })
+        });
     }
 
     dateFilter(time) {
-        let date = new Date(time)
-        return `${date.getFullYear()}-${date.getMonth().toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+        let date = new Date(time);
+        return `${date.getFullYear()}-${date.getMonth().toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
     }
 
     tabCruuent = () => {
-        let path_list = this.props.location.pathname.split('/')
-        return `${path_list[path_list.length - 1]}_${path_list[path_list.length - 2]}`
+        let path_list = this.props.location.pathname.split("/");
+        return `${path_list[path_list.length - 1]}_${path_list[path_list.length - 2]}`;
     }
 
     render() {
@@ -237,7 +237,7 @@ export default class ProjectManagementPage extends Component {
                             <Spin spinning={this.state.loadingState} tip="加载中" />
                         ) : (
                             <Tabs defaultActiveKey={`${this.state.projectBaseInfo.steps[0].uuid}_${this.state.projectBaseInfo.steps[0].name}`} type="card" activeKey={this.tabCruuent()} onChange={(e) => {
-                                this.props.history.push(`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split('_')[1]}/${e.split('_')[0]}`)
+                                this.props.history.push(`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`);
                             }}>
                                 {
                                     this.state.projectBaseInfo.steps.map(item => (
@@ -252,19 +252,19 @@ export default class ProjectManagementPage extends Component {
                         this.state.loadingState ? (
                             <Spin spinning={this.state.loadingState} tip="加载中..." />
                         ) : (
-                            <Descriptions size="small" column={3} style={{ width: 'auto' }}>
+                            <Descriptions size="small" column={3} style={{width: "auto"}}>
                                 <Descriptions.Item label="创建时间">{this.dateFilter(this.state.projectBaseInfo.basic_info.CreateAt)}</Descriptions.Item>
                                 <Descriptions.Item label="学科">
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.subjects.map((item, index) => (
-                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? '' : '、'}`}</span>
+                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? "" : "、"}`}</span>
                                         ))
                                     }
                                 </Descriptions.Item>
                                 <Descriptions.Item label="学段">
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.grade_range.map((item, index) => (
-                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.grade_range.length - 1 ? '' : '、'}`}</span>
+                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.grade_range.length - 1 ? "" : "、"}`}</span>
                                         ))
                                     }
                                 </Descriptions.Item>
@@ -290,7 +290,7 @@ export default class ProjectManagementPage extends Component {
                     }
                 </div>
             </div>
-        )
+        );
     }
 }
 

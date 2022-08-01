@@ -1,6 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table} from 'antd';
+import {Button, Col, Popconfirm, Row, Table} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as DatasetBackend from "./backend/DatasetBackend";
@@ -45,14 +45,14 @@ class DatasetListPage extends React.Component {
       introText: "Introduction..",
       defaultItem: "Home",
       treeItems: [{key: "Home", title: "首页", titleEn: "Home", content: "内容", contentEn: "Content", children: []}],
-    }
+    };
   }
 
   addDataset() {
     const newDataset = this.newDataset();
     DatasetBackend.addDataset(newDataset)
       .then((res) => {
-          Setting.showMessage("success", `Dataset added successfully`);
+          Setting.showMessage("success", "Dataset added successfully");
           this.setState({
             datasets: Setting.prependRow(this.state.datasets, newDataset),
           });
@@ -66,7 +66,7 @@ class DatasetListPage extends React.Component {
   deleteDataset(i) {
     DatasetBackend.deleteDataset(this.state.datasets[i])
       .then((res) => {
-          Setting.showMessage("success", `Dataset deleted successfully`);
+          Setting.showMessage("success", "Dataset deleted successfully");
           this.setState({
             datasets: Setting.deleteRow(this.state.datasets, i),
           });
@@ -81,23 +81,23 @@ class DatasetListPage extends React.Component {
     const columns = [
       {
         title: i18next.t("general:Name"),
-        dataIndex: 'name',
-        key: 'name',
-        width: '120px',
+        dataIndex: "name",
+        key: "name",
+        width: "120px",
         sorter: (a, b) => a.name.localeCompare(b.name),
         render: (text, record, index) => {
           return (
             <Link to={`/datasets/${text}`}>
               {text}
             </Link>
-          )
+          );
         }
       },
       {
         title: i18next.t("dataset:Start date"),
-        dataIndex: 'startDate',
-        key: 'startDate',
-        width: '70px',
+        dataIndex: "startDate",
+        key: "startDate",
+        width: "70px",
         sorter: (a, b) => a.startDate.localeCompare(b.startDate),
         render: (text, record, index) => {
           return Setting.getFormattedDate(text);
@@ -105,9 +105,9 @@ class DatasetListPage extends React.Component {
       },
       {
         title: i18next.t("dataset:End date"),
-        dataIndex: 'endDate',
-        key: 'endDate',
-        width: '70px',
+        dataIndex: "endDate",
+        key: "endDate",
+        width: "70px",
         sorter: (a, b) => a.endDate.localeCompare(b.endDate),
         render: (text, record, index) => {
           return Setting.getFormattedDate(text);
@@ -115,58 +115,58 @@ class DatasetListPage extends React.Component {
       },
       {
         title: i18next.t("dataset:Full name"),
-        dataIndex: 'fullName',
-        key: 'fullName',
-        width: '200px',
+        dataIndex: "fullName",
+        key: "fullName",
+        width: "200px",
         sorter: (a, b) => a.fullName.localeCompare(b.fullName),
       },
       {
         title: i18next.t("dataset:Organizer"),
-        dataIndex: 'organizer',
-        key: 'organizer',
-        width: '120px',
+        dataIndex: "organizer",
+        key: "organizer",
+        width: "120px",
         sorter: (a, b) => a.organizer.localeCompare(b.organizer),
       },
       {
         title: i18next.t("dataset:Location"),
-        dataIndex: 'location',
-        key: 'location',
-        width: '120px',
+        dataIndex: "location",
+        key: "location",
+        width: "120px",
         sorter: (a, b) => a.location.localeCompare(b.location),
       },
       {
         title: i18next.t("dataset:Address"),
-        dataIndex: 'address',
-        key: 'address',
-        width: '120px',
+        dataIndex: "address",
+        key: "address",
+        width: "120px",
         sorter: (a, b) => a.address.localeCompare(b.address),
       },
       {
         title: i18next.t("general:Status"),
-        dataIndex: 'status',
-        key: 'status',
-        width: '80px',
+        dataIndex: "status",
+        key: "status",
+        width: "80px",
         sorter: (a, b) => a.status.localeCompare(b.status),
       },
       {
         title: i18next.t("general:Action"),
-        dataIndex: 'action',
-        key: 'action',
-        width: '120px',
+        dataIndex: "action",
+        key: "action",
+        width: "120px",
         render: (text, record, index) => {
           return (
             <div>
-              <Button style={{marginTop: '10px', marginBottom: '10px', marginRight: '10px'}} type="primary" onClick={() => this.props.history.push(`/datasets/${record.name}`)}>{i18next.t("general:Edit")}</Button>
+              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/datasets/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
                 title={`Sure to delete dataset: ${record.name} ?`}
                 onConfirm={() => this.deleteDataset(index)}
                 okText="OK"
                 cancelText="Cancel"
               >
-                <Button style={{marginBottom: '10px'}} type="danger">{i18next.t("general:Delete")}</Button>
+                <Button style={{marginBottom: "10px"}} type="danger">{i18next.t("general:Delete")}</Button>
               </Popconfirm>
             </div>
-          )
+          );
         }
       },
     ];

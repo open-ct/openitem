@@ -43,5 +43,10 @@
       "last 1 safari version",
       "ie 9, ie 10, ie 11"
     ]
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.11.0",
+    "eslint-plugin-react": "^7.30.1"
   }
 }

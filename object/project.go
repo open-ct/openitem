@@ -14,7 +14,6 @@ type Project struct {
 	CreateAt  time.Time        `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time        `xorm:"updated" json:"updated_at"`
 	DeletedAt time.Time        `xorm:"deleted" json:"deleted_at"`
-	Uuid      string           `xorm:"varchar(256) unique" json:"uuid"`
 	Creator   string           `xorm:"varchar(256) index" json:"creator"`
 	Status    int              `json:"status"`
 	BasicInfo ProjectBasicInfo `xorm:"mediumtext" json:"basic_info"`

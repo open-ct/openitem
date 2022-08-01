@@ -24,8 +24,8 @@ export function getDataset(owner, name) {
 export function updateDataset(owner, name, dataset) {
   let newDataset = Setting.deepCopy(dataset);
   return fetch(`${Setting.ServerUrl}/api/update-dataset?id=${owner}/${encodeURIComponent(name)}`, {
-    method: 'POST',
-    credentials: 'include',
+    method: "POST",
+    credentials: "include",
     body: JSON.stringify(newDataset),
   }).then(res => res.json());
 }
@@ -33,8 +33,8 @@ export function updateDataset(owner, name, dataset) {
 export function addDataset(dataset) {
   let newDataset = Setting.deepCopy(dataset);
   return fetch(`${Setting.ServerUrl}/api/add-dataset`, {
-    method: 'POST',
-    credentials: 'include',
+    method: "POST",
+    credentials: "include",
     body: JSON.stringify(newDataset),
   }).then(res => res.json());
 }
@@ -42,8 +42,8 @@ export function addDataset(dataset) {
 export function deleteDataset(dataset) {
   let newDataset = Setting.deepCopy(dataset);
   return fetch(`${Setting.ServerUrl}/api/delete-dataset`, {
-    method: 'POST',
-    credentials: 'include',
+    method: "POST",
+    credentials: "include",
     body: JSON.stringify(newDataset),
   }).then(res => res.json());
 }

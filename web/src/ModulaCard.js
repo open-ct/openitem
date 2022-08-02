@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import "./ModulaCardless.less";
+import "./ModulaCard.less";
 
 export default class index extends Component {
     render() {

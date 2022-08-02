@@ -258,6 +258,7 @@ export default class ProjectManagementPage extends Component {
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.subjects.map((item, index) => (
                                             <span key={index}>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? "" : "、"}`}</span>
+
                                         ))
                                     }
                                 </Descriptions.Item>

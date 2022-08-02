@@ -1,18 +1,18 @@
 import React, {Component} from "react";
 import {Col, Statistic, Row} from "antd";
-import ModulaCard from "../ModulaCard";
+import ModulaCard from "./ModulaCard";
 import "./CompletionStatus.less";
 
 export default class index extends Component {
 
     state = {
-        status:{},
-        loadingState:false
+        status: {},
+        loadingState: false
     }
 
     getStatusList = () => {
         this.setState({
-            loadingState:true
+            loadingState: true
         });
         // request({
         //     url:baseURL+`/review/proj/step/stat/${this.props.stepId}`,
@@ -28,6 +28,23 @@ export default class index extends Component {
         //         loadingState:false
         //     });
         // });
+        var res = {
+            "operation_code": 1000,
+            "message": "",
+            "data": {
+                "pass": 0,
+                "pass_rate": 0,
+                "return": 0,
+                "to_audit": 0,
+                "to_correct": 0,
+                "to_upload": 0,
+                "total": 0
+            }
+        };
+        this.setState({
+            status: res.data,
+            loadingState: false
+        });
     }
 
     componentDidMount() {
@@ -38,9 +55,9 @@ export default class index extends Component {
         return (
             <ModulaCard title="完成情况">
                 {
-                    this.state.loadingState?(
+                    this.state.loadingState ? (
                         <></>
-                    ):(
+                    ) : (
                         <div className="completion-status-box" data-component="completion-status-box">
                             <div className="left-box">
                                 <div className="title">
@@ -58,21 +75,21 @@ export default class index extends Component {
                                 </div>
                             </div>
                             <div className="right-box">
-                                <Row gutter={16} style={{width:"4.2rem"}}>
+                                <Row gutter={16} style={{width: "4.2rem"}}>
                                     <Col span={4}>
-                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor:"#87D068"}}></div>通过</div>} value={this.state.status.pass} />
+                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#87D068"}}></div>通过</div>} value={this.state.status.pass} />
                                     </Col>
                                     <Col span={4}>
-                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor:"#FF5500"}}></div>驳回</div>}  value={this.state.status.return} />
+                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#FF5500"}}></div>驳回</div>} value={this.state.status.return} />
                                     </Col>
                                     <Col span={5}>
-                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor:"#FF5500"}}></div>未上传</div>}  value={this.state.status.to_upload} />
+                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#FF5500"}}></div>未上传</div>} value={this.state.status.to_upload} />
                                     </Col>
                                     <Col span={5}>
-                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor:"#2DB7F5"}}></div>待审核</div>}  value={this.state.status.to_audit} />
+                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#2DB7F5"}}></div>待审核</div>} value={this.state.status.to_audit} />
                                     </Col>
                                     <Col span={5}>
-                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor:"#2DB7F5"}}></div>再修改</div>}  value={this.state.status.to_correct} />
+                                        <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#2DB7F5"}}></div>再修改</div>} value={this.state.status.to_correct} />
                                     </Col>
                                 </Row>
                             </div>

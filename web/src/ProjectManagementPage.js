@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Switch, Route, Redirect} from "react-router-dom";
-import {PageHeader, Tabs, Button, Descriptions, Spin, message} from "antd";
+import {PageHeader, Tabs, Button, Descriptions, Spin} from "antd";
 import Step from "./Step";
 import BuildTeam from "./BuildTeam";
 import "./ProjectManagementPage.less";
@@ -257,14 +257,14 @@ export default class ProjectManagementPage extends Component {
                                 <Descriptions.Item label="学科">
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.subjects.map((item, index) => (
-                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? "" : "、"}`}</span>
+                                            <span key={index}>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? "" : "、"}`}</span>
                                         ))
                                     }
                                 </Descriptions.Item>
                                 <Descriptions.Item label="学段">
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.grade_range.map((item, index) => (
-                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.grade_range.length - 1 ? "" : "、"}`}</span>
+                                            <span key={index}>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.grade_range.length - 1 ? "" : "、"}`}</span>
                                         ))
                                     }
                                 </Descriptions.Item>

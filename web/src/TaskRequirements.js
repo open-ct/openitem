@@ -1,29 +1,29 @@
- import React, {Component} from "react";
- import {Button, Upload, message} from "antd";
- import ModulaCard from "./ModulaCard";
- import CalendarButton from "./CalendarButton";
- import {FieldTimeOutlined, LinkOutlined} from "@ant-design/icons";
- import "./TaskRequirements.less";
+import React, {Component} from "react";
+import {Button, Upload, message} from "antd";
+import ModulaCard from "./ModulaCard";
+import CalendarButton from "./CalendarButton";
+import {FieldTimeOutlined, LinkOutlined} from "@ant-design/icons";
+import "./TaskRequirements.less";
 
 
- export default class index extends Component {
+export default class index extends Component {
 
-     state = {
-         stepInfo:{},
-         loadingState:false,
-         upLoadState:false
-     }
+    state = {
+        stepInfo: {},
+        loadingState: false,
+        upLoadState: false
+    }
 
-     upLoadFile(info) {
-         this.setState({
-             upLoadState:true
-         });
-         message.info("开始上传文件："+info.file.name);
-         const formData = new FormData();
-         formData.append("file", info.file);
-         formData.append("source_project", this.props.projectId);
-         formData.append("tags", "无");
-         formData.append("description", "步骤附件");
+    upLoadFile(info) {
+        this.setState({
+            upLoadState: true
+        });
+        message.info("开始上传文件：" + info.file.name);
+        const formData = new FormData();
+        formData.append("file", info.file);
+        formData.append("source_project", this.props.projectId);
+        formData.append("tags", "无");
+        formData.append("description", "步骤附件");
         //  request({
         //      url:baseURL+"/review/file",
         //      // url:'http://49.232.73.36:8081/review/file',
@@ -60,13 +60,13 @@
         //      });
         //      message.error("文件上传失败");
         //  });
-     }
+    }
 
-     downLoadFile = () => {
-         if(this.state.stepInfo.attachments.length===0) {
-             message.warning("暂无可下载附件");
-         }else{
-             message.info(`开始下载文件：${this.state.stepInfo.attachments[0]}！`);
+    downLoadFile = () => {
+        if (this.state.stepInfo.attachments.length === 0) {
+            message.warning("暂无可下载附件");
+        } else {
+            message.info(`开始下载文件：${this.state.stepInfo.attachments[0]}！`);
             //  request({
             //      url:baseURL+`/review/file/${this.state.stepInfo.attachments[0]}`,
             //      // url:`http://49.232.73.36:8081/review/file/${this.state.stepInfo.attachments[0]}`,
@@ -88,59 +88,59 @@
             //  }).catch(err => {
             //      message.error("文件下载失败！");
             //  });
-         }
-     }
+        }
+    }
 
-     // 根据不同身份加载不同操作情况
-     operationRender = () => {
-         let operationDomList = [() => (
-             <div className="choice-box">
-                 <CalendarButton label="截止时间：2021年8月20日" icon={<FieldTimeOutlined />} onDateChange={(date) => {
-                     message.error("改操作暂不可用");
-                 }} />
-                 <Upload
-                     name="filename"
-                     showUploadList={false}
-                     beforeUpload = {() => {
-                         if(this.state.upLoadState) {
-                             message.error("当前存在上传中文件，请勿频繁上传！");
-                             return false;
-                         }
-                         return true;
-                     }}
-                     customRequest={this.upLoadFile.bind(this)}
-                 >
-                     <Button size="small" icon={<LinkOutlined />} style={{marginLeft:".1246rem"}}>{
-                         this.state.stepInfo.attachments?"已上传":"暂无文件"
-                     }</Button>
-                 </Upload>
-             </div>
-         ), () => (
-             <div className="choice-box">
-                 <Button size="small" style={{marginRight:".1246rem"}} icon={<FieldTimeOutlined />}>截止时间：2021年8月20日</Button>
-                 <Button size="small" icon={<LinkOutlined />} onClick={this.downLoadFile}>{
-                     this.state.stepInfo.attachments?"已上传":"暂无文件"
-                 }</Button>
-             </div>
-         ), () => (
-             <div className="choice-box">
-                 <Button size="small" style={{marginRight:".1246rem"}} icon={<FieldTimeOutlined />}>截止时间：2021年8月20日</Button>
-                 <Button size="small" icon={<LinkOutlined />} onClick={this.downLoadFile}>{
-                     this.state.stepInfo.attachments?"已上传":"暂无文件"
-                 }</Button>
-             </div>
-         )];
-         return operationDomList[(this.props.role==="1"||this.props.role==="5")?0:this.props.role-2]();
-     }
+    // 根据不同身份加载不同操作情况
+    operationRender = () => {
+        let operationDomList = [() => (
+            <div className="choice-box">
+                <CalendarButton label="截止时间：2021年8月20日" icon={<FieldTimeOutlined />} onDateChange={(date) => {
+                    message.error("改操作暂不可用");
+                }} />
+                <Upload
+                    name="filename"
+                    showUploadList={false}
+                    beforeUpload={() => {
+                        if (this.state.upLoadState) {
+                            message.error("当前存在上传中文件，请勿频繁上传！");
+                            return false;
+                        }
+                        return true;
+                    }}
+                    customRequest={this.upLoadFile.bind(this)}
+                >
+                    <Button size="small" icon={<LinkOutlined />} style={{marginLeft: ".1246rem"}}>{
+                        this.state.stepInfo.attachments ? "已上传" : "暂无文件"
+                    }</Button>
+                </Upload>
+            </div>
+        ), () => (
+            <div className="choice-box">
+                <Button size="small" style={{marginRight: ".1246rem"}} icon={<FieldTimeOutlined />}>截止时间：2021年8月20日</Button>
+                <Button size="small" icon={<LinkOutlined />} onClick={this.downLoadFile}>{
+                    this.state.stepInfo.attachments ? "已上传" : "暂无文件"
+                }</Button>
+            </div>
+        ), () => (
+            <div className="choice-box">
+                <Button size="small" style={{marginRight: ".1246rem"}} icon={<FieldTimeOutlined />}>截止时间：2021年8月20日</Button>
+                <Button size="small" icon={<LinkOutlined />} onClick={this.downLoadFile}>{
+                    this.state.stepInfo.attachments ? "已上传" : "暂无文件"
+                }</Button>
+            </div>
+        )];
+        return operationDomList[(this.props.role === "1" || this.props.role === "5") ? 0 : this.props.role - 2]();
+    }
 
-     componentDidMount() {
-         this.getStepInfo();
-     }
+    componentDidMount() {
+        this.getStepInfo();
+    }
 
-     getStepInfo = () => {
-         this.setState({
-             loadingState:true,
-         });
+    getStepInfo = () => {
+        this.setState({
+            loadingState: true,
+        });
         //  request({
         //      url:baseURL+`/review/proj/step/${this.props.stepId}`,
         //      // url:`http://49.232.73.36:8081/review/proj/step/${this.props.stepId}`,
@@ -155,31 +155,57 @@
         //          loadingState:false,
         //      });
         //  });
-     }
+        var res = {
+            "operation_code": 1000,
+            "message": "",
+            "data": {
+                "Id": "62e4b170b686c0cf874cf17e",
+                "CreateAt": "2022-07-30T04:20:00.14Z",
+                "UpdateAt": "2022-07-30T04:20:00.14Z",
+                "uuid": "a17143e3-e428-4058-9ee7-7c1d7998fd97",
+                "project_id": "5677cb5a-e047-4be4-9d40-718a6c9371ef",
+                "index": 1,
+                "name": "测试框架与论证报告",
+                "description": "",
+                "requirement": "",
+                "status": 0,
+                "deadline": 0,
+                "timetable": null,
+                "creator": "2ab2770e-b6e7-476b-969c-2db815e878e6",
+                "attachments": [
+                    "847ee0d9-a5bb-4186-9c59-852f9436f63e"
+                ]
+            }
+        };
+        this.setState({
+            stepInfo: res.data,
+            loadingState: false,
+        });
+    }
 
-     render() {
-         return (
-             <ModulaCard title="任务要求">
-                 {
-                     this.state.loadingState?(
-                         <></>
-                     ):(
-                         <div className="task-requirements-box" data-component="task-requirements-box">
-                             <div className="describe-box">
-                                 <div className="context">
-                                     <p>{this.state.stepInfo.requirement||"无"}</p>
-                                 </div>
-                                 <div className="btn-box">
-                                     {this.props.role===2?(<Button type="link">编辑</Button>):""}
-                                 </div>
-                             </div>
-                             {this.operationRender()}
-                         </div>
-                     )
-                 }
-             </ModulaCard>
-         );
-     }
- }
+    render() {
+        return (
+            <ModulaCard title="任务要求">
+                {
+                    this.state.loadingState ? (
+                        <></>
+                    ) : (
+                        <div className="task-requirements-box" data-component="task-requirements-box">
+                            <div className="describe-box">
+                                <div className="context">
+                                    <p>{this.state.stepInfo.requirement || "无"}</p>
+                                </div>
+                                <div className="btn-box">
+                                    {this.props.role === 2 ? (<Button type="link">编辑</Button>) : ""}
+                                </div>
+                            </div>
+                            {this.operationRender()}
+                        </div>
+                    )
+                }
+            </ModulaCard>
+        );
+    }
+}
 
 

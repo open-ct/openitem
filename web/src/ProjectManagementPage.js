@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {Switch, Route, Redirect} from "react-router-dom";
 import {PageHeader, Tabs, Button, Descriptions, Spin, message} from "antd";
-// import Step from '../../components/Step'
-// import BuildTeam from '../../components/BuildTeam'
+import Step from "./Step";
+import BuildTeam from "./BuildTeam";
 import "./ProjectManagementPage.less";
 
 const {TabPane} = Tabs;
@@ -278,12 +278,12 @@ export default class ProjectManagementPage extends Component {
                     {
                         this.state.loadingState ? (<></>) : (
                             <Switch>
-                                <Redirect from={`/home/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/home/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`} exact></Redirect>
                                 {
-                                    // this.state.projectBaseInfo.steps.map(item => (
-                                    //     <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
-                                    // ))
-                                }
+                                    this.state.projectBaseInfo.steps.map(item => (
+                                        <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
+                                        ))
+                                    }
+                                    <Redirect from={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`} ></Redirect>
                                 {/* <Route component={<BuildTeam/>} key="404"></Route> */}
                             </Switch>
                         )

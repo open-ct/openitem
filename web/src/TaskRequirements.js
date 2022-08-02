@@ -43,11 +43,11 @@
         //          }
         //      }).then(res => {
         //          console.log(res);
-                 this.setState({
-                     upLoadState:false
-                 });
-                 this.getStepInfo();
-                 message.success("文件上传成功");
+        //          this.setState({
+        //              upLoadState:false
+        //          });
+        //          this.getStepInfo();
+        //          message.success("文件上传成功");
         //      }).catch(err => {
         //          this.setState({
         //              upLoadState:false
@@ -84,7 +84,7 @@
             //      downloadElement.click();
             //      document.body.removeChild(downloadElement);
             //      window.URL.revokeObjectURL(href);
-                 message.success("文件下载成功！");
+            //      message.success("文件下载成功！");
             //  }).catch(err => {
             //      message.error("文件下载失败！");
             //  });

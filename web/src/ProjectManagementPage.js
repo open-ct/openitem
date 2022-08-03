@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {Switch, Route, Redirect} from "react-router-dom";
-import {PageHeader, Tabs, Button, Descriptions, Spin, message} from "antd";
-// import Step from '../../components/Step'
-// import BuildTeam from '../../components/BuildTeam'
-// import './index.less'
+import {PageHeader, Tabs, Button, Descriptions, Spin} from "antd";
+import Step from "./Step";
+import BuildTeam from "./BuildTeam";
+import "./ProjectManagementPage.less";
 
 const {TabPane} = Tabs;
 
@@ -257,14 +257,15 @@ export default class ProjectManagementPage extends Component {
                                 <Descriptions.Item label="学科">
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.subjects.map((item, index) => (
-                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? "" : "、"}`}</span>
+                                            <span key={index}>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.subjects.length - 1 ? "" : "、"}`}</span>
+
                                         ))
                                     }
                                 </Descriptions.Item>
                                 <Descriptions.Item label="学段">
                                     {
                                         this.state.projectBaseInfo.basic_info.basic_info.grade_range.map((item, index) => (
-                                            <span>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.grade_range.length - 1 ? "" : "、"}`}</span>
+                                            <span key={index}>{`${item}${index === this.state.projectBaseInfo.basic_info.basic_info.grade_range.length - 1 ? "" : "、"}`}</span>
                                         ))
                                     }
                                 </Descriptions.Item>
@@ -278,13 +279,13 @@ export default class ProjectManagementPage extends Component {
                     {
                         this.state.loadingState ? (<></>) : (
                             <Switch>
-                                <Redirect from={`/home/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/home/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`} exact></Redirect>
                                 {
-                                    // this.state.projectBaseInfo.steps.map(item => (
-                                    //     <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
-                                    // ))
-                                }
-                                {/* <Route component={NotFound} key="404"></Route> */}
+                                    this.state.projectBaseInfo.steps.map(item => (
+                                        <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
+                                        ))
+                                    }
+                                    <Redirect from={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`} ></Redirect>
+                                {/* <Route component={<BuildTeam/>} key="404"></Route> */}
                             </Switch>
                         )
                     }

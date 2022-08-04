@@ -85,7 +85,13 @@ func (a *Adapter) close() {
 }
 
 func (a *Adapter) createTable() {
-	err := a.engine.Sync2(new(Dataset), new(Project), new(Audit))
+	err := a.engine.Sync2(
+		new(Dataset),
+		new(Project),
+		new(Audit),
+		new(TempQuestion),
+		new(FinalQuestion),
+	)
 	if err != nil {
 		panic(err)
 	}

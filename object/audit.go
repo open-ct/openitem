@@ -64,7 +64,7 @@ func AddAudit(audit *Audit) bool {
 }
 
 func DeleteAudit(audit *Audit) bool {
-	affected, err := adapter.engine.ID(core.PK{audit.Owner, audit.Name}).Delete(&Project{})
+	affected, err := adapter.engine.ID(core.PK{audit.Owner, audit.Name}).Delete(&Audit{})
 	if err != nil {
 		panic(err)
 	}

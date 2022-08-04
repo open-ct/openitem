@@ -313,13 +313,13 @@ class App extends Component {
           </Menu>
         </Header>
         <Switch>
-          <Route exact path="/callback" component={AuthCallback} />
-          <Route exact path="/" render={(props) => <HomePage account={this.state.account} {...props} />} />
-          <Route exact path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)} />
-          <Route exact path="/pendingtasks" render={(props) => this.renderSigninIfNotSignedIn(<PendingTaskPage account={this.state.account} {...props} />)} />
-          <Route exact path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)} />
-          <Route exact path="/projectmanagements/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)} />
-          <Route exact path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)} />
+          <Route path="/callback" component={AuthCallback} />
+          <Route path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)} />
+          <Route path="/pendingtasks" render={(props) => this.renderSigninIfNotSignedIn(<PendingTaskPage account={this.state.account} {...props} />)} />
+          <Route path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)} />
+          <Route path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)} />
+          <Route path="/projectmanagements/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)} />
+          <Route path="/" render={(props) => <HomePage account={this.state.account} {...props} />} />
         </Switch>
       </div>
     );

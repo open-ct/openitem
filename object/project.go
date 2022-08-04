@@ -29,6 +29,14 @@ type ProjectBasicInfo struct {
 	Summary     string   `json:"summary"`
 }
 
+type ProjectTimePoint struct {
+	Title     string    `json:"title"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+	Notice    string    `json:"notice"`
+	Comment   string    `json:"comment"`
+}
+
 func getProject(owner string, name string) *Project {
 	project := Project{Owner: owner, Name: name}
 	existed, err := adapter.engine.Get(&project)

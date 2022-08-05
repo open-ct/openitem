@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {Switch, Route, Redirect} from "react-router-dom";
 import {PageHeader, Tabs, Button, Descriptions, Spin} from "antd";
-// import Step from '../../components/Step'
+import Step from "./Step";
 import BuildTeam from "./BuildTeam";
 import "./ProjectManagementPage.less";
 

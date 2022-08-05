@@ -50,7 +50,7 @@ i18n.init({
   interpolation: {
     escapeValue: false,
   },
-  //debug: true,
+  // debug: true,
   saveMissing: true,
 });
 

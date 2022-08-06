@@ -1,8 +1,11 @@
 package object
 
 import (
+	"fmt"
 	"github.com/open-ct/openitem/util"
+	"log"
 	"time"
+	"xorm.io/builder"
 	"xorm.io/core"
 )
 
@@ -211,4 +214,214 @@ func DeleteFinalQuestion(finalQuestion *FinalQuestion) bool {
 	}
 
 	return affected != 0
+}
+
+func CreateNewTempQuestion(request *TempQuestion) (string, error) {
+	newTempQuestion := TempQuestion{
+		Owner:       request.Owner,
+		Name:        request.Name,
+		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+
+		IsRoot:        true,
+		Base:          fmt.Sprintf("%s/%s", request.Owner, request.Name),
+		SourceProject: request.SourceProject,
+		Author:        request.Author,
+		Info:          request.Info,
+		BasicProps:    request.BasicProps,
+		SpecProps:     request.SpecProps,
+		ExtraProps:    request.ExtraProps,
+		AdvancedProps: request.AdvancedProps,
+		ApplyRecord:   request.ApplyRecord,
+		CommentRecord: nil,
+	}
+
+	err := AddTempQuestion(&newTempQuestion)
+	if err != nil {
+		log.Printf("insert new temp-question error: %s\n", err.Error())
+		return "", err
+	}
+
+	tempTestQuestionId := fmt.Sprintf("%s/%s", request.Owner, request.Name)
+
+	log.Printf("new temp-question created: %s\n", tempTestQuestionId)
+	return tempTestQuestionId, nil
+}
+
+func UpdateQuestion(request *TempQuestion) (string, error) {
+	var oldQuestion TempQuestion
+
+	owner, name := util.GetOwnerAndNameFromId(request.Base)
+
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&oldQuestion)
+	if err != nil {
+		log.Println("base question cannot find")
+		return "", err
+	}
+
+	newTempQuestion := TempQuestion{
+		Owner:       request.Owner,
+		Name:        request.Name,
+		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+
+		IsRoot:        false,
+		Base:          request.Base,
+		SourceProject: oldQuestion.SourceProject,
+		Author:        request.Author,
+		Info:          request.Info,
+		BasicProps:    request.BasicProps,
+		SpecProps:     request.SpecProps,
+		ExtraProps:    request.ExtraProps,
+		AdvancedProps: request.AdvancedProps,
+		ApplyRecord:   request.ApplyRecord,
+		CommentRecord: nil,
+	}
+
+	err = AddTempQuestion(&newTempQuestion)
+	if err != nil {
+		log.Printf("update a temp-question error: %s\n", err.Error())
+		return "", err
+	}
+
+	updatedId := fmt.Sprintf("%s/%s", newTempQuestion.Owner, newTempQuestion.Name)
+	log.Printf("temp-question updated: %s\n", updatedId)
+	return updatedId, nil
+}
+
+func TraceQuestionVersion(qid string) ([]TempQuestion, error) {
+	var endPointQuestion TempQuestion
+
+	owner, name := util.GetOwnerAndNameFromId(qid)
+
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&endPointQuestion)
+	if err != nil {
+		log.Printf("find base questions failed, qid: [%s] %s", qid, err.Error())
+		return nil, err
+	}
+
+	var questions []TempQuestion
+	questions = append(questions, endPointQuestion)
+	isEnd := endPointQuestion.IsRoot
+	currentBaseId := endPointQuestion.Base
+
+	for !isEnd {
+		var currentNode TempQuestion
+
+		currentOwner, currentName := util.GetOwnerAndNameFromId(currentBaseId)
+
+		_, err := adapter.engine.ID(core.PK{currentOwner, currentName}).Get(&currentNode)
+		if err != nil {
+			log.Printf("find middle-node questions failed, qid: [%s] %s", currentBaseId, err.Error())
+			return questions, err
+		}
+		questions = append(questions, currentNode)
+		isEnd = currentNode.IsRoot == true
+		currentBaseId = currentNode.Base
+	}
+	return questions, nil
+}
+
+func AddQuestionComment(request *AddQuestionCommentRequest) error {
+	newComment := QuestionComment{
+		TimePoint: time.Now(),
+		Comment:   request.Comment,
+		Author:    request.Author,
+	}
+	var commentQuestion TempQuestion
+
+	owner, name := util.GetOwnerAndNameFromId(request.QuestionId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&commentQuestion)
+	if err != nil {
+		log.Printf("cannot address the question: %s for %s", request.QuestionId, err.Error())
+		return err
+	}
+	newComments := append(commentQuestion.CommentRecord, newComment)
+	newTempQuestion := TempQuestion{CommentRecord: newComments}
+
+	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("comment_record").Update(&newTempQuestion)
+	if err != nil {
+		log.Printf("add new comment error: %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+func FinishTempQuestion(qid string) (string, error) {
+	var tempQuestion TempQuestion
+
+	owner, name := util.GetOwnerAndNameFromId(qid)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&tempQuestion)
+	if err != nil {
+		log.Printf("cannot address the question: %s for %s", qid, err.Error())
+		return "", err
+	}
+	finalQuestion := FinalQuestion{
+		Owner:       tempQuestion.Owner,
+		Name:        tempQuestion.Name,
+		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+
+		SourceProject: tempQuestion.SourceProject,
+		FinalVersion:  fmt.Sprintf("%s/%s", tempQuestion.Owner, tempQuestion.Name),
+		Author:        tempQuestion.Author,
+		Info:          tempQuestion.Info,
+		BasicProps:    tempQuestion.BasicProps,
+		SpecProps:     tempQuestion.SpecProps,
+		ExtraProps:    tempQuestion.ExtraProps,
+		AdvancedProps: tempQuestion.AdvancedProps,
+		ApplyRecord:   tempQuestion.ApplyRecord,
+	}
+
+	err = AddFinalQuestion(&finalQuestion)
+	if err != nil {
+		log.Printf("conver to final-question failed: %s", err.Error())
+		return "", err
+	}
+
+	finalQuestionId := fmt.Sprintf("%s/%s", finalQuestion.Owner, finalQuestion.Name)
+
+	log.Printf("convert to final successfully: %s\n", finalQuestionId)
+	return finalQuestionId, nil
+}
+
+func GetUserTempQuestions(uid string) ([]TempQuestion, error) {
+	var questions []TempQuestion
+
+	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&questions)
+	if err != nil {
+		log.Printf("find user's temp-question error: %s\n", err.Error())
+		return nil, err
+	}
+	return questions, nil
+}
+
+func GetUserFinalQuestions(uid string) ([]FinalQuestion, error) {
+	var questions []FinalQuestion
+
+	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&questions)
+	if err != nil {
+		log.Printf("find user's final-question error: %s\n", err.Error())
+		return nil, err
+	}
+	return questions, nil
+}
+
+func GetProjectTempQuestions(pid string) ([]TempQuestion, error) {
+	var questions []TempQuestion
+
+	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&questions)
+	if err != nil {
+		log.Printf("find project's temp-question error: %s", err.Error())
+		return nil, err
+	}
+	return questions, nil
+}
+
+func GetProjectFinalQuestions(pid string) ([]FinalQuestion, error) {
+	var questions []FinalQuestion
+
+	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&questions)
+	if err != nil {
+		log.Printf("find project's final-question error: %s\n", err.Error())
+		return nil, err
+	}
+	return questions, nil
 }

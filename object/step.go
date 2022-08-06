@@ -10,7 +10,7 @@ import (
 type Step struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
 	ProjectId   string             `json:"project_id"`
 	Index       int                `json:"index"`
@@ -61,13 +61,13 @@ func UpdateStep(id string, step *Step) bool {
 	return true
 }
 
-func AddStep(step *Step) bool {
-	affected, err := adapter.engine.Insert(step)
+func AddStep(step *Step) error {
+	_, err := adapter.engine.Insert(step)
 	if err != nil {
 		panic(err)
 	}
 
-	return affected != 0
+	return nil
 }
 
 func DeleteStep(step *Step) bool {

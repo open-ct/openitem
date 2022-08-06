@@ -14,6 +14,7 @@ import SigninPage from "./SigninPage";
 import i18next from "i18next";
 import PendingTaskPage from "./PendingTaskPage";
 import ProjectManagementPage from "./ProjectManagementPage";
+import PropositionPaperPage from "./PropositionPaperPage";
 
 const {Header, Footer} = Layout;
 
@@ -29,71 +30,73 @@ class App extends Component {
       selectedMenuKey: 0,
       account: undefined,
       uri: null,
-   };
+    };
 
     Setting.initServerUrl();
     Setting.initCasdoorSdk(Conf.AuthConfig);
- }
+  }
 
   getRemSize = () => {
     let whdef = 100 / 1920;
     let wW = window.innerWidth;
     let rem = wW * whdef;
     document.documentElement.style.fontSize = rem + "px";
- }
+  }
 
   componentDidMount = () => {
     window.resize = () => {
       this.getRemSize();
-   };
+    };
     this.getRemSize();
- }
+  }
 
   componentWillMount() {
     this.updateMenuKey();
     this.getAccount();
- }
+  }
 
   componentDidUpdate() {
     // eslint-disable-next-line no-restricted-globals
     const uri = location.pathname;
     if (this.state.uri !== uri) {
       this.updateMenuKey();
-   }
- }
+    }
+  }
 
   updateMenuKey() {
     // eslint-disable-next-line no-restricted-globals
     const uri = location.pathname;
     this.setState({
       uri: uri,
-   });
+    });
     if (uri === "/") {
       this.setState({selectedMenuKey: "/"});
-   } else if (uri.includes("/datasets")) {
+    } else if (uri.includes("/datasets")) {
       this.setState({selectedMenuKey: "/datasets"});
-   } else if (uri.includes("/pendingtasks")) {
+    } else if (uri.includes("/pendingtasks")) {
       this.setState({selectedMenuKey: "/pendingtasks"});
-   } else if (uri.includes("/projectmanagements")) {
+    } else if (uri.includes("/projectmanagements")) {
       this.setState({selectedMenuKey: "/projectmanagements"});
-   } else {
+    } else if (uri.includes("/propositionpapers")) {
+      this.setState({selectedMenuKey: "/propositionpapers"});
+    } else {
       this.setState({selectedMenuKey: "null"});
-   }
- }
+    }
+  }
 
   onUpdateAccount(account) {
     this.setState({
       account: account
-   });
- }
+    });
+  }
 
   setLanguage(account) {
     // let language = account?.language;
     let language = localStorage.getItem("language");
     if (language !== "" && language !== i18next.language) {
       Setting.setLanguage(language);
-   }
- }
+    }
+  }
 
   getAccount() {
     AccountBackend.getAccount()
@@ -101,13 +104,13 @@ class App extends Component {
         let account = res.data;
         if (account !== null) {
           this.setLanguage(account);
-       }
+        }
 
         this.setState({
           account: account,
-       });
-     });
- }
+        });
+      });
+  }
 
   signout() {
     AccountBackend.signout()
@@ -115,24 +118,24 @@ class App extends Component {
         if (res.status === "ok") {
           this.setState({
             account: null
-         });
+          });
 
           Setting.showMessage("success", "Successfully signed out, redirected to homepage");
           Setting.goToLink("/");
           // this.props.history.push("/");
-       } else {
+        } else {
           Setting.showMessage("error", `Signout failed: ${res.msg}`);
-       }
-     });
- }
+        }
+      });
+  }
 
   handleRightDropdownClick(e) {
     if (e.key === "/account") {
       Setting.openLink(Setting.getMyProfileUrl(this.state.account));
-   } else if (e.key === "/logout") {
+    } else if (e.key === "/logout") {
       this.signout();
-   }
- }
+    }
+  }
 
   renderAvatar() {
     if (this.state.account.avatar === "") {
@@ -141,14 +144,14 @@ class App extends Component {
           {Setting.getShortName(this.state.account.name)}
         </Avatar>
       );
-   } else {
+    } else {
       return (
         <Avatar src={this.state.account.avatar} style={{verticalAlign: "middle"}} size="large">
           {Setting.getShortName(this.state.account.name)}
         </Avatar>
       );
-   }
- }
+    }
+  }
 
   renderRightDropdown() {
     const menu = (
@@ -171,7 +174,7 @@ class App extends Component {
           &nbsp;
           {
             this.renderAvatar()
-         }
+          }
           &nbsp;
           &nbsp;
           {Setting.isMobile() ? null : Setting.getShortName(this.state.account.displayName)} &nbsp; <DownOutlined />
@@ -181,14 +184,14 @@ class App extends Component {
         </div>
       </Dropdown>
     );
- }
+  }
 
   renderAccount() {
     let res = [];
 
     if (this.state.account === undefined) {
       return null;
-   } else if (this.state.account === null) {
+    } else if (this.state.account === null) {
       res.push(
         <Menu.Item key="/signup" style={{float: "right", marginRight: "20px"}}>
           <a href={Setting.getSignupUrl()}>
@@ -210,19 +213,19 @@ class App extends Component {
           </a>
         </Menu.Item>
       );
-   } else {
+    } else {
       res.push(this.renderRightDropdown());
-   }
+    }
 
     return res;
- }
+  }
 
   renderMenu() {
     let res = [];
 
     if (this.state.account === null || this.state.account === undefined) {
       return [];
-   }
+    }
 
     res.push(
       <Menu.Item key="/">
@@ -251,27 +254,35 @@ class App extends Component {
       </Menu.Item>
     );
 
+    res.push(
+      <Menu.Item key="/propositionpapers">
+        <Link to="/propositionpapers">
+          {i18next.t("general:PropositionPapers")}
+        </Link>
+      </Menu.Item>
+    );
+
     return res;
- }
+  }
 
   renderHomeIfSignedIn(component) {
     if (this.state.account !== null && this.state.account !== undefined) {
       return <Redirect to="/" />;
-   } else {
+    } else {
       return component;
-   }
- }
+    }
+  }
 
   renderSigninIfNotSignedIn(component) {
     if (this.state.account === null) {
       sessionStorage.setItem("from", window.location.pathname);
       return <Redirect to="/signin" />;
-   } else if (this.state.account === undefined) {
+    } else if (this.state.account === undefined) {
       return null;
-   } else {
+    } else {
       return component;
-   }
- }
+    }
+  }
 
   renderContent() {
     return (
@@ -279,7 +290,7 @@ class App extends Component {
         <Header style={{padding: "0", marginBottom: "3px"}}>
           {
             Setting.isMobile() ? null : <a className="logo" href={"/"} />
-         }
+          }
           <Menu
             // theme="dark"
             mode={"horizontal"}
@@ -288,10 +299,10 @@ class App extends Component {
           >
             {
               this.renderMenu()
-           }
+            }
             {
               this.renderAccount()
-           }
+            }
             <Menu.Item key="en" className="rightDropDown" style={{float: "right", cursor: "pointer", marginLeft: "-10px", marginRight: "20px"}}>
               <div className="rightDropDown" style={{float: "right", cursor: "pointer"}} onClick={() => {Setting.changeLanguage("en");}}>
                 &nbsp;&nbsp;&nbsp;&nbsp;<IconFont type="icon-en" />
@@ -319,11 +330,12 @@ class App extends Component {
           <Route path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)} />
           <Route path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)} />
           <Route path="/projectmanagements/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)} />
+          <Route path="/propositionpapers" render={(props) => this.renderSigninIfNotSignedIn(<PropositionPaperPage account={this.state.account} {...props} />)} />
           <Route path="/" render={(props) => <HomePage account={this.state.account} {...props} />} />
         </Switch>
       </div>
     );
- }
+  }
 
   renderFooter() {
     // How to keep your footer where it belongs ?
@@ -335,12 +347,12 @@ class App extends Component {
           borderTop: "1px solid #e8e8e8",
           backgroundColor: "white",
           textAlign: "center",
-       }
-     }>
+        }
+      }>
         Made with <span style={{color: "rgb(255, 255, 255)"}}>❤️</span> by <a style={{fontWeight: "bold", color: "black"}} target="_blank" rel="noreferrer" href="https://item.open-ct.com">OpenItem</a>, {Setting.isMobile() ? "Mobile" : "Desktop"} View
       </Footer>
     );
- }
+  }
 
   render() {
     return (
@@ -349,14 +361,14 @@ class App extends Component {
         <div id="content-wrap">
           {
             this.renderContent()
-         }
+          }
         </div>
         {
           this.renderFooter()
-       }
+        }
       </div>
     );
- }
+  }
 }
 
 export default withRouter(App);

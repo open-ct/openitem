@@ -2,9 +2,10 @@ package object
 
 import (
 	"fmt"
-	"github.com/open-ct/openitem/util"
 	"log"
 	"time"
+
+	"github.com/open-ct/openitem/util"
 	"xorm.io/builder"
 	"xorm.io/core"
 )
@@ -111,7 +112,7 @@ func CreateNewTestpaper(request *TempTestpaper) (string, error) {
 
 	err := AddTempTestpaper(&newTestPaper)
 	if err != nil {
-		log.Printf("insert new temp-tes-paper error: %s", err.Error())
+		log.Println("insert new temp-tes-paper error")
 		return "", err
 	}
 
@@ -154,7 +155,7 @@ func UpdateTestpaper(request *TempTestpaper) (string, error) {
 	}
 
 	updatedId := fmt.Sprintf("%s/%s", updatedTestPaper.Owner, updatedTestPaper.Name)
-	log.Printf("temp-test-paper updated: %s\n", updatedId)
+	log.Printf("temp-test-paper updated: %s", updatedId)
 
 	return updatedId, nil
 }
@@ -251,7 +252,7 @@ func FinishTempTestpaper(tid string) (string, error) {
 
 	finalTestpaperId := fmt.Sprintf("%s/%s", finishedTestPaper.Owner, finishedTestPaper.Name)
 
-	log.Printf("convert to final successfully: %s\n", finalTestpaperId)
+	log.Printf("convert to final successfully: %s", finalTestpaperId)
 	return finalTestpaperId, nil
 }
 

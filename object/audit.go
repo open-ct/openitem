@@ -1,9 +1,11 @@
 package object
 
 import (
+	"log"
 	"time"
 
 	"github.com/open-ct/openitem/util"
+	"xorm.io/builder"
 	"xorm.io/core"
 )
 
@@ -64,11 +66,36 @@ func AddAudit(audit *Audit) bool {
 	return affected != 0
 }
 
-func DeleteAudit(audit *Audit) bool {
-	affected, err := adapter.engine.ID(core.PK{audit.Owner, audit.Name}).Delete(&Audit{})
-	if err != nil {
-		panic(err)
-	}
+func GetOneAudit(auditId string) (*Audit, error) {
+	var audit Audit
 
-	return affected != 0
+	owner, name := util.GetOwnerAndNameFromId(auditId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&audit)
+	if err != nil {
+		log.Println("find audit info err: " + err.Error())
+		return nil, err
+	}
+	return &audit, nil
+}
+
+func GetSubmitAudits(submitId string) (*[]Audit, error) {
+	var submit Submit
+
+	owner, name := util.GetOwnerAndNameFromId(submitId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&submit)
+	if err != nil {
+		log.Println("address submit info err: " + err.Error())
+		return nil, err
+	}
+	var audits []Audit
+	for _, content := range submit.Contents {
+		var audit Audit
+		_, err := adapter.engine.Where(builder.Eq{"submit_content": content.Uuid}).Get(&audit)
+		if err != nil {
+			continue
+		} else {
+			audits = append(audits, audit)
+		}
+	}
+	return &audits, nil
 }

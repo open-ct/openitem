@@ -71,6 +71,12 @@ type FinalTestpaper struct {
 	DeletedAt time.Time `xorm:"deleted" json:"deleted_at"`
 }
 
+type AddTestpaperCommentRequest struct {
+	TestpaperId string `json:"testpaper_id"`
+	Comment     string `json:"comment"`
+	Author      string `json:"author"`
+}
+
 func AddTempTestpaper(tempTestpaper *TempTestpaper) error {
 	_, err := adapter.engine.Insert(tempTestpaper)
 	if err != nil {
@@ -86,6 +92,99 @@ func AddFinalTestpaper(finalTestpaper *FinalTestpaper) error {
 		return err
 	}
 
+	return nil
+}
+
+func CreateNewTestpaper(request *TempTestpaper) (string, error) {
+	newTestPaper := TempTestpaper{
+		Owner:       request.Owner,
+		Name:        request.Name,
+		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+
+		IsRoot:        true,
+		Base:          fmt.Sprintf("%s/%s", request.Owner, request.Name),
+		SourceProject: request.SourceProject,
+		Author:        request.Author,
+		Title:         request.Title,
+		Info:          request.Info,
+		Props:         request.Props,
+	}
+
+	err := AddTempTestpaper(&newTestPaper)
+	if err != nil {
+		log.Println("insert new temp-tes-paper error")
+		return "", err
+	}
+
+	tempTestpaperId := fmt.Sprintf("%s/%s", request.Owner, request.Name)
+
+	log.Printf("new temp-test-paper created: %s\n", tempTestpaperId)
+	return tempTestpaperId, nil
+}
+
+func UpdateTestpaper(request *TempTestpaper) (string, error) {
+	var oldTestPaper TempTestpaper
+
+	owner, name := util.GetOwnerAndNameFromId(request.Base)
+
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&oldTestPaper)
+
+	if err != nil {
+		log.Println("base test-paper cannot find")
+		return "", err
+	}
+
+	updatedTestPaper := TempTestpaper{
+		Owner:       request.Owner,
+		Name:        request.Name,
+		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+
+		IsRoot:        false,
+		Base:          request.Base,
+		SourceProject: oldTestPaper.SourceProject,
+		Author:        request.Author,
+		Title:         request.Title,
+		Info:          request.Info,
+		Props:         request.Props,
+	}
+
+	err = AddTempTestpaper(&updatedTestPaper)
+	if err != nil {
+		log.Printf("updated temp-tes-paper error: %s", err.Error())
+		return "", err
+	}
+
+	updatedId := fmt.Sprintf("%s/%s", updatedTestPaper.Owner, updatedTestPaper.Name)
+	log.Printf("temp-test-paper updated: %s", updatedId)
+
+	return updatedId, nil
+}
+
+func AddTestpaperComment(requset *AddTestpaperCommentRequest) error {
+	newComment := TestpaperComment{
+		TimePoint: time.Now(),
+		Comment:   requset.Comment,
+		Author:    requset.Author,
+	}
+	var commentTestPaper TempTestpaper
+
+	owner, name := util.GetOwnerAndNameFromId(requset.TestpaperId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&commentTestPaper)
+
+	if err != nil {
+		log.Printf("cannot address the test-paper: %s", err.Error())
+		return err
+	}
+
+	newComments := append(commentTestPaper.CommentRecord, newComment)
+	newTempTestpaper := TempTestpaper{CommentRecord: newComments}
+
+	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("comment_record").Update(&newTempTestpaper)
+
+	if err != nil {
+		log.Printf("add new comment error: %s", err.Error())
+		return err
+	}
 	return nil
 }
 

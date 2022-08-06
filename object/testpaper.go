@@ -1,9 +1,11 @@
 package object
 
 import (
-	"github.com/open-ct/openitem/util"
+	"fmt"
 	"log"
 	"time"
+
+	"github.com/open-ct/openitem/util"
 	"xorm.io/builder"
 	"xorm.io/core"
 )
@@ -94,7 +96,7 @@ func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&endPointTestPaper)
 	if err != nil {
-		log.Println("cannot get the end test-paper: " + err.Error())
+		log.Printf("cannot get the end test-paper: %s", err.Error())
 		return nil, err
 	}
 
@@ -110,7 +112,7 @@ func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 
 		_, err := adapter.engine.ID(core.PK{currentOwner, currentName}).Get(&currentNode)
 		if err != nil {
-			log.Println("find middle node cannot find: " + err.Error())
+			log.Printf("find middle node cannot find: %s", err.Error())
 			return testPapers, err
 		}
 		testPapers = append(testPapers, currentNode)
@@ -126,7 +128,7 @@ func FinishTempTestpaper(tid string) (string, error) {
 
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&finishedTestPaper)
 	if err != nil {
-		log.Println("error to find finished error: " + err.Error())
+		log.Printf("error to find finished error: %s", err.Error())
 		return "", nil
 	}
 
@@ -145,11 +147,11 @@ func FinishTempTestpaper(tid string) (string, error) {
 	err = AddFinalTestpaper(&newFinalPaper)
 
 	if err != nil {
-		log.Println("conver to final-test-paper failed: " + err.Error())
+		log.Printf("conver to final-test-paper failed: %s", err.Error())
 		return "", err
 	}
 
-	finalTestpaperId := finishedTestPaper.Owner + "/" + finishedTestPaper.Name
+	finalTestpaperId := fmt.Sprintf("%s/%s", finishedTestPaper.Owner, finishedTestPaper.Name)
 
 	log.Printf("convert to final successfully: %s", finalTestpaperId)
 	return finalTestpaperId, nil
@@ -160,7 +162,7 @@ func GetUserTempTestpaper(uid string) ([]TempTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&testPapers)
 	if err != nil {
-		log.Println("find user's temp-test-paper error: " + err.Error())
+		log.Printf("find user's temp-test-paper error: %s", err.Error())
 		return nil, err
 	}
 	return testPapers, nil
@@ -171,7 +173,7 @@ func GetUserFinalTestpaper(uid string) ([]FinalTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&testPapers)
 	if err != nil {
-		log.Println("find user's final-test-paper error: " + err.Error())
+		log.Printf("find user's final-test-paper error: %s", err.Error())
 		return nil, err
 	}
 	return testPapers, nil
@@ -182,7 +184,7 @@ func GetProjectTempTestpaper(pid string) ([]TempTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&testPapers)
 	if err != nil {
-		log.Println("find project's temp-test-paper error: " + err.Error())
+		log.Printf("find project's temp-test-paper error: %s", err.Error())
 		return nil, err
 	}
 	return testPapers, nil
@@ -193,7 +195,7 @@ func GetProjecgtFinalTestpaper(pid string) ([]FinalTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&testPapers)
 	if err != nil {
-		log.Println("find project's final-test-paper error: " + err.Error())
+		log.Printf("find project's final-test-paper error: %s", err.Error())
 		return nil, err
 	}
 	return testPapers, nil

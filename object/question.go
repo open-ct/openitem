@@ -1,8 +1,9 @@
 package object
 
 import (
-	"github.com/open-ct/openitem/util"
 	"time"
+
+	"github.com/open-ct/openitem/util"
 	"xorm.io/core"
 )
 
@@ -70,12 +71,12 @@ type TempQuestion struct {
 	Base          string                `json:"base"`           // 若不是root, 需要设置上级题目, 进行版本管理
 	SourceProject string                `json:"source_project"` // 项目来源
 	Author        string                `json:"author"`
-	Info          QuestionInfo          `xorm:"mediumtext" json:"info"`
-	BasicProps    QuestionBasicProps    `xorm:"mediumtext" json:"basic_props"`
-	SpecProps     QuestionSpecProps     `xorm:"mediumtext" json:"spec_props"`
-	ExtraProps    QuestionExtraProps    `xorm:"mediumtext" json:"extra_props"`
-	AdvancedProps QuestionAdvancedProps `xorm:"mediumtext" json:"advanced_props"`
-	ApplyRecord   QuestionApplyRecord   `xorm:"mediumtext" json:"apply_record"`
+	Info          QuestionInfo          `xorm:"mediumtext json" json:"info"`
+	BasicProps    QuestionBasicProps    `xorm:"mediumtext json" json:"basic_props"`
+	SpecProps     QuestionSpecProps     `xorm:"mediumtext json" json:"spec_props"`
+	ExtraProps    QuestionExtraProps    `xorm:"mediumtext json" json:"extra_props"`
+	AdvancedProps QuestionAdvancedProps `xorm:"mediumtext json" json:"advanced_props"`
+	ApplyRecord   QuestionApplyRecord   `xorm:"mediumtext json" json:"apply_record"`
 	CommentRecord []QuestionComment     `xorm:"mediumtext" json:"comment_record"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
@@ -91,16 +92,22 @@ type FinalQuestion struct {
 	SourceProject string                `json:"source_project"` // 来源项目id
 	FinalVersion  string                `json:"final_version"`  // 录入final的最后一个版本
 	Author        string                `json:"author"`
-	Info          QuestionInfo          `xorm:"mediumtext" json:"info"`
-	BasicProps    QuestionBasicProps    `xorm:"mediumtext" json:"basic_props"`
-	SpecProps     QuestionSpecProps     `xorm:"mediumtext" json:"spec_props"`
-	ExtraProps    QuestionExtraProps    `xorm:"mediumtext" json:"extra_props"`
-	AdvancedProps QuestionAdvancedProps `xorm:"mediumtext" json:"advanced_props"`
-	ApplyRecord   QuestionApplyRecord   `xorm:"mediumtext" json:"apply_record"`
+	Info          QuestionInfo          `xorm:"mediumtext json" json:"info"`
+	BasicProps    QuestionBasicProps    `xorm:"mediumtext json" json:"basic_props"`
+	SpecProps     QuestionSpecProps     `xorm:"mediumtext json" json:"spec_props"`
+	ExtraProps    QuestionExtraProps    `xorm:"mediumtext json" json:"extra_props"`
+	AdvancedProps QuestionAdvancedProps `xorm:"mediumtext json" json:"advanced_props"`
+	ApplyRecord   QuestionApplyRecord   `xorm:"mediumtext json" json:"apply_record"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
 	DeletedAt time.Time `xorm:"deleted" json:"deleted_at"`
+}
+
+type AddQuestionCommentRequest struct {
+	QuestionId string `json:"question_id"`
+	Comment    string `json:"comment"`
+	Author     string `json:"'author'"`
 }
 
 func getTempQuestion(owner string, name string) *TempQuestion {
@@ -137,13 +144,13 @@ func UpdateTempQuestion(id string, tempQuestion *TempQuestion) bool {
 	return true
 }
 
-func AddTempQuestion(tempQuestion *TempQuestion) bool {
-	affected, err := adapter.engine.Insert(tempQuestion)
+func AddTempQuestion(tempQuestion *TempQuestion) error {
+	_, err := adapter.engine.Insert(tempQuestion)
 	if err != nil {
 		panic(err)
 	}
 
-	return affected != 0
+	return nil
 }
 
 func DeleteTempQuestion(tempQuestion *TempQuestion) bool {
@@ -189,13 +196,13 @@ func UpdateFinalQuestion(id string, finalQuestion *FinalQuestion) bool {
 	return true
 }
 
-func AddFinalQuestion(finalQuestion *FinalQuestion) bool {
-	affected, err := adapter.engine.Insert(finalQuestion)
+func AddFinalQuestion(finalQuestion *FinalQuestion) error {
+	_, err := adapter.engine.Insert(finalQuestion)
 	if err != nil {
 		panic(err)
 	}
 
-	return affected != 0
+	return nil
 }
 
 func DeleteFinalQuestion(finalQuestion *FinalQuestion) bool {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/open-ct/openitem/util"
+	"xorm.io/builder"
 	"xorm.io/core"
 )
 
@@ -253,4 +254,48 @@ func FinishTempTestpaper(tid string) (string, error) {
 
 	log.Printf("convert to final successfully: %s", finalTestpaperId)
 	return finalTestpaperId, nil
+}
+
+func GetUserTempTestpaper(uid string) ([]TempTestpaper, error) {
+	var testPapers []TempTestpaper
+
+	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&testPapers)
+	if err != nil {
+		log.Printf("find user's temp-test-paper error: %s", err.Error())
+		return nil, err
+	}
+	return testPapers, nil
+}
+
+func GetUserFinalTestpaper(uid string) ([]FinalTestpaper, error) {
+	var testPapers []FinalTestpaper
+
+	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&testPapers)
+	if err != nil {
+		log.Printf("find user's final-test-paper error: %s", err.Error())
+		return nil, err
+	}
+	return testPapers, nil
+}
+
+func GetProjectTempTestpaper(pid string) ([]TempTestpaper, error) {
+	var testPapers []TempTestpaper
+
+	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&testPapers)
+	if err != nil {
+		log.Printf("find project's temp-test-paper error: %s", err.Error())
+		return nil, err
+	}
+	return testPapers, nil
+}
+
+func GetProjecgtFinalTestpaper(pid string) ([]FinalTestpaper, error) {
+	var testPapers []FinalTestpaper
+
+	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&testPapers)
+	if err != nil {
+		log.Printf("find project's final-test-paper error: %s", err.Error())
+		return nil, err
+	}
+	return testPapers, nil
 }

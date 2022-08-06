@@ -295,7 +295,7 @@ func TraceQuestionVersion(qid string) ([]TempQuestion, error) {
 
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&endPointQuestion)
 	if err != nil {
-		log.Printf("find base questions failed, qid: [%s] %s", qid, err.Error())
+		log.Printf("find base questions failed, qid: [%s] %s\n", qid, err.Error())
 		return nil, err
 	}
 
@@ -311,7 +311,7 @@ func TraceQuestionVersion(qid string) ([]TempQuestion, error) {
 
 		_, err := adapter.engine.ID(core.PK{currentOwner, currentName}).Get(&currentNode)
 		if err != nil {
-			log.Printf("find middle-node questions failed, qid: [%s] %s", currentBaseId, err.Error())
+			log.Printf("find middle-node questions failed, qid: [%s] %s\n", currentBaseId, err.Error())
 			return questions, err
 		}
 		questions = append(questions, currentNode)
@@ -332,7 +332,7 @@ func AddQuestionComment(request *AddQuestionCommentRequest) error {
 	owner, name := util.GetOwnerAndNameFromId(request.QuestionId)
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&commentQuestion)
 	if err != nil {
-		log.Printf("cannot address the question: %s for %s", request.QuestionId, err.Error())
+		log.Printf("cannot address the question: %s for %s\n", request.QuestionId, err.Error())
 		return err
 	}
 	newComments := append(commentQuestion.CommentRecord, newComment)
@@ -340,7 +340,7 @@ func AddQuestionComment(request *AddQuestionCommentRequest) error {
 
 	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("comment_record").Update(&newTempQuestion)
 	if err != nil {
-		log.Printf("add new comment error: %s", err.Error())
+		log.Printf("add new comment error: %s\n", err.Error())
 		return err
 	}
 	return nil
@@ -352,7 +352,7 @@ func FinishTempQuestion(qid string) (string, error) {
 	owner, name := util.GetOwnerAndNameFromId(qid)
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&tempQuestion)
 	if err != nil {
-		log.Printf("cannot address the question: %s for %s", qid, err.Error())
+		log.Printf("cannot address the question: %s for %s\n", qid, err.Error())
 		return "", err
 	}
 	finalQuestion := FinalQuestion{
@@ -373,7 +373,7 @@ func FinishTempQuestion(qid string) (string, error) {
 
 	err = AddFinalQuestion(&finalQuestion)
 	if err != nil {
-		log.Printf("conver to final-question failed: %s", err.Error())
+		log.Printf("conver to final-question failed: %s\n", err.Error())
 		return "", err
 	}
 
@@ -410,7 +410,7 @@ func GetProjectTempQuestions(pid string) ([]TempQuestion, error) {
 
 	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&questions)
 	if err != nil {
-		log.Printf("find project's temp-question error: %s", err.Error())
+		log.Printf("find project's temp-question error: %s\n", err.Error())
 		return nil, err
 	}
 	return questions, nil

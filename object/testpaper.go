@@ -2,9 +2,11 @@ package object
 
 import (
 	"fmt"
-	"github.com/open-ct/openitem/util"
 	"log"
 	"time"
+
+	"github.com/open-ct/openitem/util"
+	"xorm.io/builder"
 	"xorm.io/core"
 )
 
@@ -116,7 +118,7 @@ func CreateNewTestpaper(request *TempTestpaper) (string, error) {
 
 	tempTestpaperId := fmt.Sprintf("%s/%s", request.Owner, request.Name)
 
-	log.Printf("new temp-test-paper created: %s", tempTestpaperId)
+	log.Printf("new temp-test-paper created: %s\n", tempTestpaperId)
 	return tempTestpaperId, nil
 }
 

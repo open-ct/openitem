@@ -1,8 +1,11 @@
 package object
 
 import (
-	"github.com/open-ct/openitem/util"
+	"log"
 	"time"
+
+	"github.com/open-ct/openitem/util"
+	"xorm.io/builder"
 	"xorm.io/core"
 )
 
@@ -63,11 +66,84 @@ func AddAudit(audit *Audit) bool {
 	return affected != 0
 }
 
-func DeleteAudit(audit *Audit) bool {
-	affected, err := adapter.engine.ID(core.PK{audit.Owner, audit.Name}).Delete(&Audit{})
-	if err != nil {
-		panic(err)
-	}
+func GetOneAudit(auditId string) (*Audit, error) {
+	var audit Audit
 
-	return affected != 0
+	owner, name := util.GetOwnerAndNameFromId(auditId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&audit)
+	if err != nil {
+		log.Println("find audit info err: " + err.Error())
+		return nil, err
+	}
+	return &audit, nil
 }
+
+func GetSubmitAudits(submitId string) (*[]Audit, error) {
+	var submit Submit
+
+	owner, name := util.GetOwnerAndNameFromId(submitId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&submit)
+	if err != nil {
+		log.Println("address submit info err: " + err.Error())
+		return nil, err
+	}
+	var audits []Audit
+	for _, content := range submit.Contents {
+		var audit Audit
+		_, err := adapter.engine.Where(builder.Eq{"submit_content": content.Uuid}).Get(&audit)
+		if err != nil {
+			continue
+		} else {
+			audits = append(audits, audit)
+		}
+	}
+	return &audits, nil
+}
+
+// func MakeOneAudit(req *makeOneAudit) (*Audit, int) {
+// 	newAudit := Audit{
+// 		DefaultField:  field.DefaultField{},
+// 		Uuid:          utils.GenUuidV4(),
+// 		SubmitContent: req.SubmitContentId,
+// 		Result:        req.Result,
+// 		Comment:       req.Comment,
+// 		Auditor:       req.UserId,
+// 	}
+// 	insert, err := database.MgoAudits.InsertOne(context.Background(), &newAudit)
+// 	if err != nil {
+// 		logger.Recorder.Warn("[mongo create new audit failed] " + err.Error())
+// 		return nil, response.AuditCreateFail
+// 	}
+// 	logger.Recorder.Info("[Mongo Insert] " + fmt.Sprintf("%s", insert.InsertedID))
+// 	return &newAudit, response.SUCCESS
+// }
+//
+// func CorrectAudit(req *request.UpdateAudit) (*Audit, int) {
+// 	err := database.MgoAudits.UpdateOne(context.Background(), bson.M{
+// 		"uuid": req.AuditId,
+// 	}, bson.M{
+// 		"$set": bson.M{
+// 			"result":  req.NewResult,
+// 			"comment": req.NewComment,
+// 			"auditor": req.NewAuditor,
+// 		},
+// 	})
+// 	if err != nil {
+// 		logger.Recorder.Warn("[mongo update new audit failed] " + err.Error())
+// 		return nil, response.AuditCorrectFail
+// 	}
+// 	var newAudit Audit
+// 	database.MgoAudits.Find(context.Background(), bson.M{"uuid": req.AuditId}).One(&newAudit)
+// 	return &newAudit, response.SUCCESS
+// }
+//
+// func DeleteAudit(auditId string) int {
+// 	// delete in audit collection
+// 	err := database.MgoAudits.Remove(context.Background(), bson.M{
+// 		"uuid": auditId,
+// 	})
+// 	if err != nil {
+// 		return response.AuditDeleteFail
+// 	}
+// 	return response.SUCCESS
+// }

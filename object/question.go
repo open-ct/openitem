@@ -103,6 +103,12 @@ type FinalQuestion struct {
 	DeletedAt time.Time `xorm:"deleted" json:"deleted_at"`
 }
 
+type AddQuestionCommentRequest struct {
+	QuestionId string `json:"question_id"`
+	Comment    string `json:"comment"`
+	Author     string `json:"'author'"`
+}
+
 func getTempQuestion(owner string, name string) *TempQuestion {
 	tempQuestion := TempQuestion{Owner: owner, Name: name}
 	existed, err := adapter.engine.Get(&tempQuestion)

@@ -69,12 +69,6 @@ type FinalTestpaper struct {
 	DeletedAt time.Time `xorm:"deleted" json:"deleted_at"`
 }
 
-type AddQuestionCommentRequest struct {
-	QuestionId string `json:"question_id"`
-	Comment    string `json:"comment"`
-	Author     string `json:"'author'"`
-}
-
 type AddTestpaperCommentRequest struct {
 	TestpaperId string `json:"testpaper_id"`
 	Comment     string `json:"comment"`

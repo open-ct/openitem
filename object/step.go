@@ -55,6 +55,16 @@ type DeleteStepTimePointRequest struct {
 	PointIndex int    `json:"point_index"`
 }
 
+type StepDataStatistic struct {
+	Total     float64 `json:"total"`
+	PassRate  float64 `json:"pass_rate"`
+	Pass      float64 `json:"pass"`
+	Returned  float64 `json:"returned"`
+	ToUpload  float64 `json:"to_upload"`
+	ToAudit   float64 `json:"to_audit"`
+	ToCorrect float64 `json:"to_correct"`
+}
+
 func getStep(owner string, name string) *Step {
 	step := Step{Owner: owner, Name: name}
 	existed, err := adapter.engine.Get(&step)
@@ -102,7 +112,7 @@ func CreateOneStep(req *Step) (string, error) {
 	newStep := Step{
 		Owner:       req.Owner,
 		Name:        req.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+		CreatedTime: util.GetCurrentTime(),
 
 		ProjectId:   req.ProjectId,
 		Index:       req.Index,
@@ -185,21 +195,7 @@ func UpdateStepInfo(req *Step) error {
 		return err
 	}
 
-	var newStep Step
-	if req.Name != "" {
-		newStep.Name = req.Name
-	}
-	if req.Description != "" {
-		newStep.Description = req.Description
-	}
-	if req.Requirement != "" {
-		newStep.Requirement = req.Requirement
-	}
-	if req.Deadline != oldStep.Deadline {
-		newStep.Deadline = req.Deadline
-	}
-
-	_, err = adapter.engine.ID(core.PK{oldStep.Owner, oldStep.Name}).Update(&newStep)
+	_, err = adapter.engine.ID(core.PK{oldStep.Owner, oldStep.Name}).Update(req)
 	if err != nil {
 		log.Printf("update step information: %s\n", err.Error())
 		return err
@@ -277,15 +273,8 @@ func DeleteStepTimePoint(req *DeleteStepTimePointRequest) error {
 	return nil
 }
 
-func GetStepDataStatistic(stepId string) (map[string]float64, error) {
-	dataStatistic := make(map[string]float64)
-	dataStatistic["total"] = 0
-	dataStatistic["pass_rate"] = 0
-	dataStatistic["pass"] = 0
-	dataStatistic["return"] = 0
-	dataStatistic["to_upload"] = 0
-	dataStatistic["to_audit"] = 0
-	dataStatistic["to_correct"] = 0
+func GetStepDataStatistic(stepId string) (*StepDataStatistic, error) {
+	var dataStatistic StepDataStatistic
 	var submits []Submit
 
 	err := adapter.engine.Where(builder.Eq{"step_id": stepId}).Find(&submits)
@@ -293,36 +282,36 @@ func GetStepDataStatistic(stepId string) (map[string]float64, error) {
 		log.Printf("find submits info err: " + err.Error())
 		return nil, err
 	}
-	dataStatistic["total"] = float64(len(submits))
+	dataStatistic.Total = float64(len(submits))
 	for _, submit := range submits {
 		contentCount := len(submit.Contents)
 		if contentCount == 0 {
-			dataStatistic["to_upload"] += 1
+			dataStatistic.ToUpload += 1
 			continue
 		}
 		lastContentId := submit.Contents[contentCount-1].Uuid
 		var lastAudit Audit
 		_, err := adapter.engine.Where(builder.Eq{"submit_content": lastContentId}).Get(&lastAudit)
 		if err != nil {
-			dataStatistic["to_audit"] += 1
+			dataStatistic.ToAudit += 1
 			continue
 		}
-		if lastAudit.Result == 0 {
-			dataStatistic["return"] += 1
+		if lastAudit.Result == "not pass" {
+			dataStatistic.Returned += 1
 		}
-		if lastAudit.Result == 1 {
-			dataStatistic["pass"] += 1
+		if lastAudit.Result == "pass" {
+			dataStatistic.Pass += 1
 		}
-		if lastAudit.Result == 2 {
-			dataStatistic["to_correct"] += 1
+		if lastAudit.Result == "need correct" {
+			dataStatistic.ToCorrect += 1
 		}
 	}
-	if dataStatistic["total"] == 0 {
-		dataStatistic["pass_rate"] = 0
+	if dataStatistic.Total == 0 {
+		dataStatistic.PassRate = 0
 	} else {
-		dataStatistic["pass_rate"] = dataStatistic["pass"] / dataStatistic["total"]
+		dataStatistic.PassRate = dataStatistic.Pass / dataStatistic.Total
 	}
-	return dataStatistic, nil
+	return &dataStatistic, nil
 }
 
 func DeleteStep(stepId string) error {

@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {Switch, Route, Redirect} from "react-router-dom";
 import {PageHeader, Tabs, Button, Descriptions, Spin} from "antd";
-// import Step from '../../components/Step'
+import Step from "./Step";
 import BuildTeam from "./BuildTeam";
 import "./ProjectManagementPage.less";
 
@@ -280,7 +280,7 @@ export default class ProjectManagementPage extends Component {
                             <Switch>
                                 {
                                     this.state.projectBaseInfo.steps.map(item => (
-                                        <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : BuildTeam} exact key={item.Id}></Route>
+                                        <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
                                         ))
                                     }
                                     <Redirect from={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`}></Redirect>

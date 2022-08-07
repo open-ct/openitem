@@ -36,4 +36,17 @@ func initAPI() {
 	beego.Router("/api/review/proj", &controllers.ApiController{}, "PUT:UpdateProjectInfo")
 	beego.Router("/api/review/proj/basic", &controllers.ApiController{}, "GET:GetBasicInfo")
 	beego.Router("/api/review/proj/detailed", &controllers.ApiController{}, "GET:GetDetailedInfo")
+	// audit
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "GET:GetOneAudit")
+	beego.Router("/api/review/proj/audits", &controllers.ApiController{}, "GET:GetAuditsInSubmit")
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "POST:CreateOneAudit")
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "PUT:CorrectAudit")
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "DELETE:DeleteAudit")
+
+	// file
+	beego.Router("/api/review/file", &controllers.ApiController{}, "POST:UploadFile")
+	beego.Router("/api/review/file", &controllers.ApiController{}, "GET:DownloadFile")
+	beego.Router("/api/review/file/info", &controllers.ApiController{}, "GET:GetFileInfo")
+	beego.Router("/api/review/file/search", &controllers.ApiController{}, "POST:SearchFiles")
+	beego.Router("/api/review/file", &controllers.ApiController{}, "DELETE:DeleteFile")
 }

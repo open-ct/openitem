@@ -150,12 +150,12 @@ func UpdateTestpaper(request *TempTestpaper) (string, error) {
 
 	err = AddTempTestpaper(&updatedTestPaper)
 	if err != nil {
-		log.Printf("updated temp-tes-paper error: %s", err.Error())
+		log.Printf("updated temp-tes-paper error: %s\n", err.Error())
 		return "", err
 	}
 
 	updatedId := fmt.Sprintf("%s/%s", updatedTestPaper.Owner, updatedTestPaper.Name)
-	log.Printf("temp-test-paper updated: %s", updatedId)
+	log.Printf("temp-test-paper updated: %s\n", updatedId)
 
 	return updatedId, nil
 }
@@ -172,7 +172,7 @@ func AddTestpaperComment(requset *AddTestpaperCommentRequest) error {
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&commentTestPaper)
 
 	if err != nil {
-		log.Printf("cannot address the test-paper: %s", err.Error())
+		log.Printf("cannot address the test-paper: %s\n", err.Error())
 		return err
 	}
 
@@ -182,7 +182,7 @@ func AddTestpaperComment(requset *AddTestpaperCommentRequest) error {
 	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("comment_record").Update(&newTempTestpaper)
 
 	if err != nil {
-		log.Printf("add new comment error: %s", err.Error())
+		log.Printf("add new comment error: %s\n", err.Error())
 		return err
 	}
 	return nil
@@ -195,7 +195,7 @@ func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&endPointTestPaper)
 	if err != nil {
-		log.Printf("cannot get the end test-paper: %s", err.Error())
+		log.Printf("cannot get the end test-paper: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -211,7 +211,7 @@ func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 
 		_, err := adapter.engine.ID(core.PK{currentOwner, currentName}).Get(&currentNode)
 		if err != nil {
-			log.Printf("find middle node cannot find: %s", err.Error())
+			log.Printf("find middle node cannot find: %s\n", err.Error())
 			return testPapers, err
 		}
 		testPapers = append(testPapers, currentNode)
@@ -227,7 +227,7 @@ func FinishTempTestpaper(tid string) (string, error) {
 
 	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&finishedTestPaper)
 	if err != nil {
-		log.Printf("error to find finished error: %s", err.Error())
+		log.Printf("error to find finished error: %s\n", err.Error())
 		return "", nil
 	}
 
@@ -246,13 +246,13 @@ func FinishTempTestpaper(tid string) (string, error) {
 	err = AddFinalTestpaper(&newFinalPaper)
 
 	if err != nil {
-		log.Printf("conver to final-test-paper failed: %s", err.Error())
+		log.Printf("conver to final-test-paper failed: %s\n", err.Error())
 		return "", err
 	}
 
 	finalTestpaperId := fmt.Sprintf("%s/%s", finishedTestPaper.Owner, finishedTestPaper.Name)
 
-	log.Printf("convert to final successfully: %s", finalTestpaperId)
+	log.Printf("convert to final successfully: %s\n", finalTestpaperId)
 	return finalTestpaperId, nil
 }
 
@@ -261,7 +261,7 @@ func GetUserTempTestpaper(uid string) ([]TempTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&testPapers)
 	if err != nil {
-		log.Printf("find user's temp-test-paper error: %s", err.Error())
+		log.Printf("find user's temp-test-paper error: %s\n", err.Error())
 		return nil, err
 	}
 	return testPapers, nil
@@ -272,7 +272,7 @@ func GetUserFinalTestpaper(uid string) ([]FinalTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&testPapers)
 	if err != nil {
-		log.Printf("find user's final-test-paper error: %s", err.Error())
+		log.Printf("find user's final-test-paper error: %s\n", err.Error())
 		return nil, err
 	}
 	return testPapers, nil
@@ -283,7 +283,7 @@ func GetProjectTempTestpaper(pid string) ([]TempTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&testPapers)
 	if err != nil {
-		log.Printf("find project's temp-test-paper error: %s", err.Error())
+		log.Printf("find project's temp-test-paper error: %s\n", err.Error())
 		return nil, err
 	}
 	return testPapers, nil
@@ -294,7 +294,7 @@ func GetProjecgtFinalTestpaper(pid string) ([]FinalTestpaper, error) {
 
 	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&testPapers)
 	if err != nil {
-		log.Printf("find project's final-test-paper error: %s", err.Error())
+		log.Printf("find project's final-test-paper error: %s\n", err.Error())
 		return nil, err
 	}
 	return testPapers, nil

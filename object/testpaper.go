@@ -39,7 +39,7 @@ type TestpaperComment struct {
 type TempTestpaper struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
 	IsRoot        bool               `json:"is_root"`
 	Base          string             `json:"base"`

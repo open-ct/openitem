@@ -10,7 +10,7 @@ import (
 type Submit struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
 	StepId      string    `json:"step_id"`
 	Title       string    `json:"title"`

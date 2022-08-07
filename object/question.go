@@ -68,7 +68,7 @@ type QuestionApplyRecord struct {
 type TempQuestion struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
 	IsRoot        bool                  `json:"is_root"`        // 临时题目是否是根
 	Base          string                `json:"base"`           // 若不是root, 需要设置上级题目, 进行版本管理

@@ -36,4 +36,10 @@ func initAPI() {
 	beego.Router("/api/review/proj", &controllers.ApiController{}, "PUT:UpdateProjectInfo")
 	beego.Router("/api/review/proj/basic", &controllers.ApiController{}, "GET:GetBasicInfo")
 	beego.Router("/api/review/proj/detailed", &controllers.ApiController{}, "GET:GetDetailedInfo")
+	// audit
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "GET:GetOneAudit")
+	beego.Router("/api/review/proj/audits", &controllers.ApiController{}, "GET:GetAuditsInSubmit")
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "POST:CreateOneAudit")
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "PUT:CorrectAudit")
+	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "DELETE:DeleteAudit")
 }

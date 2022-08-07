@@ -15,7 +15,7 @@ class DatasetListPage extends React.Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getDatasets();
   }
 

@@ -17,7 +17,7 @@ class DatasetEditPage extends React.Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getDataset();
   }
 

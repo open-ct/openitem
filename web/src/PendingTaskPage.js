@@ -214,7 +214,7 @@ export default class PeddingTasks extends Component {
             },
           ],
         };
-        let id_list = res1.data.map(item => item.project_id);
+        // let id_list = res1.data.map(item => item.project_id);
         let role_lits = res1.data.map(item => item.role);
         let project_id_list = res1.data.map(item => item.project_id);
 

@@ -49,7 +49,7 @@ class App extends Component {
     this.getRemSize();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.updateMenuKey();
     this.getAccount();
   }

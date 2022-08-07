@@ -11,7 +11,7 @@ const {Search} = Input;
 export default class inedx extends Component {
 
     state = {
-      fileType: [<FileTextFilled />, <FileExcelFilled />, <FileZipFilled />, <FileMarkdownFilled />, <FilePptFilled />],
+      fileType: [<FileTextFilled key={1} />, <FileExcelFilled key={2} />, <FileZipFilled key={3} />, <FileMarkdownFilled key={4} />, <FilePptFilled key={5} />],
       fileList: [],
       upLoadVisible: false,
       getFileLoading: false,
@@ -91,7 +91,7 @@ export default class inedx extends Component {
         return this.state.fileList.map(item => (
           <div className="file-item" key={item.Id} onClick={this.downLoadFile.bind(this, item.uuid)}>
             <div className="icon">
-              <FileTextFilled />
+              <FileTextFilled key={item.Id} />
             </div>
             <div className="name">
               <span>{item.name}</span>

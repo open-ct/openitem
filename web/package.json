@@ -6,6 +6,7 @@
     "@ant-design/icons": "4.6.2",
     "@craco/craco": "6.4.5",
     "antd": "4.16.0",
+    "babel-eslint": "^10.1.0",
     "casdoor-js-sdk": "^0.2.7",
     "copy-to-clipboard": "^3.3.1",
     "craco-less": "2.0.0",
@@ -23,12 +24,11 @@
     "build": "del build.zip 2>nul && set \"GENERATE_SOURCEMAP=false\" && set \"SKIP_PREFLIGHT_CHECK=true\" && craco build && 360zip.exe -ar build %cd%/build.zip || ECHO.",
     "test": "craco test",
     "eject": "craco eject",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "fix": "eslint --fix ."
   },
   "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
+    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -45,7 +45,6 @@
     ]
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
     "eslint": "^7.11.0",
     "eslint-plugin-react": "^7.30.1"
   }

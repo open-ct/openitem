@@ -11,6 +11,7 @@ const {Search} = Input;
 export default class inedx extends Component {
 
     state = {
+      // eslint-disable-next-line react/jsx-key
       fileType: [<FileTextFilled />, <FileExcelFilled />, <FileZipFilled />, <FileMarkdownFilled />, <FilePptFilled />],
       fileList: [],
       upLoadVisible: false,

@@ -33,6 +33,8 @@ class App extends Component {
 
     Setting.initServerUrl();
     Setting.initCasdoorSdk(Conf.AuthConfig);
+    this.updateMenuKey();
+    this.getAccount();
   }
 
   getRemSize = () => {
@@ -47,11 +49,6 @@ class App extends Component {
       this.getRemSize();
     };
     this.getRemSize();
-  }
-
-  componentWillMount() {
-    this.updateMenuKey();
-    this.getAccount();
   }
 
   componentDidUpdate() {

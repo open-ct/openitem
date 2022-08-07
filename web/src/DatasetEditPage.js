@@ -15,9 +15,6 @@ class DatasetEditPage extends React.Component {
       datasetName: props.match.params.datasetName,
       dataset: null,
     };
-  }
-
-  componentWillMount() {
     this.getDataset();
   }
 

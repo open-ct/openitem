@@ -1,7 +1,6 @@
 import {message} from "antd";
 import {isMobile as isMobileDevice} from "react-device-detect";
 import i18next from "i18next";
-import moment from "moment";
 import Sdk from "casdoor-js-sdk";
 
 export let ServerUrl = "";

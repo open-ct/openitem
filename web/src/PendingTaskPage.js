@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {Button, Dropdown, Form, Input, Layout, Menu, Modal, Pagination, Space, Spin, Table, Tag, message} from "antd";
 import {DownOutlined, PlusCircleOutlined} from "@ant-design/icons";
-
 import ChangeTags from "./ChangeTags";
 import "./PendingTaskPage.less";
 
@@ -214,7 +213,7 @@ export default class PeddingTasks extends Component {
             },
           ],
         };
-        let id_list = res1.data.map(item => item.project_id);
+        // let id_list = res1.data.map(item => item.project_id);
         let role_lits = res1.data.map(item => item.role);
         let project_id_list = res1.data.map(item => item.project_id);
 

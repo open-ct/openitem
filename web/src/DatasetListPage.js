@@ -13,9 +13,6 @@ class DatasetListPage extends React.Component {
       classes: props,
       datasets: null,
     };
-  }
-
-  componentWillMount() {
     this.getDatasets();
   }
 

@@ -52,11 +52,11 @@ class DatasetListPage extends React.Component {
     const newDataset = this.newDataset();
     DatasetBackend.addDataset(newDataset)
       .then((res) => {
-          Setting.showMessage("success", "Dataset added successfully");
-          this.setState({
-            datasets: Setting.prependRow(this.state.datasets, newDataset),
-          });
-        }
+        Setting.showMessage("success", "Dataset added successfully");
+        this.setState({
+          datasets: Setting.prependRow(this.state.datasets, newDataset),
+        });
+      }
       )
       .catch(error => {
         Setting.showMessage("error", `Dataset failed to add: ${error}`);
@@ -66,11 +66,11 @@ class DatasetListPage extends React.Component {
   deleteDataset(i) {
     DatasetBackend.deleteDataset(this.state.datasets[i])
       .then((res) => {
-          Setting.showMessage("success", "Dataset deleted successfully");
-          this.setState({
-            datasets: Setting.deleteRow(this.state.datasets, i),
-          });
-        }
+        Setting.showMessage("success", "Dataset deleted successfully");
+        this.setState({
+          datasets: Setting.deleteRow(this.state.datasets, i),
+        });
+      }
       )
       .catch(error => {
         Setting.showMessage("error", `Dataset failed to delete: ${error}`);
@@ -91,7 +91,7 @@ class DatasetListPage extends React.Component {
               {text}
             </Link>
           );
-        }
+        },
       },
       {
         title: i18next.t("dataset:Start date"),
@@ -101,7 +101,7 @@ class DatasetListPage extends React.Component {
         sorter: (a, b) => a.startDate.localeCompare(b.startDate),
         render: (text, record, index) => {
           return Setting.getFormattedDate(text);
-        }
+        },
       },
       {
         title: i18next.t("dataset:End date"),
@@ -111,7 +111,7 @@ class DatasetListPage extends React.Component {
         sorter: (a, b) => a.endDate.localeCompare(b.endDate),
         render: (text, record, index) => {
           return Setting.getFormattedDate(text);
-        }
+        },
       },
       {
         title: i18next.t("dataset:Full name"),
@@ -167,20 +167,20 @@ class DatasetListPage extends React.Component {
               </Popconfirm>
             </div>
           );
-        }
+        },
       },
     ];
 
     return (
       <div>
         <Table columns={columns} dataSource={datasets} rowKey="name" size="middle" bordered pagination={{pageSize: 100}}
-               title={() => (
-                 <div>
-                   {i18next.t("general:Datasets")}&nbsp;&nbsp;&nbsp;&nbsp;
-                   <Button type="primary" size="small" onClick={this.addDataset.bind(this)}>{i18next.t("general:Add")}</Button>
-                 </div>
-               )}
-               loading={datasets === null}
+          title={() => (
+            <div>
+              {i18next.t("general:Datasets")}&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary" size="small" onClick={this.addDataset.bind(this)}>{i18next.t("general:Add")}</Button>
+            </div>
+          )}
+          loading={datasets === null}
         />
       </div>
     );

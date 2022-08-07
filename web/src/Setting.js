@@ -135,7 +135,7 @@ export function getShortName(s) {
   return s.split("/").slice(-1)[0];
 }
 
-export function getShortText(s, maxLength=35) {
+export function getShortText(s, maxLength = 35) {
   if (s.length > maxLength) {
     return `${s.slice(0, maxLength)}...`;
   } else {

@@ -18,20 +18,20 @@ function initLanguage() {
       let userLanguage;
       userLanguage = navigator.language;
       switch (userLanguage) {
-        case "zh-CN":
-          language = "zh";
-          break;
-        case "zh":
-          language = "zh";
-          break;
-        case "en":
-          language = "en";
-          break;
-        case "en-US":
-          language = "en";
-          break;
-        default:
-          language = Conf.DefaultLanguage;
+      case "zh-CN":
+        language = "zh";
+        break;
+      case "zh":
+        language = "zh";
+        break;
+      case "en":
+        language = "en";
+        break;
+      case "en-US":
+        language = "en";
+        break;
+      default:
+        language = Conf.DefaultLanguage;
       }
     }
   }

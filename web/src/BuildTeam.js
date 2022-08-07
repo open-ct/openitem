@@ -1,9 +1,8 @@
 import React, {Component} from "react";
-import {Button, message, Table, Tag, Space, Modal, Select, Input, Form} from "antd";
+import {Button, Form, Input, Modal, Select, Space, Table, Tag, message} from "antd";
 import {withRouter} from "react-router-dom";
 import ModalCard from "./ModulaCard";
 import "./BuildTeam.less";
-
 
 import {WarningTwoTone} from "@ant-design/icons";
 
@@ -21,13 +20,13 @@ class index extends Component {
         show: false,
         assignment_id: "",
         new_role: "",
-        updateLoading: false
+        updateLoading: false,
       },
       addMemberForm: {
         show: false,
         loadingState: false,
         role: 1,
-        user_id: ""
+        user_id: "",
       },
       emailForm: {
         show: false,
@@ -35,11 +34,11 @@ class index extends Component {
         message: "",
         send_time: "",
         // sender: store.getState().userInfo.name,
-        sender:"binary",
+        sender: "binary",
         destination: [],
-        subject: ""
+        subject: "",
       },
-      memberList: []
+      memberList: [],
     };
   }
   columns = [{
@@ -47,61 +46,61 @@ class index extends Component {
     align: "center",
     render: (text, record) => (
       <span>{record.info.name}</span>
-    )
+    ),
   }, {
     title: "年龄",
     align: "center",
     render: (text, record) => (
       <span>{record.info.age}</span>
-    )
+    ),
   }, {
     title: "性别",
     align: "center",
     render: (text, record) => (
       <span>{record.info.gender ? "男" : "女"}</span>
-    )
+    ),
   }, {
     title: "专业",
     align: "center",
     render: (text, record) => (
       <Tag color="processing">{record.info.degree}</Tag>
-    )
+    ),
   }, {
     title: "职位",
     align: "center",
     render: (text, record) => (
       <span>{record.info.position}</span>
-    )
+    ),
   }, {
     title: "邮箱",
     align: "center",
     render: (text, record) => (
       <Button type="link" onClick={() => {
         this.setState({
-          emailForm: Object.assign(this.state.emailForm, {destination: [record.info.email], send_time: new Date().getTime().toString(), show: true})
+          emailForm: Object.assign(this.state.emailForm, {destination: [record.info.email], send_time: new Date().getTime().toString(), show: true}),
         });
       }}>
         {record.info.email}
       </Button>
-    )
+    ),
   }, {
     title: "组织",
     align: "center",
     render: (text, record) => (
       <span>{record.info.organization}</span>
-    )
+    ),
   }, {
     title: "位置",
     align: "center",
     render: (text, record) => (
       <span>{record.info.location}</span>
-    )
+    ),
   }, {
     title: "电话",
     align: "center",
     render: (text, record) => (
       <span>{record.info.phone}</span>
-    )
+    ),
   }, {
     title: "项目角色",
     align: "center",
@@ -110,7 +109,7 @@ class index extends Component {
       return (
         <Tag color="green">{roleList[record.role - 1]}</Tag>
       );
-    }
+    },
   }, {
     title: "状态",
     align: "center",
@@ -124,7 +123,7 @@ class index extends Component {
           )
         }
       </>
-    )
+    ),
   }, {
     title: "管理",
     align: "center",
@@ -135,8 +134,8 @@ class index extends Component {
             roleChangeForm: Object.assign(this.state.roleChangeForm, {
               assignment_id: record.Id,
               new_role: record.role,
-              show: true
-            })
+              show: true,
+            }),
           });
         }}>更改角色</Button>
         <Button type="link" danger onClick={() => {
@@ -166,14 +165,14 @@ class index extends Component {
             //     });
             //   });
             // },
-            onOk:() => {},
+            onOk: () => {},
             onCancel() {
               message.info("已取消移除");
             },
           });
         }}>移除人员</Button>
       </Space>
-    )
+    ),
   }]
 
   emailFormRef = React.createRef()
@@ -246,7 +245,7 @@ class index extends Component {
   // }
   getProjectMember = () => {
     this.setState({
-      loadingState: true
+      loadingState: true,
     });
     let memberList = [];
     var res = {
@@ -264,14 +263,14 @@ class index extends Component {
             "role": 1,
             "operator": "system",
             "is_confirmed": true,
-            "status": 0
-          }
+            "status": 0,
+          },
         ],
         "assistants": [],
         "experts": [],
         "out_experts": [],
-        "teachers": []
-      }
+        "teachers": [],
+      },
     };
     memberList = [...res.data.admins.map(item => {
       item.roleName = "admin";
@@ -310,12 +309,12 @@ class index extends Component {
             "degree": "string",
             "position": "string",
             "employer": "string",
-            "major": "string"
+            "major": "string",
           },
           "password": "a6ba7732dfb7c19d1520b1eb0386d1a2",
-          "salt": "371832835a7ea8c50f44c8c8ab333c55"
-        }
-      }
+          "salt": "371832835a7ea8c50f44c8c8ab333c55",
+        },
+      },
     };
     let userInfo_list = Object.values(res1.data);
     memberList = memberList.map((item, index) => {
@@ -324,7 +323,7 @@ class index extends Component {
     });
     this.setState({
       memberList,
-      loadingState: false
+      loadingState: false,
     });
   }
 
@@ -336,7 +335,7 @@ class index extends Component {
           right={(
             <Button type="primary" size="small" onClick={() => {
               this.setState({
-                addMemberForm: Object.assign(this.state.addMemberForm, {show: true})
+                addMemberForm: Object.assign(this.state.addMemberForm, {show: true}),
               });
             }}>添加成员</Button>
           )}
@@ -394,7 +393,7 @@ class index extends Component {
               message.error("修改中，操作不可中断！");
             } else {
               this.setState({
-                roleChangeForm: Object.assign(this.state.roleChangeForm, {show: false})
+                roleChangeForm: Object.assign(this.state.roleChangeForm, {show: false}),
               });
             }
           }}
@@ -402,7 +401,7 @@ class index extends Component {
           <label style={{lineHeight: ".6rem"}}>新的角色：</label>
           <Select value={this.state.roleChangeForm.new_role} style={{width: "100%"}} onChange={(e) => {
             this.setState({
-              roleChangeForm: Object.assign(this.state.roleChangeForm, {new_role: e})
+              roleChangeForm: Object.assign(this.state.roleChangeForm, {new_role: e}),
             });
           }}>
             <Option value={1}>管理员</Option>
@@ -429,7 +428,7 @@ class index extends Component {
               message.error("添加中，操作不可中断！");
             } else {
               this.setState({
-                addMemberForm: Object.assign(this.state.addMemberForm, {show: false})
+                addMemberForm: Object.assign(this.state.addMemberForm, {show: false}),
               });
             }
           }}
@@ -444,7 +443,7 @@ class index extends Component {
                 <label style={{lineHeight: ".6rem"}}>角色分配：</label>
                 <Select value={this.state.addMemberForm.role} style={{width: "100%"}} onChange={(e) => {
                   this.setState({
-                    addMemberForm: Object.assign(this.state.addMemberForm, {role: e})
+                    addMemberForm: Object.assign(this.state.addMemberForm, {role: e}),
                   });
                 }}>
                   <Option value={1}>管理员</Option>
@@ -509,7 +508,7 @@ class index extends Component {
             } else {
               this.emailFormRef.current.resetFields();
               this.setState({
-                emailForm: Object.assign(this.state.emailForm, {show: false})
+                emailForm: Object.assign(this.state.emailForm, {show: false}),
               });
             }
           }}

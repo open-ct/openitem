@@ -144,10 +144,10 @@ class DatasetEditPage extends React.Component {
           </Col>
           <Col span={22} >
             <Select virtual={false} mode="tags" style={{width: "100%"}} placeholder="Please input"
-                    value={this.state.dataset.carousels}
-                    onChange={value => {
-                      this.updateDatasetField("carousels", value);
-                    }}
+              value={this.state.dataset.carousels}
+              onChange={value => {
+                this.updateDatasetField("carousels", value);
+              }}
             >
               {
                 this.state.dataset.carousels.map((carousel, index) => <Option key={carousel}>{carousel}</Option>)

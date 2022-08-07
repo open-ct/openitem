@@ -14,6 +14,7 @@ import SigninPage from "./SigninPage";
 import i18next from "i18next";
 import PendingTaskPage from "./PendingTaskPage";
 import ProjectManagementPage from "./ProjectManagementPage";
+import PropositionPaperPage from "./PropositionPaperPage";
 
 const {Header, Footer} = Layout;
 
@@ -76,6 +77,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/pendingtasks"});
     } else if (uri.includes("/projectmanagements")) {
       this.setState({selectedMenuKey: "/projectmanagements"});
+    } else if (uri.includes("/propositionpapers")) {
+      this.setState({selectedMenuKey: "/propositionpapers"});
     } else {
       this.setState({selectedMenuKey: "null"});
     }
@@ -251,6 +254,14 @@ class App extends Component {
       </Menu.Item>
     );
 
+    res.push(
+      <Menu.Item key="/propositionpapers">
+        <Link to="/propositionpapers">
+          {i18next.t("general:PropositionPapers")}
+        </Link>
+      </Menu.Item>
+    );
+
     return res;
   }
 
@@ -319,6 +330,7 @@ class App extends Component {
           <Route path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)} />
           <Route path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)} />
           <Route path="/projectmanagements/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)} />
+          <Route path="/propositionpapers" render={(props) => this.renderSigninIfNotSignedIn(<PropositionPaperPage account={this.state.account} {...props} />)} />
           <Route path="/" render={(props) => <HomePage account={this.state.account} {...props} />} />
         </Switch>
       </div>

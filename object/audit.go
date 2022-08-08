@@ -16,7 +16,7 @@ type Audit struct {
 	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
 	SubmitContent string `json:"submit_content"`
-	Result        int    `json:"result"`
+	Result        string `json:"result"`
 	Comment       string `json:"comment"`
 	Auditor       string `json:"auditor"`
 

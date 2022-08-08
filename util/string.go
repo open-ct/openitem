@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func IndexAt(s, sep string, n int) int {
@@ -108,4 +109,10 @@ func WriteBytesToPath(b []byte, path string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetCurrentTime() string {
+	timestamp := time.Now().Unix()
+	tm := time.Unix(timestamp, 0)
+	return tm.Format(time.RFC3339)
 }

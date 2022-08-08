@@ -300,7 +300,7 @@ export default class CreatePaper extends Component {
         <div className="create-paper-page" data-component="create-paper-page">
           <PageHeader
             ghost={false}
-            onBack={() => this.props.history.push("/propositionpapers/home")}
+            onBack={() => this.props.history.push("/proposition-paper/home")}
             title="命题组卷"
             subTitle="上传试题"
             extra={[

@@ -55,7 +55,7 @@ export default class UploadQuestions extends Component {
         <div className="upLoad-question-page" data-component="upLoad-question-page">
           <PageHeader
             ghost={false}
-            onBack={() => this.props.history.push("/home/proposition-paper/home")}
+            onBack={() => this.props.history.push("/proposition-paper/home")}
             title="命题组卷"
             subTitle="上传试题"
             extra={[
@@ -109,7 +109,7 @@ export default class UploadQuestions extends Component {
                   theme="light"
                   onClick = {(e) => {
                     let data = this.props.match.params;
-                    this.props.history.push(`/home/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${e.key}`);
+                    this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${e.key}`);
                   }}
                 >
                   <Menu.Item key="1">选择题</Menu.Item>

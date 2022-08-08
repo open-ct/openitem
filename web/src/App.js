@@ -14,6 +14,7 @@ import SigninPage from "./SigninPage";
 import i18next from "i18next";
 import PendingTaskPage from "./PendingTaskPage";
 import ProjectManagementPage from "./ProjectManagementPage";
+import PropositionPaperPage from "./PropositionPaperPage";
 
 const {Header, Footer} = Layout;
 
@@ -55,7 +56,6 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    // eslint-disable-next-line no-restricted-globals
     const uri = location.pathname;
     if (this.state.uri !== uri) {
       this.updateMenuKey();
@@ -63,7 +63,6 @@ class App extends Component {
   }
 
   updateMenuKey() {
-    // eslint-disable-next-line no-restricted-globals
     const uri = location.pathname;
     this.setState({
       uri: uri,
@@ -72,10 +71,12 @@ class App extends Component {
       this.setState({selectedMenuKey: "/"});
     } else if (uri.includes("/datasets")) {
       this.setState({selectedMenuKey: "/datasets"});
-    } else if (uri.includes("/pendingtasks")) {
-      this.setState({selectedMenuKey: "/pendingtasks"});
-    } else if (uri.includes("/projectmanagements")) {
-      this.setState({selectedMenuKey: "/projectmanagements"});
+    } else if (uri.includes("/pending-tasks")) {
+      this.setState({selectedMenuKey: "/pending-tasks"});
+    } else if (uri.includes("/project-management")) {
+      this.setState({selectedMenuKey: "/project-management"});
+    } else if (uri.includes("/proposition-paper")) {
+      this.setState({selectedMenuKey: "/proposition-paper"});
     } else {
       this.setState({selectedMenuKey: "null"});
     }
@@ -244,9 +245,17 @@ class App extends Component {
     );
 
     res.push(
-      <Menu.Item key="/pendingtasks">
-        <Link to="/pendingtasks">
-          {i18next.t("general:Pendingtasks")}
+      <Menu.Item key="/pending-tasks">
+        <Link to="/pending-tasks">
+          {i18next.t("general:Pending Tasks")}
+        </Link>
+      </Menu.Item>
+    );
+
+    res.push(
+      <Menu.Item key="/proposition-paper">
+        <Link to="/proposition-paper">
+          {i18next.t("general:Proposition Paper")}
         </Link>
       </Menu.Item>
     );
@@ -315,10 +324,11 @@ class App extends Component {
         <Switch>
           <Route path="/callback" component={AuthCallback} />
           <Route path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)} />
-          <Route path="/pendingtasks" render={(props) => this.renderSigninIfNotSignedIn(<PendingTaskPage account={this.state.account} {...props} />)} />
+          <Route path="/pending-tasks" render={(props) => this.renderSigninIfNotSignedIn(<PendingTaskPage account={this.state.account} {...props} />)} />
           <Route path="/datasets" render={(props) => this.renderSigninIfNotSignedIn(<DatasetListPage account={this.state.account} {...props} />)} />
           <Route path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)} />
-          <Route path="/projectmanagements/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)} />
+          <Route path="/project-management/:project_id/:role" render={(props) => this.renderSigninIfNotSignedIn(<ProjectManagementPage account={this.state.account} {...props} />)} />
+          <Route path="/proposition-paper" render={(props) => this.renderSigninIfNotSignedIn(<PropositionPaperPage account={this.state.account} {...props} />)} />
           <Route path="/" render={(props) => <HomePage account={this.state.account} {...props} />} />
         </Switch>
       </div>

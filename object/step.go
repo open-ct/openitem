@@ -1,20 +1,16 @@
 package object
 
 import (
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/open-ct/openitem/util"
 	"xorm.io/builder"
-	"xorm.io/core"
 )
 
 type Step struct {
-	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
-
+	Uuid        string             `xorm:"notnull pk" json:"uuid"`
+	Name        string             `json:"name"`
 	ProjectId   string             `json:"project_id"`
 	Index       int                `json:"index"`
 	Description string             `json:"description"`
@@ -65,40 +61,6 @@ type StepDataStatistic struct {
 	ToCorrect float64 `json:"to_correct"`
 }
 
-func getStep(owner string, name string) *Step {
-	step := Step{Owner: owner, Name: name}
-	existed, err := adapter.engine.Get(&step)
-	if err != nil {
-		panic(err)
-	}
-
-	if existed {
-		return &step
-	} else {
-		return nil
-	}
-}
-
-func GetStep(id string) *Step {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	return getStep(owner, name)
-}
-
-func UpdateStep(id string, step *Step) bool {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	if getStep(owner, name) == nil {
-		return false
-	}
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(step)
-	if err != nil {
-		panic(err)
-	}
-
-	// return affected != 0
-	return true
-}
-
 func AddStep(step *Step) error {
 	_, err := adapter.engine.Insert(step)
 	if err != nil {
@@ -110,10 +72,8 @@ func AddStep(step *Step) error {
 
 func CreateOneStep(req *Step) (string, error) {
 	newStep := Step{
-		Owner:       req.Owner,
+		Uuid:        util.GenUuidV4(),
 		Name:        req.Name,
-		CreatedTime: util.GetCurrentTime(),
-
 		ProjectId:   req.ProjectId,
 		Index:       req.Index,
 		Description: req.Description,
@@ -142,7 +102,7 @@ func CreateOneStep(req *Step) (string, error) {
 		return "", err
 	}
 
-	insertedStepId := fmt.Sprintf("%s/%s", newStep.Owner, newStep.Name)
+	insertedStepId := newStep.Uuid
 
 	log.Printf("[Insert] %s\n", insertedStepId)
 	return insertedStepId, nil
@@ -151,9 +111,7 @@ func CreateOneStep(req *Step) (string, error) {
 func GetStepInfo(sid string) (*Step, error) {
 	var step Step
 
-	owner, name := util.GetOwnerAndNameFromId(sid)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&step)
+	_, err := adapter.engine.ID(sid).Get(&step)
 	if err != nil {
 		log.Printf("err: %s\n", err.Error())
 		return nil, err
@@ -177,8 +135,7 @@ func UploadStepAttachments(req *AddStepAttachment) error {
 
 	updateStep.Attachments = req.FilesIds
 
-	owner, name := util.GetOwnerAndNameFromId(req.StepId)
-	_, err := adapter.engine.ID(core.PK{owner, name}).Cols("attachments").Update(&updateStep)
+	_, err := adapter.engine.ID(req.StepId).Cols("attachments").Update(&updateStep)
 	if err != nil {
 		log.Printf("add attachments for step: %s\n", err.Error())
 		return err
@@ -189,13 +146,13 @@ func UploadStepAttachments(req *AddStepAttachment) error {
 func UpdateStepInfo(req *Step) error {
 	var oldStep Step
 
-	_, err := adapter.engine.ID(core.PK{req.Owner, req.Name}).Get(&oldStep)
+	_, err := adapter.engine.ID(req.Uuid).Get(&oldStep)
 	if err != nil {
 		log.Printf("update step information: %s\n", err.Error())
 		return err
 	}
 
-	_, err = adapter.engine.ID(core.PK{oldStep.Owner, oldStep.Name}).Update(req)
+	_, err = adapter.engine.ID(oldStep.Uuid).Update(req)
 	if err != nil {
 		log.Printf("update step information: %s\n", err.Error())
 		return err
@@ -204,7 +161,7 @@ func UpdateStepInfo(req *Step) error {
 }
 
 func SetStepStatus(req *Step) error {
-	_, err := adapter.engine.ID(core.PK{req.Owner, req.Name}).Cols("status").Update(req)
+	_, err := adapter.engine.ID(req.Uuid).Cols("status").Update(req)
 	if err != nil {
 		log.Printf("change step status: %s\n", err.Error())
 		return err
@@ -216,8 +173,7 @@ func SetStepTimePoint(req *SetStepTimePointRequest) (*[]ProjectTimePoint, error)
 	// get step data:
 	var step Step
 
-	owner, name := util.GetOwnerAndNameFromId(req.StepId)
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&step)
+	_, err := adapter.engine.ID(req.StepId).Get(&step)
 	if err != nil {
 		log.Printf("address the step error: %s\n", err.Error())
 		return nil, err
@@ -233,7 +189,7 @@ func SetStepTimePoint(req *SetStepTimePointRequest) (*[]ProjectTimePoint, error)
 	if req.PointIndex < 0 || req.PointIndex >= len(step.Timetable) {
 		newTimeTable = append(newTimeTable, newTimePoint)
 
-		_, err = adapter.engine.ID(core.PK{owner, name}).Cols("timetable").Update(&Step{Timetable: newTimeTable})
+		_, err = adapter.engine.ID(req.StepId).Cols("timetable").Update(&Step{Timetable: newTimeTable})
 		if err != nil {
 			log.Printf("append step time point error: %s\n" + err.Error())
 			return nil, err
@@ -242,7 +198,7 @@ func SetStepTimePoint(req *SetStepTimePointRequest) (*[]ProjectTimePoint, error)
 	}
 	newTimeTable[req.PointIndex] = newTimePoint
 
-	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("timetable").Update(&Step{Timetable: newTimeTable})
+	_, err = adapter.engine.ID(req.StepId).Cols("timetable").Update(&Step{Timetable: newTimeTable})
 	if err != nil {
 		log.Printf("append step time point error: %s\n" + err.Error())
 		return nil, err
@@ -253,8 +209,7 @@ func SetStepTimePoint(req *SetStepTimePointRequest) (*[]ProjectTimePoint, error)
 func DeleteStepTimePoint(req *DeleteStepTimePointRequest) error {
 	var step Step
 
-	owner, name := util.GetOwnerAndNameFromId(req.StepId)
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&step)
+	_, err := adapter.engine.ID(req.StepId).Get(&step)
 	if err != nil {
 		log.Printf("address the step error: %s\n", err.Error())
 		return err
@@ -265,7 +220,7 @@ func DeleteStepTimePoint(req *DeleteStepTimePointRequest) error {
 	newTimeTable := step.Timetable
 	// delete array element
 	newTimeTable = append(newTimeTable[:req.PointIndex], newTimeTable[req.PointIndex+1:]...)
-	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("timetable").Update(&Step{Timetable: newTimeTable})
+	_, err = adapter.engine.ID(req.StepId).Cols("timetable").Update(&Step{Timetable: newTimeTable})
 	if err != nil {
 		log.Printf("delete time point error: %s\n", err.Error())
 		return err
@@ -315,9 +270,7 @@ func GetStepDataStatistic(stepId string) (*StepDataStatistic, error) {
 }
 
 func DeleteStep(stepId string) error {
-	owner, name := util.GetOwnerAndNameFromId(stepId)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Delete(&Step{})
+	_, err := adapter.engine.ID(stepId).Delete(&Step{})
 	if err != nil {
 		log.Printf("delete step error: %s\n" + err.Error())
 		return err

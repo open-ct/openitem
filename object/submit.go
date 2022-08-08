@@ -1,9 +1,13 @@
 package object
 
 import (
+	"errors"
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/open-ct/openitem/util"
+	"xorm.io/builder"
 	"xorm.io/core"
 )
 
@@ -32,6 +36,30 @@ type Content struct {
 	Comment string `json:"comment"`
 }
 
+type GetUserSubmitsInStepRequest struct {
+	UserId string `json:"user_id"`
+	StepId string `json:"step_id"`
+}
+
+type AppendContentInSubmit struct {
+	SubmitId string `json:"submit_id"`
+	Type     int    `json:"type"`
+	ItemId   string `json:"item_id"`
+	Version  string `json:"version"`
+	Comment  string `json:"comment"`
+}
+
+type WithdrawContentInSubmit struct {
+	SubmitId     string `json:"submit_id"`
+	ContentIndex int    `json:"content_index"`
+	ContentId    string `json:"content_id"`
+}
+
+type SetSubmitStatusRequest struct {
+	SubmitId  string `json:"submit_id"`
+	NewStatus int    `json:"new_status"`
+}
+
 func getSubmit(owner string, name string) *Submit {
 	submit := Submit{Owner: owner, Name: name}
 	existed, err := adapter.engine.Get(&submit)
@@ -46,40 +74,147 @@ func getSubmit(owner string, name string) *Submit {
 	}
 }
 
-func GetSubmit(id string) *Submit {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	return getSubmit(owner, name)
-}
-
-func UpdateSubmit(id string, submit *Submit) bool {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	if getSubmit(owner, name) == nil {
-		return false
-	}
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(submit)
+func AddSubmit(submit *Submit) error {
+	_, err := adapter.engine.Insert(submit)
 	if err != nil {
 		panic(err)
 	}
 
-	// return affected != 0
-	return true
+	return nil
 }
 
-func AddSubmit(submit *Submit) bool {
-	affected, err := adapter.engine.Insert(submit)
-	if err != nil {
-		panic(err)
-	}
+func GetOneSubmit(subId string) (*Submit, error) {
+	var submit Submit
 
-	return affected != 0
+	owner, name := util.GetOwnerAndNameFromId(subId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&submit)
+	if err != nil {
+		log.Printf("find submit info err: %s\n", err.Error())
+		return nil, err
+	}
+	return &submit, nil
 }
 
-func DeleteSubmit(submit *Submit) bool {
-	affected, err := adapter.engine.ID(core.PK{submit.Owner, submit.Name}).Delete(&Submit{})
+func GetStepSubmits(stepId string) (*[]Submit, error) {
+	var submits []Submit
+
+	err := adapter.engine.Where(builder.Eq{"step_id": stepId}).Find(&submits)
 	if err != nil {
-		panic(err)
+		log.Printf("find submits info err: %s\n", err.Error())
+		return nil, err
+	}
+	return &submits, nil
+}
+
+func GetUserSubmitsInStep(req *GetUserSubmitsInStepRequest) (*[]Submit, error) {
+	var submits []Submit
+
+	err := adapter.engine.Where(builder.Eq{"submitter": req.UserId, "step_id": req.StepId}).Find(&submits)
+	if err != nil {
+		log.Printf("find submits info err: %s\n", err.Error())
+		return nil, err
+	}
+	return &submits, nil
+}
+
+func MakeOneSubmit(req *Submit) (*Submit, error) {
+	newSubmit := Submit{
+		Owner:       req.Owner,
+		Name:        req.Name,
+		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+
+		StepId:      req.StepId,
+		Title:       req.Title,
+		Description: req.Description,
+		Submitter:   req.Submitter,
 	}
 
-	return affected != 0
+	err := AddSubmit(&newSubmit)
+	if err != nil {
+		log.Printf("[create new submit failed] %s\n", err.Error())
+		return nil, err
+	}
+
+	insertedSubmitId := fmt.Sprintf("%s/%s", newSubmit.Owner, newSubmit.Name)
+
+	log.Printf("[Insert] %s", insertedSubmitId)
+	return &newSubmit, nil
+}
+
+func AppendContent(req *AppendContentInSubmit) (*[]Content, error) {
+	var submit Submit
+
+	owner, name := util.GetOwnerAndNameFromId(req.SubmitId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&submit)
+	if err != nil {
+		log.Printf("Address submit error: %s\n", err.Error())
+		return nil, err
+	}
+	contents := submit.Contents
+	newContent := Content{
+		Uuid:    util.GenUuidV4(),
+		Type:    req.Type,
+		ItemId:  req.ItemId,
+		Version: req.Version,
+		Comment: req.Comment,
+	}
+	contents = append(contents, newContent)
+
+	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("contents").Update(&Submit{Contents: contents})
+	if err != nil {
+		log.Printf("append a content error: %s\n", err.Error())
+		return nil, err
+	}
+	return &contents, nil
+}
+
+func WithdrawContent(req *WithdrawContentInSubmit) (*[]Content, error) {
+	var submit Submit
+
+	owner, name := util.GetOwnerAndNameFromId(req.SubmitId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&submit)
+	if err != nil {
+		log.Printf("Address submit error: %s\n", err.Error())
+		return nil, err
+	}
+	contents := submit.Contents
+	for index, content := range contents {
+		if index == req.ContentIndex || content.Uuid == req.ContentId {
+			contents = append(contents[:index], contents[index+1:]...)
+			break
+		}
+		if index == len(contents)-1 {
+			return &contents, errors.New("SubmitWithdrawFail")
+		}
+	}
+
+	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("contents").Update(&Submit{Contents: contents})
+	if err != nil {
+		log.Printf("delete content error: %s\n", err.Error())
+		return &submit.Contents, err
+	}
+	return &contents, nil
+}
+
+func SetSubmitStatus(req *SetSubmitStatusRequest) error {
+	owner, name := util.GetOwnerAndNameFromId(req.SubmitId)
+
+	_, err := adapter.engine.ID(core.PK{owner, name}).Cols("status").Update(&Submit{Status: req.NewStatus})
+	if err != nil {
+		log.Printf("delete content error: %s\n" + err.Error())
+		return err
+	}
+	return nil
+}
+
+func DeleteSubmit(submitId string) error {
+	owner, name := util.GetOwnerAndNameFromId(submitId)
+
+	_, err := adapter.engine.ID(core.PK{owner, name}).Delete(&Submit{})
+	if err != nil {
+		log.Printf("delete submit error: %s\n", err.Error())
+		return err
+	}
+
+	return nil
 }

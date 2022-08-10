@@ -58,10 +58,43 @@ func initAPI() {
 	beego.Router("/api/review/proj/step/stat", &controllers.ApiController{}, "GET:GetStepStatisticData")
 	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "DELETE:DeleteStep")
 
-  // file
+	// submit
+	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "GET:GetOneSubmit")
+	beego.Router("/api/review/proj/submits", &controllers.ApiController{}, "GET:GetSubmitsInStep")
+	beego.Router("/api/review/proj/submits/user", &controllers.ApiController{}, "POST:GetUserSubmitInStep")
+	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "POST:MakeOneSubmit")
+	beego.Router("/api/review/proj/submit/content", &controllers.ApiController{}, "POST:AppendContentInStep")
+	beego.Router("/api/review/proj/submit/content", &controllers.ApiController{}, "DELETE:WithdrawContentInStep")
+	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "PUT:SetSubmitStatus")
+	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "DELETE:DeleteSubmit")
+
+	// assignment
+	beego.Router("/api/review/proj/user", &controllers.ApiController{}, "GET:GetUserAssignments")
+	beego.Router("/api/review/proj/assign", &controllers.ApiController{}, "POST:MakeOneAssignment")
+	beego.Router("/api/review/proj/assign", &controllers.ApiController{}, "GET:GetProjectAssignments")
+	beego.Router("/api/review/proj/assign", &controllers.ApiController{}, "DELETE:DeleteAssignment")
+	beego.Router("/api/review/proj/assign", &controllers.ApiController{}, "PATCH:ChangeAssignment")
+
+	// file
 	beego.Router("/api/review/file", &controllers.ApiController{}, "POST:UploadFile")
 	beego.Router("/api/review/file", &controllers.ApiController{}, "GET:DownloadFile")
 	beego.Router("/api/review/file/info", &controllers.ApiController{}, "GET:GetFileInfo")
 	beego.Router("/api/review/file/search", &controllers.ApiController{}, "POST:SearchFiles")
 	beego.Router("/api/review/file", &controllers.ApiController{}, "DELETE:DeleteFile")
+
+	// query
+	beego.Router("/api/review/query/proj", &controllers.ApiController{}, "POST:GetProjectList")
+	beego.Router("/api/qbank/query/t_question", &controllers.ApiController{}, "POST:GetTempQuestionList")
+
+	// qbank
+	// question
+	beego.Router("/api/qbank/question", &controllers.ApiController{}, "POST:CreateNewQuestion")
+	beego.Router("/api/qbank/question", &controllers.ApiController{}, "PUT:UpdateQuestion")
+	beego.Router("/api/qbank/question/comment", &controllers.ApiController{}, "POST:AddQuestionComment")
+	beego.Router("/api/qbank/question/trace", &controllers.ApiController{}, "GET:TraceQuestionVersion")
+	beego.Router("/api/qbank/question/finish", &controllers.ApiController{}, "GET:FinishTempQuestion")
+	beego.Router("/api/qbank/question/user_t", &controllers.ApiController{}, "GET:GetUserTempQuestions")
+	beego.Router("/api/qbank/question/user_f", &controllers.ApiController{}, "GET:GetUserFinalQuestions")
+	beego.Router("/api/qbank/question/proj_t", &controllers.ApiController{}, "GET:GetProjectTempQuestions")
+	beego.Router("/api/qbank/question/proj_f", &controllers.ApiController{}, "GET:GetProjectFinalQuestions")
 }

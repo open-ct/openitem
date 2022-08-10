@@ -5,57 +5,23 @@ import (
 	"log"
 	"time"
 
-	"github.com/astaxie/beego"
+	"github.com/casdoor/casdoor-go-sdk/auth"
+
 	"github.com/open-ct/openitem/util"
-	"xorm.io/core"
 )
 
 type FileItem struct {
-	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
-
+	Uuid          string   `xorm:"not null pk" json:"uuid"`
+	Name          string   `json:"name"`
 	Type          string   `json:"type"`
 	SourceProject string   `json:"source_project"`
 	Description   string   `json:"description"`
 	Tags          []string `xorm:"mediumtext" json:"tags"`
 	Path          string   `json:"path"`
+	Owner         string   `json:"owner"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
-}
-
-// fileStoreConfig: define the location of files to save.
-type fileStoreConfig struct {
-	RootPath   string
-	NameFormat string
-}
-
-var fileStore fileStoreConfig
-
-func init() {
-	// 加载文件存储目录
-	fileStoreRootPath := beego.AppConfig.String("filerootpath")
-	fileStore.RootPath = fileStoreRootPath
-}
-
-func getFile(owner string, name string) *FileItem {
-	fileItem := FileItem{Owner: owner, Name: name}
-	existed, err := adapter.engine.Get(&fileItem)
-	if err != nil {
-		panic(err)
-	}
-
-	if existed {
-		return &fileItem
-	} else {
-		return nil
-	}
-}
-
-func GetFile(id string) *FileItem {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	return getFile(owner, name)
 }
 
 func AddFile(fileItem *FileItem) error {
@@ -67,39 +33,43 @@ func AddFile(fileItem *FileItem) error {
 	return nil
 }
 
-func CreateNewFileRecord(req *FileItem) (*FileItem, error) {
-	fileUuid := fmt.Sprintf("%s-%s", req.Owner, req.Name)
-	file := FileItem{
-		Owner:       req.Owner, // record the uploader's id
-		Name:        req.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+func UploadFileToStorage(req *FileItem, fileBytes []byte) (string, string) {
+	tag := "file"
+	parent := "UploadFile"
+	fullFilePath := fmt.Sprintf("openitem/file/%s/%s/%s", req.Owner, "uploadfile", req.Name)
+	fileUrl, objectKey, err := auth.UploadResource(req.Owner, tag, parent, fullFilePath, fileBytes)
+	if err != nil {
+		panic(err)
+	}
 
+	file := FileItem{
+		Uuid:          util.GenUuidV4(),
+		Name:          req.Name,
 		Type:          req.Type,
 		SourceProject: req.SourceProject,
 		Description:   req.Description,
 		Tags:          req.Tags,
-		Path:          genFilesPath(fileUuid, req.Type),
+		Path:          fileUrl,
+		Owner:         req.Owner,
 	}
 
-	err := AddFile(&file)
+	err = AddFile(&file)
 	if err != nil {
 		log.Printf("[File upload (insert new file record failed)] %s", err.Error())
-		return nil, err
+		return "", err.Error()
 	}
 
-	insertedId := fmt.Sprintf("%s/%s", req.Owner, req.Name)
+	insertedId := file.Uuid
 
 	log.Printf("[Insert] %s", insertedId)
-	return &file, nil
+	return fileUrl, objectKey
 }
 
 // GetFileInfo get file information by file-uuid
 func GetFileInfo(fileUuid string) (*FileItem, error) {
 	var fileInfo FileItem
 
-	owner, name := util.GetOwnerAndNameFromId(fileUuid)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&fileInfo)
+	_, err := adapter.engine.ID(fileUuid).Get(&fileInfo)
 	if err != nil {
 		log.Printf("err: %s", err.Error())
 		return nil, err
@@ -130,25 +100,10 @@ func SearchFiles(searchReq *FileItem) (*[]FileItem, error) {
 
 // DeleteFile delete the file-record in mongodb (keep on disk currently)
 func DeleteFile(fileID string) error {
-	owner, name := util.GetOwnerAndNameFromId(fileID)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Delete(&FileItem{})
+	_, err := adapter.engine.ID(fileID).Delete(&FileItem{})
 	if err != nil {
 		log.Printf("[File Delete] %s\n", err.Error())
 		return err
 	}
 	return nil
-}
-
-// genFilesPath generate the files saving-path and saving-filename.
-func genFilesPath(fileID string, fileType string) string {
-	t := time.Now()
-	dateString := fmt.Sprintf("%d-%d-%d", t.Year(), t.Month(), t.Day())
-	todayPath := fileStore.RootPath + dateString
-	// 如果没有目录, 需要创建
-	if !util.IsDirExists(todayPath) {
-		fmt.Println("dir not exist")
-		util.CreateDateDir(fileStore.RootPath)
-	}
-	return todayPath + "/" + fileID + fileType
 }

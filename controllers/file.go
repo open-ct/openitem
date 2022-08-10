@@ -1,14 +1,26 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
+	"net/url"
 	"path"
 	"strings"
 
 	"github.com/open-ct/openitem/object"
 )
+
+func getFileBytes(file *multipart.File) []byte {
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, *file); err != nil {
+		panic(err)
+	}
+
+	return buf.Bytes()
+}
 
 // UploadFile
 // @Title UploadFile
@@ -33,7 +45,10 @@ func (c *ApiController) UploadFile() {
 	}
 	defer file.Close()
 
-	fmt.Println(c.GetString("description"), c.GetString("tags"))
+	fileName := fileHeader.Filename
+	fileName = url.QueryEscape(fileName)
+	fileBytes := getFileBytes(&file)
+
 	fileDescription := c.GetString("description")
 	fileTags := strings.Split(c.GetString("tags"), ",")
 	fileSourceProject := c.GetString("source_project")
@@ -42,53 +57,19 @@ func (c *ApiController) UploadFile() {
 
 	uploadRequest := object.FileItem{
 		Owner:         user.Id,
-		Name:          fileHeader.Filename,
+		Name:          fileName,
 		Type:          path.Ext(fileHeader.Filename),
 		SourceProject: fileSourceProject,
 		Description:   fileDescription,
 		Tags:          fileTags,
 	}
-	fileRecord, err := object.CreateNewFileRecord(&uploadRequest)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-	err = c.SaveToFile("file", fileRecord.Path)
-	if err != nil {
-		log.Printf("[upload file] error: %s", err.Error())
-		// delete the file record
-		object.DeleteFile(fmt.Sprintf("%s/%s", uploadRequest.Owner, uploadRequest.Name))
-		c.ResponseError("上传文件错误", fileRecord)
+	fileUrl, objectKey := object.UploadFileToStorage(&uploadRequest, fileBytes)
+	if fileUrl == "" {
+		c.ResponseError("upload file error")
 		return
 	}
 
-	c.ResponseOk(fileRecord)
-}
-
-// DownloadFile
-// @Title DownloadFile
-// @Description download a file by file id(根据文件id下载文件)
-// @Param   fid path string true "file uuid"
-// @Success 200 {object} object.FileItem
-// @Failure 400 "invalid file uuid"
-// @router /:fid [get]
-func (c *ApiController) DownloadFile() {
-	if c.RequireSignedIn() {
-		return
-	}
-
-	fid := c.GetString(":fid")
-	if fid == "" {
-		c.ResponseError("invalid file id")
-		return
-	}
-	fileInfo, err := object.GetFileInfo(fid)
-	if err == nil {
-		c.Ctx.Output.Download(fileInfo.Path, fileInfo.Name)
-		return
-	}
-	c.ResponseOk(fileInfo)
-	return
+	c.ResponseOk(fileUrl, objectKey)
 }
 
 // GetFileInfo

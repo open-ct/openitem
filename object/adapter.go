@@ -85,7 +85,57 @@ func (a *Adapter) close() {
 }
 
 func (a *Adapter) createTable() {
-	err := a.engine.Sync2(new(Dataset), new(Project), new(Assignment), new(Audit), new(FileItem), new(Step), new(Submit), new(TempQuestion), new(FinalQuestion), new(TempTestpaper), new(FinalTestpaper))
+	err := a.engine.Sync2(new(Dataset))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(Project))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(Assignment))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(Audit))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(FileItem))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(Step))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(Submit))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(TempQuestion))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(FinalQuestion))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(TempTestpaper))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.engine.Sync2(new(FinalTestpaper))
 	if err != nil {
 		panic(err)
 	}

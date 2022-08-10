@@ -1,13 +1,11 @@
 package object
 
 import (
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/open-ct/openitem/util"
 	"xorm.io/builder"
-	"xorm.io/core"
 )
 
 type QuestionItem struct {
@@ -37,10 +35,7 @@ type TestpaperComment struct {
 }
 
 type TempTestpaper struct {
-	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
-
+	Uuid          string             `xorm:"notnull pk" json:"uuid"`
 	IsRoot        bool               `json:"is_root"`
 	Base          string             `json:"base"`
 	SourceProject string             `json:"source_project"`
@@ -56,10 +51,7 @@ type TempTestpaper struct {
 }
 
 type FinalTestpaper struct {
-	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
-
+	Uuid          string          `xorm:"notnull pk" json:"uuid"`
 	SourceProject string          `json:"source_project"`
 	Author        string          `json:"author"`
 	Title         string          `json:"title"`
@@ -97,18 +89,15 @@ func AddFinalTestpaper(finalTestpaper *FinalTestpaper) error {
 
 func CreateNewTestpaper(request *TempTestpaper) (string, error) {
 	newTestPaper := TempTestpaper{
-		Owner:       request.Owner,
-		Name:        request.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
-
+		Uuid:          util.GenUuidV4(),
 		IsRoot:        true,
-		Base:          fmt.Sprintf("%s/%s", request.Owner, request.Name),
 		SourceProject: request.SourceProject,
 		Author:        request.Author,
 		Title:         request.Title,
 		Info:          request.Info,
 		Props:         request.Props,
 	}
+	newTestPaper.Base = newTestPaper.Uuid
 
 	err := AddTempTestpaper(&newTestPaper)
 	if err != nil {
@@ -116,7 +105,7 @@ func CreateNewTestpaper(request *TempTestpaper) (string, error) {
 		return "", err
 	}
 
-	tempTestpaperId := fmt.Sprintf("%s/%s", request.Owner, request.Name)
+	tempTestpaperId := newTestPaper.Uuid
 
 	log.Printf("new temp-test-paper created: %s\n", tempTestpaperId)
 	return tempTestpaperId, nil
@@ -125,9 +114,7 @@ func CreateNewTestpaper(request *TempTestpaper) (string, error) {
 func UpdateTestpaper(request *TempTestpaper) (string, error) {
 	var oldTestPaper TempTestpaper
 
-	owner, name := util.GetOwnerAndNameFromId(request.Base)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&oldTestPaper)
+	_, err := adapter.engine.ID(request.Base).Get(&oldTestPaper)
 
 	if err != nil {
 		log.Println("base test-paper cannot find")
@@ -135,10 +122,7 @@ func UpdateTestpaper(request *TempTestpaper) (string, error) {
 	}
 
 	updatedTestPaper := TempTestpaper{
-		Owner:       request.Owner,
-		Name:        request.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
-
+		Uuid:          util.GenUuidV4(),
 		IsRoot:        false,
 		Base:          request.Base,
 		SourceProject: oldTestPaper.SourceProject,
@@ -154,7 +138,7 @@ func UpdateTestpaper(request *TempTestpaper) (string, error) {
 		return "", err
 	}
 
-	updatedId := fmt.Sprintf("%s/%s", updatedTestPaper.Owner, updatedTestPaper.Name)
+	updatedId := updatedTestPaper.Uuid
 	log.Printf("temp-test-paper updated: %s\n", updatedId)
 
 	return updatedId, nil
@@ -168,8 +152,7 @@ func AddTestpaperComment(requset *AddTestpaperCommentRequest) error {
 	}
 	var commentTestPaper TempTestpaper
 
-	owner, name := util.GetOwnerAndNameFromId(requset.TestpaperId)
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&commentTestPaper)
+	_, err := adapter.engine.ID(requset.TestpaperId).Get(&commentTestPaper)
 
 	if err != nil {
 		log.Printf("cannot address the test-paper: %s\n", err.Error())
@@ -179,7 +162,7 @@ func AddTestpaperComment(requset *AddTestpaperCommentRequest) error {
 	newComments := append(commentTestPaper.CommentRecord, newComment)
 	newTempTestpaper := TempTestpaper{CommentRecord: newComments}
 
-	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("comment_record").Update(&newTempTestpaper)
+	_, err = adapter.engine.ID(requset.TestpaperId).Cols("comment_record").Update(&newTempTestpaper)
 
 	if err != nil {
 		log.Printf("add new comment error: %s\n", err.Error())
@@ -191,9 +174,7 @@ func AddTestpaperComment(requset *AddTestpaperCommentRequest) error {
 func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 	var endPointTestPaper TempTestpaper
 
-	owner, name := util.GetOwnerAndNameFromId(tid)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&endPointTestPaper)
+	_, err := adapter.engine.ID(tid).Get(&endPointTestPaper)
 	if err != nil {
 		log.Printf("cannot get the end test-paper: %s\n", err.Error())
 		return nil, err
@@ -207,9 +188,7 @@ func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 	for !isEnd {
 		var currentNode TempTestpaper
 
-		currentOwner, currentName := util.GetOwnerAndNameFromId(currentBaseId)
-
-		_, err := adapter.engine.ID(core.PK{currentOwner, currentName}).Get(&currentNode)
+		_, err := adapter.engine.ID(currentBaseId).Get(&currentNode)
 		if err != nil {
 			log.Printf("find middle node cannot find: %s\n", err.Error())
 			return testPapers, err
@@ -223,19 +202,15 @@ func TraceTestpaperVersion(tid string) ([]TempTestpaper, error) {
 
 func FinishTempTestpaper(tid string) (string, error) {
 	var finishedTestPaper TempTestpaper
-	owner, name := util.GetOwnerAndNameFromId(tid)
 
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&finishedTestPaper)
+	_, err := adapter.engine.ID(tid).Get(&finishedTestPaper)
 	if err != nil {
 		log.Printf("error to find finished error: %s\n", err.Error())
 		return "", nil
 	}
 
 	newFinalPaper := FinalTestpaper{
-		Owner:       finishedTestPaper.Owner,
-		Name:        finishedTestPaper.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
-
+		Uuid:          util.GenUuidV4(),
 		SourceProject: finishedTestPaper.SourceProject,
 		Author:        finishedTestPaper.Author,
 		Title:         finishedTestPaper.Title,
@@ -250,7 +225,7 @@ func FinishTempTestpaper(tid string) (string, error) {
 		return "", err
 	}
 
-	finalTestpaperId := fmt.Sprintf("%s/%s", finishedTestPaper.Owner, finishedTestPaper.Name)
+	finalTestpaperId := newFinalPaper.Uuid
 
 	log.Printf("convert to final successfully: %s\n", finalTestpaperId)
 	return finalTestpaperId, nil

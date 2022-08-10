@@ -67,7 +67,6 @@ func initAPI() {
 	beego.Router("/api/review/proj/submit/content", &controllers.ApiController{}, "DELETE:WithdrawContentInStep")
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "PUT:SetSubmitStatus")
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "DELETE:DeleteSubmit")
-	beego.Router("/api/review/proj/user", &controllers.ApiController{}, "GET:GetUserAssignments")
 
 	// assignment
 	beego.Router("/api/review/proj/user", &controllers.ApiController{}, "GET:GetUserAssignments")
@@ -86,4 +85,16 @@ func initAPI() {
 	// query
 	beego.Router("/api/review/query/proj", &controllers.ApiController{}, "POST:GetProjectList")
 	beego.Router("/api/qbank/query/t_question", &controllers.ApiController{}, "POST:GetTempQuestionList")
+
+	// qbank
+	// question
+	beego.Router("/api/qbank/question", &controllers.ApiController{}, "POST:CreateNewQuestion")
+	beego.Router("/api/qbank/question", &controllers.ApiController{}, "PUT:UpdateQuestion")
+	beego.Router("/api/qbank/question/comment", &controllers.ApiController{}, "POST:AddQuestionComment")
+	beego.Router("/api/qbank/question/trace", &controllers.ApiController{}, "GET:TraceQuestionVersion")
+	beego.Router("/api/qbank/question/finish", &controllers.ApiController{}, "GET:FinishTempQuestion")
+	beego.Router("/api/qbank/question/user_t", &controllers.ApiController{}, "GET:GetUserTempQuestions")
+	beego.Router("/api/qbank/question/user_f", &controllers.ApiController{}, "GET:GetUserFinalQuestions")
+	beego.Router("/api/qbank/question/proj_t", &controllers.ApiController{}, "GET:GetProjectTempQuestions")
+	beego.Router("/api/qbank/question/proj_f", &controllers.ApiController{}, "GET:GetProjectFinalQuestions")
 }

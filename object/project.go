@@ -148,6 +148,25 @@ func CreateEmptyProject(req *Project) (string, error) {
 		return "", err
 	}
 
+	// create the assignment: creator is an admin of the project
+	assign := Assignment{
+		Uuid:        util.GenUuidV4(),
+		UserId:      req.Owner,
+		ProjectId:   fmt.Sprintf("%s/%s", req.Owner, req.Name),
+		Role:        1,
+		Operator:    "system",
+		IsConfirmed: true,
+		Status:      0,
+	}
+
+	_, err = adapter.engine.Insert(&assign)
+	if err != nil {
+		log.Printf("[Mongo] Create project's assignment error: %s\n", err.Error())
+		// delete project
+		adapter.engine.ID(core.PK{newProject.Owner, newProject.Name}).Delete(&Project{})
+		return "", err
+	}
+
 	insertedId := fmt.Sprintf("%s/%s", req.Owner, req.Name)
 
 	log.Printf("[Project] New project has been created pid:%s\n", insertedId)
@@ -175,6 +194,25 @@ func CreateTemplateProject(req *Project) (string, error) {
 	err := AddProject(&newProject)
 	if err != nil {
 		log.Printf("create new project: %s\n", err.Error())
+		return "", err
+	}
+
+	// create the assignment: creator is an admin of the project
+	assign := Assignment{
+		Uuid:        util.GenUuidV4(),
+		UserId:      req.Owner,
+		ProjectId:   fmt.Sprintf("%s/%s", req.Owner, req.Name),
+		Role:        1,
+		Operator:    "system",
+		IsConfirmed: true,
+		Status:      0,
+	}
+
+	_, err = adapter.engine.Insert(&assign)
+	if err != nil {
+		log.Printf("[Mongo] Create project's assignment error: %s\n", err.Error())
+		// delete project
+		adapter.engine.ID(core.PK{newProject.Owner, newProject.Name}).Delete(&Project{})
 		return "", err
 	}
 
@@ -219,6 +257,7 @@ func CreateTemplateProject(req *Project) (string, error) {
 	if err != nil {
 		log.Printf("Create project's template step error: %s\n", err.Error()) // delete project
 		adapter.engine.ID(core.PK{newProject.Owner, newProject.Name}).Delete(&Project{})
+		adapter.engine.ID(assign.Uuid).Delete(&Assignment{})
 		return "", err
 	}
 
@@ -281,10 +320,17 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 	}
 	projectInfo["basic_info"] = basicInfo
 
+	// get group
+	projectGroup, err := GetProjectAssignment(pid)
+	if err != nil {
+		return nil, err
+	}
+	projectInfo["group"] = projectGroup
+
 	// get steps & all references
 	var projectSteps []Step
 
-	err = adapter.engine.Where(builder.Eq{"project_id": pid}).Find(&projectSteps)
+	err = adapter.engine.Where(builder.Eq{"project_id": pid}).Asc("index").Find(&projectSteps)
 	if err != nil {
 		return nil, err
 	}
@@ -316,4 +362,20 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 	projectInfo["materials"] = projectMaterials
 
 	return projectInfo, nil
+}
+
+// QueryProjects get project list
+func QueryProjects(ids []string) map[string]Project {
+	projs := make(map[string]Project)
+	for _, id := range ids {
+		var p Project
+
+		owner, name := util.GetOwnerAndNameFromId(id)
+		_, err := adapter.engine.ID(core.PK{owner, name}).Get(&p)
+		if err != nil {
+			continue
+		}
+		projs[id] = p
+	}
+	return projs
 }

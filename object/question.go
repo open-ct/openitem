@@ -1,13 +1,11 @@
 package object
 
 import (
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/open-ct/openitem/util"
 	"xorm.io/builder"
-	"xorm.io/core"
 )
 
 type QuestionInfo struct {
@@ -66,10 +64,7 @@ type QuestionApplyRecord struct {
 }
 
 type TempQuestion struct {
-	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
-
+	Uuid          string                `json:"uuid"`
 	IsRoot        bool                  `json:"is_root"`        // 临时题目是否是根
 	Base          string                `json:"base"`           // 若不是root, 需要设置上级题目, 进行版本管理
 	SourceProject string                `json:"source_project"` // 项目来源
@@ -88,10 +83,7 @@ type TempQuestion struct {
 }
 
 type FinalQuestion struct {
-	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
-
+	Uuid          string                `json:"uuid"`
 	SourceProject string                `json:"source_project"` // 来源项目id
 	FinalVersion  string                `json:"final_version"`  // 录入final的最后一个版本
 	Author        string                `json:"author"`
@@ -113,40 +105,6 @@ type AddQuestionCommentRequest struct {
 	Author     string `json:"'author'"`
 }
 
-func getTempQuestion(owner string, name string) *TempQuestion {
-	tempQuestion := TempQuestion{Owner: owner, Name: name}
-	existed, err := adapter.engine.Get(&tempQuestion)
-	if err != nil {
-		panic(err)
-	}
-
-	if existed {
-		return &tempQuestion
-	} else {
-		return nil
-	}
-}
-
-func GetTempQuestion(id string) *TempQuestion {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	return getTempQuestion(owner, name)
-}
-
-func UpdateTempQuestion(id string, tempQuestion *TempQuestion) bool {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	if getTempQuestion(owner, name) == nil {
-		return false
-	}
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(tempQuestion)
-	if err != nil {
-		panic(err)
-	}
-
-	// return affected != 0
-	return true
-}
-
 func AddTempQuestion(tempQuestion *TempQuestion) error {
 	_, err := adapter.engine.Insert(tempQuestion)
 	if err != nil {
@@ -157,46 +115,12 @@ func AddTempQuestion(tempQuestion *TempQuestion) error {
 }
 
 func DeleteTempQuestion(tempQuestion *TempQuestion) bool {
-	affected, err := adapter.engine.ID(core.PK{tempQuestion.Owner, tempQuestion.Name}).Delete(&TempQuestion{})
+	affected, err := adapter.engine.ID(tempQuestion.Uuid).Delete(&TempQuestion{})
 	if err != nil {
 		panic(err)
 	}
 
 	return affected != 0
-}
-
-func getFinalQuestion(owner string, name string) *FinalQuestion {
-	finalQuestion := FinalQuestion{Owner: owner, Name: name}
-	existed, err := adapter.engine.Get(&finalQuestion)
-	if err != nil {
-		panic(err)
-	}
-
-	if existed {
-		return &finalQuestion
-	} else {
-		return nil
-	}
-}
-
-func GetFinalQuestion(id string) *FinalQuestion {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	return getFinalQuestion(owner, name)
-}
-
-func UpdateFinalQuestion(id string, finalQuestion *FinalQuestion) bool {
-	owner, name := util.GetOwnerAndNameFromId(id)
-	if getFinalQuestion(owner, name) == nil {
-		return false
-	}
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(finalQuestion)
-	if err != nil {
-		panic(err)
-	}
-
-	// return affected != 0
-	return true
 }
 
 func AddFinalQuestion(finalQuestion *FinalQuestion) error {
@@ -209,7 +133,7 @@ func AddFinalQuestion(finalQuestion *FinalQuestion) error {
 }
 
 func DeleteFinalQuestion(finalQuestion *FinalQuestion) bool {
-	affected, err := adapter.engine.ID(core.PK{finalQuestion.Owner, finalQuestion.Name}).Delete(&FinalQuestion{})
+	affected, err := adapter.engine.ID(finalQuestion.Uuid).Delete(&FinalQuestion{})
 	if err != nil {
 		panic(err)
 	}
@@ -219,12 +143,8 @@ func DeleteFinalQuestion(finalQuestion *FinalQuestion) bool {
 
 func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 	newTempQuestion := TempQuestion{
-		Owner:       request.Owner,
-		Name:        request.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
-
+		Uuid:          util.GenUuidV4(),
 		IsRoot:        true,
-		Base:          fmt.Sprintf("%s/%s", request.Owner, request.Name),
 		SourceProject: request.SourceProject,
 		Author:        request.Author,
 		Info:          request.Info,
@@ -235,6 +155,7 @@ func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 		ApplyRecord:   request.ApplyRecord,
 		CommentRecord: nil,
 	}
+	newTempQuestion.Base = newTempQuestion.Uuid
 
 	err := AddTempQuestion(&newTempQuestion)
 	if err != nil {
@@ -242,7 +163,7 @@ func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 		return "", err
 	}
 
-	tempTestQuestionId := fmt.Sprintf("%s/%s", request.Owner, request.Name)
+	tempTestQuestionId := newTempQuestion.Uuid
 
 	log.Printf("new temp-question created: %s\n", tempTestQuestionId)
 	return tempTestQuestionId, nil
@@ -251,19 +172,14 @@ func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 func UpdateQuestion(request *TempQuestion) (string, error) {
 	var oldQuestion TempQuestion
 
-	owner, name := util.GetOwnerAndNameFromId(request.Base)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&oldQuestion)
+	_, err := adapter.engine.ID(request.Base).Get(&oldQuestion)
 	if err != nil {
 		log.Println("base question cannot find")
 		return "", err
 	}
 
 	newTempQuestion := TempQuestion{
-		Owner:       request.Owner,
-		Name:        request.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
-
+		Uuid:          util.GenUuidV4(),
 		IsRoot:        false,
 		Base:          request.Base,
 		SourceProject: oldQuestion.SourceProject,
@@ -283,7 +199,7 @@ func UpdateQuestion(request *TempQuestion) (string, error) {
 		return "", err
 	}
 
-	updatedId := fmt.Sprintf("%s/%s", newTempQuestion.Owner, newTempQuestion.Name)
+	updatedId := newTempQuestion.Uuid
 	log.Printf("temp-question updated: %s\n", updatedId)
 	return updatedId, nil
 }
@@ -291,9 +207,7 @@ func UpdateQuestion(request *TempQuestion) (string, error) {
 func TraceQuestionVersion(qid string) ([]TempQuestion, error) {
 	var endPointQuestion TempQuestion
 
-	owner, name := util.GetOwnerAndNameFromId(qid)
-
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&endPointQuestion)
+	_, err := adapter.engine.ID(qid).Get(&endPointQuestion)
 	if err != nil {
 		log.Printf("find base questions failed, qid: [%s] %s\n", qid, err.Error())
 		return nil, err
@@ -307,9 +221,7 @@ func TraceQuestionVersion(qid string) ([]TempQuestion, error) {
 	for !isEnd {
 		var currentNode TempQuestion
 
-		currentOwner, currentName := util.GetOwnerAndNameFromId(currentBaseId)
-
-		_, err := adapter.engine.ID(core.PK{currentOwner, currentName}).Get(&currentNode)
+		_, err := adapter.engine.ID(currentBaseId).Get(&currentNode)
 		if err != nil {
 			log.Printf("find middle-node questions failed, qid: [%s] %s\n", currentBaseId, err.Error())
 			return questions, err
@@ -329,8 +241,7 @@ func AddQuestionComment(request *AddQuestionCommentRequest) error {
 	}
 	var commentQuestion TempQuestion
 
-	owner, name := util.GetOwnerAndNameFromId(request.QuestionId)
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&commentQuestion)
+	_, err := adapter.engine.ID(request.QuestionId).Get(&commentQuestion)
 	if err != nil {
 		log.Printf("cannot address the question: %s for %s\n", request.QuestionId, err.Error())
 		return err
@@ -338,7 +249,7 @@ func AddQuestionComment(request *AddQuestionCommentRequest) error {
 	newComments := append(commentQuestion.CommentRecord, newComment)
 	newTempQuestion := TempQuestion{CommentRecord: newComments}
 
-	_, err = adapter.engine.ID(core.PK{owner, name}).Cols("comment_record").Update(&newTempQuestion)
+	_, err = adapter.engine.ID(request.QuestionId).Cols("comment_record").Update(&newTempQuestion)
 	if err != nil {
 		log.Printf("add new comment error: %s\n", err.Error())
 		return err
@@ -349,19 +260,15 @@ func AddQuestionComment(request *AddQuestionCommentRequest) error {
 func FinishTempQuestion(qid string) (string, error) {
 	var tempQuestion TempQuestion
 
-	owner, name := util.GetOwnerAndNameFromId(qid)
-	_, err := adapter.engine.ID(core.PK{owner, name}).Get(&tempQuestion)
+	_, err := adapter.engine.ID(qid).Get(&tempQuestion)
 	if err != nil {
 		log.Printf("cannot address the question: %s for %s\n", qid, err.Error())
 		return "", err
 	}
 	finalQuestion := FinalQuestion{
-		Owner:       tempQuestion.Owner,
-		Name:        tempQuestion.Name,
-		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
-
+		Uuid:          util.GenUuidV4(),
 		SourceProject: tempQuestion.SourceProject,
-		FinalVersion:  fmt.Sprintf("%s/%s", tempQuestion.Owner, tempQuestion.Name),
+		FinalVersion:  qid,
 		Author:        tempQuestion.Author,
 		Info:          tempQuestion.Info,
 		BasicProps:    tempQuestion.BasicProps,
@@ -377,7 +284,7 @@ func FinishTempQuestion(qid string) (string, error) {
 		return "", err
 	}
 
-	finalQuestionId := fmt.Sprintf("%s/%s", finalQuestion.Owner, finalQuestion.Name)
+	finalQuestionId := finalQuestion.Uuid
 
 	log.Printf("convert to final successfully: %s\n", finalQuestionId)
 	return finalQuestionId, nil
@@ -425,4 +332,20 @@ func GetProjectFinalQuestions(pid string) ([]FinalQuestion, error) {
 		return nil, err
 	}
 	return questions, nil
+}
+
+// QueryTempQuestions 进行批量查询的方法
+func QueryTempQuestions(idList []string) map[string]TempQuestion {
+	questionsMap := make(map[string]TempQuestion)
+	for _, id := range idList {
+		var question TempQuestion
+
+		_, err := adapter.engine.ID(id).Get(&question)
+		if err != nil {
+			log.Printf("get temp-question error: [%s] %s\n", id, err.Error())
+			continue
+		}
+		questionsMap[id] = question
+	}
+	return questionsMap
 }

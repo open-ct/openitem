@@ -189,9 +189,8 @@ func CreateTemplateProject(req *Project) (string, error) {
 		}
 		for i := 0; i < 7; i++ {
 			step := Step{
-				Owner:       req.Owner,
-				Name:        stepName[i],
-				CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
+				Uuid: util.GenUuidV4(),
+				Name: stepName[i],
 
 				ProjectId: fmt.Sprintf("%s/%s", newProject.Owner, newProject.Name),
 				Index:     i,
@@ -204,7 +203,7 @@ func CreateTemplateProject(req *Project) (string, error) {
 				return nil, err
 			}
 
-			insertedStepId := fmt.Sprintf("%s/%s", step.Owner, step.Name)
+			insertedStepId := step.Uuid
 
 			log.Printf("[create step] template steps successfully %s\n", insertedStepId)
 		}
@@ -283,7 +282,7 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 	projectInfo["basic_info"] = basicInfo
 
 	// get steps & all references
-	projectSteps := []Step{}
+	var projectSteps []Step
 
 	err = adapter.engine.Where(builder.Eq{"project_id": pid}).Find(&projectSteps)
 	if err != nil {
@@ -295,7 +294,7 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 	for _, step := range projectSteps {
 		var submits []Submit
 
-		stepId := fmt.Sprintf("%s/%s", step.Owner, step.Name)
+		stepId := step.Uuid
 		err = adapter.engine.Where(builder.Eq{"step_id": stepId}).Find(&submits)
 		if err != nil {
 			return nil, err

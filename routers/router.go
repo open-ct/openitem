@@ -23,6 +23,8 @@ func initAPI() {
 	beego.Router("/api/signout", &controllers.ApiController{}, "POST:Signout")
 	beego.Router("/api/get-account", &controllers.ApiController{}, "GET:GetAccount")
 
+	beego.Router("/api/get-users", &controllers.ApiController{}, "GET:GetUsers")
+
 	beego.Router("/api/get-global-datasets", &controllers.ApiController{}, "GET:GetGlobalDatasets")
 	beego.Router("/api/get-datasets", &controllers.ApiController{}, "GET:GetDatasets")
 	beego.Router("/api/get-dataset", &controllers.ApiController{}, "GET:GetDataset")

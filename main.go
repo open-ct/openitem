@@ -4,12 +4,14 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/astaxie/beego/session/redis"
+	"github.com/open-ct/openitem/casdoor"
 	"github.com/open-ct/openitem/object"
 	"github.com/open-ct/openitem/routers"
 )
 
 func main() {
 	object.InitAdapter()
+	casdoor.InitCasdoorAdapter()
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins:     []string{"*"},

@@ -12,7 +12,7 @@ import (
 // @Param   json body object.Project true "基本的项目信息, 创建人(creator)一项不需要填写,会根据token自动解析填充"
 // @Success 200 projectId owner/name
 // @Failure 400 "[request login] please login"
-// @router / [post]
+// @router /api/review/proj/ [post]
 func (c *ApiController) CreateEmptyProject() {
 	if c.RequireSignedIn() {
 		c.ResponseError("[request login] please login")
@@ -40,7 +40,7 @@ func (c *ApiController) CreateEmptyProject() {
 // @Param   json body object.Project true "基本的项目信息, 创建人(creator)一项不需要填写,会根据token自动解析填充"
 // @Success 200 projectId owner/name
 // @Failure 400 "[request login] please login"
-// @router /template [post]
+// @router /api/review/proj/template [post]
 func (c *ApiController) CreatTemplateProject() {
 	var req object.Project
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
@@ -69,7 +69,7 @@ func (c *ApiController) CreatTemplateProject() {
 // @Param   json body object.Project true 要更新的项目信息数据
 // @Success 200 ok
 // @Failure 400 "invalid body"
-// @router / [put]
+// @router /api/review/proj/ [put]
 func (c *ApiController) UpdateProjectInfo() {
 	if c.RequireSignedIn() {
 		return
@@ -96,7 +96,7 @@ func (c *ApiController) UpdateProjectInfo() {
 // @Param   pid path string true "项目的id owner/name"
 // @Success 200 {object} object.Project
 // @Failure 400 "invalid project id"
-// @router /basic/:pid [get]
+// @router /api/review/proj/basic/:pid [get]
 func (c *ApiController) GetBasicInfo() {
 	if c.RequireSignedIn() {
 		return
@@ -122,7 +122,7 @@ func (c *ApiController) GetBasicInfo() {
 // @Param   pid path string true "项目的id owner/name"
 // @Success 200 {object} object.Project
 // @Failure 400 "invalid project id"
-// @router /detailed/:pid [get]
+// @router /api/review/proj/detailed/:pid [get]
 func (c *ApiController) GetDetailedInfo() {
 	if c.RequireSignedIn() {
 		return
@@ -133,11 +133,37 @@ func (c *ApiController) GetDetailedInfo() {
 		c.ResponseError("invalid project id")
 		return
 	}
-	proj, err := object.GetProjectBasicInfo(pid)
+	proj, err := object.GetProjectDetailedInfo(pid)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
 	c.ResponseOk(proj)
+}
+
+// GetUserAssignments
+// @Title GetUserAssignment
+// @Description 获取某一个用户的所有项目参与情况(即参与各个项目的角色分配情况)
+// @Param   uid path string true "user id"
+// @Success 200 {object} response.Default
+// @Failure 400 "invalid user id"
+// @router /api/review/proj/user/:uid [get]
+func (c *ApiController) GetUserAssignments() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	uid := c.GetString(":uid")
+	if uid == "" {
+		c.ResponseError("invalid project id")
+		return
+	}
+	assigns, err := object.GetUserAssignments(uid)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(assigns)
 }

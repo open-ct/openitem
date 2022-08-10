@@ -35,7 +35,7 @@ type TestpaperComment struct {
 }
 
 type TempTestpaper struct {
-	Uuid          string             `xorm:"notnull pk" json:"uuid"`
+	Uuid          string             `xorm:"varchar(100) notnull pk" json:"uuid"`
 	IsRoot        bool               `json:"is_root"`
 	Base          string             `json:"base"`
 	SourceProject string             `json:"source_project"`
@@ -51,7 +51,7 @@ type TempTestpaper struct {
 }
 
 type FinalTestpaper struct {
-	Uuid          string          `xorm:"notnull pk" json:"uuid"`
+	Uuid          string          `xorm:"varchar(100) notnull pk" json:"uuid"`
 	SourceProject string          `json:"source_project"`
 	Author        string          `json:"author"`
 	Title         string          `json:"title"`

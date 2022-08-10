@@ -9,7 +9,7 @@ import (
 )
 
 type Step struct {
-	Uuid        string             `xorm:"notnull pk" json:"uuid"`
+	Uuid        string             `xorm:"varchar(100) notnull pk" json:"uuid"`
 	Name        string             `json:"name"`
 	ProjectId   string             `json:"project_id"`
 	Index       int                `json:"index"`

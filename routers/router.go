@@ -97,4 +97,16 @@ func initAPI() {
 	beego.Router("/api/qbank/question/user_f", &controllers.ApiController{}, "GET:GetUserFinalQuestions")
 	beego.Router("/api/qbank/question/proj_t", &controllers.ApiController{}, "GET:GetProjectTempQuestions")
 	beego.Router("/api/qbank/question/proj_f", &controllers.ApiController{}, "GET:GetProjectFinalQuestions")
+
+	// testpaper
+	beego.Router("/api/qbank/testpaper", &controllers.ApiController{}, "POST:CreateNewTestpaper")
+	beego.Router("/api/qbank/testpaper", &controllers.ApiController{}, "PUT:UpdateTestpaper")
+	beego.Router("/api/qbank/testpaper/comment", &controllers.ApiController{}, "POST:AddTestpaperComment")
+	beego.Router("/api/qbank/testpaper/trace", &controllers.ApiController{}, "GET:TraceTestpaperVersion")
+	beego.Router("/api/qbank/testpaper/finish", &controllers.ApiController{}, "GET:FinishTempTestpaper")
+	beego.Router("/api/qbank/testpaper/user_t", &controllers.ApiController{}, "GET:GetUserTempTestpaper")
+	beego.Router("/api/qbank/testpaper/user_t", &controllers.ApiController{}, "GET:GetUserTempTestpaper")
+	beego.Router("/api/qbank/testpaper/user_f", &controllers.ApiController{}, "GET:GetUserFinalTestpaper")
+	beego.Router("/api/qbank/testpaper/proj_t", &controllers.ApiController{}, "GET:GetProjectTempTestpaper")
+	beego.Router("/api/qbank/testpaper/proj_f", &controllers.ApiController{}, "GET:GetProjectFinalTestpaper")
 }

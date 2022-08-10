@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/open-ct/openitem/util"
 	"xorm.io/builder"
 )
 
@@ -18,6 +19,19 @@ type Assignment struct {
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
+}
+
+type MakeOneAssignmentRequest struct {
+	Operator  string `json:"operator"`
+	ProjectId string `json:"project_id"`
+	UserId    string `json:"user_id"`
+	Role      int    `json:"role"`
+}
+
+type ChangeAssignmentRequest struct {
+	Operator     string `json:"operator"`
+	AssignmentId string `json:"assignment_id"`
+	NewRole      int    `json:"new_role"`
 }
 
 func GetUserAssignments(uid string) (*[]Assignment, error) {
@@ -69,4 +83,48 @@ func GetProjectAssignment(pid string) (map[string][]Assignment, error) {
 		}
 	}
 	return result, nil
+}
+
+func MakeOneAssignment(req *MakeOneAssignmentRequest) (string, error) {
+	newAssign := Assignment{
+		Uuid:        util.GenUuidV4(),
+		UserId:      req.UserId,
+		ProjectId:   req.ProjectId,
+		Role:        req.Role,
+		Operator:    req.Operator,
+		IsConfirmed: false,
+		Status:      0,
+	}
+	_, err := adapter.engine.Insert(&newAssign)
+	if err != nil {
+		log.Printf("[Assignment] %s\n", err.Error())
+		return "", err
+	}
+	log.Printf("Created new assignment: %s", newAssign.Uuid)
+	return newAssign.Uuid, nil
+}
+
+func RemoveAssignment(aid string) error {
+	_, err := adapter.engine.ID(aid).Delete(&Assignment{})
+	if err != nil {
+		log.Printf("[delete assign] delete role error: %s\n", err.Error())
+		return err
+	}
+	return nil
+}
+
+func ChangeAssignment(req *ChangeAssignmentRequest) error {
+
+	_, err := adapter.engine.ID(req.AssignmentId).Update(
+		&Assignment{
+			Role:        req.NewRole,
+			Operator:    req.Operator,
+			IsConfirmed: false,
+		},
+	)
+	if err != nil {
+		log.Printf("[change assign] change role error: %s\n", err.Error())
+		return err
+	}
+	return nil
 }

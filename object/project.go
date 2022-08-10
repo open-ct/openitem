@@ -363,3 +363,19 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 
 	return projectInfo, nil
 }
+
+// QueryProjects get project list
+func QueryProjects(ids []string) map[string]Project {
+	projs := make(map[string]Project)
+	for _, id := range ids {
+		var p Project
+
+		owner, name := util.GetOwnerAndNameFromId(id)
+		_, err := adapter.engine.ID(core.PK{owner, name}).Get(&p)
+		if err != nil {
+			continue
+		}
+		projs[id] = p
+	}
+	return projs
+}

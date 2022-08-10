@@ -82,4 +82,8 @@ func initAPI() {
 	beego.Router("/api/review/file/info", &controllers.ApiController{}, "GET:GetFileInfo")
 	beego.Router("/api/review/file/search", &controllers.ApiController{}, "POST:SearchFiles")
 	beego.Router("/api/review/file", &controllers.ApiController{}, "DELETE:DeleteFile")
+
+	// query
+	beego.Router("/api/review/query/proj", &controllers.ApiController{}, "POST:GetProjectList")
+	beego.Router("/api/qbank/query/t_question", &controllers.ApiController{}, "POST:GetTempQuestionList")
 }

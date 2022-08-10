@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/casdoor/casdoor-go-sdk/auth"
-
 	"github.com/open-ct/openitem/util"
 )
 

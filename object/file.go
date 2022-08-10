@@ -10,7 +10,7 @@ import (
 )
 
 type FileItem struct {
-	Uuid          string   `xorm:"not null pk" json:"uuid"`
+	Uuid          string   `xorm:"notnull pk" json:"uuid"`
 	Name          string   `json:"name"`
 	Type          string   `json:"type"`
 	SourceProject string   `json:"source_project"`

@@ -9,7 +9,7 @@ import (
 )
 
 type Assignment struct {
-	Uuid        string `xorm:"not null pk" json:"uuid"`
+	Uuid        string `xorm:"notnull pk" json:"uuid"`
 	UserId      string `json:"user_id" bson:"user_id"`
 	ProjectId   string `json:"project_id" bson:"project_id"`
 	Role        int    `json:"role" bson:"role"`

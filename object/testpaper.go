@@ -22,10 +22,10 @@ type TestpaperPart struct {
 }
 
 type TestpaperProps struct {
-	GradeRange []string `xorm:"mediumtext not null pk" json:"grade_range"`
-	Subjects   []string `xorm:"mediumtext not null pk" json:"subjects"`
-	Difficulty string   `xorm:"not null pk" json:"difficulty"`
-	TimeLimit  string   `xorm:"not null pkpk" json:"time_limit"`
+	GradeRange []string `xorm:"mediumtext notnull pk" json:"grade_range"`
+	Subjects   []string `xorm:"mediumtext notnull pk" json:"subjects"`
+	Difficulty string   `xorm:"notnull pk" json:"difficulty"`
+	TimeLimit  string   `xorm:"notnull pk" json:"time_limit"`
 }
 
 type TestpaperComment struct {

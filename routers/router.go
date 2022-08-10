@@ -44,4 +44,15 @@ func initAPI() {
 	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "POST:CreateOneAudit")
 	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "PUT:CorrectAudit")
 	beego.Router("/api/review/proj/audit", &controllers.ApiController{}, "DELETE:DeleteAudit")
+	// step
+	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "POST:CreateOneStep")
+	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "GET:GetOneStepInfo")
+	beego.Router("/api/review/proj/steps", &controllers.ApiController{}, "GET:GetStepsInProject")
+	beego.Router("/api/review/proj/step/attachment", &controllers.ApiController{}, "POST:UploadStepAttachment")
+	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "PUT:UpdateStepInfo")
+	beego.Router("/api/review/proj/step/status", &controllers.ApiController{}, "PUT:SetStepStatus")
+	beego.Router("/api/review/proj/step/timepoint", &controllers.ApiController{}, "PUT:SetStepTimePoint")
+	beego.Router("/api/review/proj/step/timepoint", &controllers.ApiController{}, "DELETE:DeleteStepTimePoint")
+	beego.Router("/api/review/proj/step/stat", &controllers.ApiController{}, "GET:GetStepStatisticData")
+	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "DELETE:DeleteStep")
 }

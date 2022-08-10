@@ -57,6 +57,7 @@ func initAPI() {
 	beego.Router("/api/review/proj/step/timepoint", &controllers.ApiController{}, "DELETE:DeleteStepTimePoint")
 	beego.Router("/api/review/proj/step/stat", &controllers.ApiController{}, "GET:GetStepStatisticData")
 	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "DELETE:DeleteStep")
+
 	// submit
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "GET:GetOneSubmit")
 	beego.Router("/api/review/proj/submits", &controllers.ApiController{}, "GET:GetSubmitsInStep")
@@ -67,7 +68,7 @@ func initAPI() {
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "PUT:SetSubmitStatus")
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "DELETE:DeleteSubmit")
 
-  // file
+	// file
 	beego.Router("/api/review/file", &controllers.ApiController{}, "POST:UploadFile")
 	beego.Router("/api/review/file", &controllers.ApiController{}, "GET:DownloadFile")
 	beego.Router("/api/review/file/info", &controllers.ApiController{}, "GET:GetFileInfo")

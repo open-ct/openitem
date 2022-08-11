@@ -12,7 +12,7 @@ import (
 // @Param   submitId path string true "要获取的submit uuid"
 // @Success 200 {object} object.Submit
 // @Failure 400 "invalid submit id"
-// @router /submit/:submitId [get]
+// @router /api/review/proj/submit/:submitId [get]
 func (c *ApiController) GetOneSubmit() {
 	if c.RequireSignedIn() {
 		return
@@ -37,7 +37,7 @@ func (c *ApiController) GetOneSubmit() {
 // @Param   stepId path string true "step的uuid"
 // @Success 200 {object} []object.Submit
 // @Failure 400 "invalid step id"
-// @router /submits/:stepId [get]
+// @router /api/review/proj/submits/:stepId [get]
 func (c *ApiController) GetSubmitsInStep() {
 	if c.RequireSignedIn() {
 		return
@@ -63,7 +63,7 @@ func (c *ApiController) GetSubmitsInStep() {
 // @Param   json body object.GetUserSubmitsInStepRequest true "用户&step信息"
 // @Success 200 {object} []object.Submit
 // @Failure 400 "invalid json"
-// @router /submits/user [post]
+// @router /api/review/proj/submits/user [post]
 func (c *ApiController) GetUserSubmitInStep() {
 	if c.RequireSignedIn() {
 		return
@@ -91,7 +91,7 @@ func (c *ApiController) GetUserSubmitInStep() {
 // @Param   json body object.Submit true "新submit信息"
 // @Success 200 {object} response.Default
 // @Failure 400 "invalid json"
-// @router /submit [post]
+// @router /api/review/proj/submit [post]
 func (c *ApiController) MakeOneSubmit() {
 	if c.RequireSignedIn() {
 		return
@@ -122,7 +122,7 @@ func (c *ApiController) MakeOneSubmit() {
 // @Param   json body object.AppendContentInSubmit true "上传的材料信息"
 // @Success 200 {object} response.Default
 // @Failure 400 "invalid json"
-// @router /submit/content [post]
+// @router /api/review/proj/submit/content [post]
 func (c *ApiController) AppendContentInStep() {
 	if c.RequireSignedIn() {
 		return
@@ -149,7 +149,7 @@ func (c *ApiController) AppendContentInStep() {
 // @Param   json body object.WithdrawContentInSubmit true "撤回的信息"
 // @Success 200 {object} response.Default
 // @Failure 400 "invalid json"
-// @router /submit/content [delete]
+// @router /api/review/proj/submit/content [delete]
 func (c *ApiController) WithdrawContentInStep() {
 	if c.RequireSignedIn() {
 		return
@@ -176,7 +176,7 @@ func (c *ApiController) WithdrawContentInStep() {
 // @Param   json body object.SetSubmitStatusRequest true "设定的状态"
 // @Success 200 true
 // @Failure 400 "invalid json"
-// @router /submit [put]
+// @router /api/review/proj/submit [put]
 func (c *ApiController) SetSubmitStatus() {
 	if c.RequireSignedIn() {
 		return
@@ -203,7 +203,7 @@ func (c *ApiController) SetSubmitStatus() {
 // @Param   submitId path string true "要删除的submit的uuid"
 // @Success 200 true
 // @Failure 400 "invalid submit id"
-// @router /submit/:submitId [delete]
+// @router /api/review/proj/submit/:submitId [delete]
 func (c *ApiController) DeleteSubmit() {
 	if c.RequireSignedIn() {
 		return

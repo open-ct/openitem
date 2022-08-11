@@ -31,7 +31,7 @@ func getFileBytes(file *multipart.File) []byte {
 // @Param   source_project formData string true "上传文件对应的项目id, 查询使用"
 // @Success 200 {object} object.FileItem
 // @Failure 400 "invalid file"
-// @router / [post]
+// @router /api/review/file/ [post]
 func (c *ApiController) UploadFile() {
 	if c.RequireSignedIn() {
 		return
@@ -78,7 +78,7 @@ func (c *ApiController) UploadFile() {
 // @Param   fid path string true "file uuid owner/name"
 // @Success 200 {object} response.Default
 // @Failure 400 "invalid file uuid"
-// @router /info/:fid [get]
+// @router /api/review/file/info/:fid [get]
 func (c *ApiController) GetFileInfo() {
 	if c.RequireSignedIn() {
 		return
@@ -103,7 +103,7 @@ func (c *ApiController) GetFileInfo() {
 // @Param   json body object.FileItem true "搜索条件"
 // @Success 200 {object} []object.FileItem
 // @Failure 400 "invalid conditions (parse body failed)"
-// @router /search [post]
+// @router /api/review/file/search [post]
 func (c *ApiController) SearchFiles() {
 	if c.RequireSignedIn() {
 		return
@@ -131,7 +131,7 @@ func (c *ApiController) SearchFiles() {
 // @Param   fid path string true "the file's id you want to delete owner/name"
 // @Success 200 true
 // @Failure 400 "invalid file id"
-// @router /:fid [delete]
+// @router /api/review/file/:fid [delete]
 func (c *ApiController) DeleteFile() {
 	if c.RequireSignedIn() {
 		return

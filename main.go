@@ -21,8 +21,9 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	//beego.DelStaticPath("/static")
+	// beego.DelStaticPath("/static")
 	beego.SetStaticPath("/static", "web/build/static")
+	beego.SetStaticPath("/swagger", "swagger")
 	// https://studygolang.com/articles/2303
 	beego.InsertFilter("/", beego.BeforeRouter, routers.TransparentStatic) // must has this for default page
 	beego.InsertFilter("/*", beego.BeforeRouter, routers.TransparentStatic)

@@ -1,6 +1,8 @@
 package casdoor
 
-import "github.com/casdoor/casdoor-go-sdk/auth"
+import (
+	"github.com/casdoor/casdoor-go-sdk/auth"
+)
 
 func GetUsers() []*auth.User {
 	owner := CasdoorOrganization
@@ -56,4 +58,23 @@ func GetUser(name string) *auth.User {
 	} else {
 		return nil
 	}
+}
+
+func QueryUsers(ids []string) map[string]*auth.User {
+	owner := CasdoorOrganization
+	users := make(map[string]*auth.User)
+	for _, id := range ids {
+		user := auth.User{Owner: owner, Id: id}
+		existed, err := adapter.Engine.Get(&user)
+		if err != nil {
+			panic(err)
+		}
+
+		if existed {
+			users[id] = &user
+		} else {
+			continue
+		}
+	}
+	return users
 }

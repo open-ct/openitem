@@ -12,7 +12,7 @@ import (
 // @Param   json body object.Step true "新建步骤的基本信息结构"
 // @Success 200 stepId owner/name
 // @Failure 400 "invalid step json body"
-// @router /step [post]
+// @router /api/review/proj/step [post]
 func (c *ApiController) CreateOneStep() {
 	if c.RequireSignedIn() {
 		return
@@ -43,7 +43,7 @@ func (c *ApiController) CreateOneStep() {
 // @Param   stepId path string true "对应step的uuid"
 // @Success 200 {object} object.Step
 // @Failure 400 "invalid stepID"
-// @router /step/:stepId [get]
+// @router /api/review/proj/step/:stepId [get]
 func (c *ApiController) GetOneStepInfo() {
 	if c.RequireSignedIn() {
 		return
@@ -68,7 +68,7 @@ func (c *ApiController) GetOneStepInfo() {
 // @Param   pid path string true "指定的项目uuid"
 // @Success 200 {object} []object.Step
 // @Failure 400 "invalid project id"
-// @router /steps/:pid [get]
+// @router /api/review/proj/steps/:pid [get]
 func (c *ApiController) GetStepsInProject() {
 	if c.RequireSignedIn() {
 		return
@@ -94,7 +94,7 @@ func (c *ApiController) GetStepsInProject() {
 // @Param   json body object.AddStepAttachment true "附件信息"
 // @Success 200 true
 // @Failure 400 "invalid attachment json"
-// @router /step/attachment [post]
+// @router /api/review/proj/step/attachment [post]
 func (c *ApiController) UploadStepAttachment() {
 	if c.RequireSignedIn() {
 		return
@@ -124,7 +124,7 @@ func (c *ApiController) UploadStepAttachment() {
 // @Param   json body object.Step true "要更新的信息"
 // @Success 200 {object} response.Default
 // @Failure 400 "invalid json"
-// @router /step [put]
+// @router /api/review/proj/step [put]
 func (c *ApiController) UpdateStepInfo() {
 	if c.RequireSignedIn() {
 		return
@@ -151,7 +151,7 @@ func (c *ApiController) UpdateStepInfo() {
 // @Param   json body object.Step true "新的状态信息"
 // @Success 200 true
 // @Failure 400 "invalid json body"
-// @router /step/status [put]
+// @router /api/review/proj/step/status [put]
 func (c *ApiController) SetStepStatus() {
 	if c.RequireSignedIn() {
 		return
@@ -178,7 +178,7 @@ func (c *ApiController) SetStepStatus() {
 // @Param   json body object.SetStepTimePoint true "时间点信息"
 // @Success 200 {object} []object.ProjectTimePoint
 // @Failure 400 "invalid json"
-// @router /step/timepoint [put]
+// @router /api/review/proj/step/timepoint [put]
 func (c *ApiController) SetStepTimePoint() {
 	if c.RequireSignedIn() {
 		return
@@ -204,7 +204,7 @@ func (c *ApiController) SetStepTimePoint() {
 // @Param   json body object.DeleteStepTimePointRequest true "要删除的时间点信息"
 // @Success 200 true
 // @Failure 400 "invalid jsob"
-// @router /step/timepoint [delete]
+// @router /api/review/proj/step/timepoint [delete]
 func (c *ApiController) DeleteStepTimePoint() {
 	if c.RequireSignedIn() {
 		return
@@ -230,7 +230,7 @@ func (c *ApiController) DeleteStepTimePoint() {
 // @Param   stepId path string true "指定的step的uuid"
 // @Success 200 {object} object.StepDataStatistic
 // @Failure 400 "invalid project id"
-// @router /step/stat/:stepId [get]
+// @router /api/review/proj/step/stat/:stepId [get]
 func (c *ApiController) GetStepStatisticData() {
 	if c.RequireSignedIn() {
 		return
@@ -256,7 +256,7 @@ func (c *ApiController) GetStepStatisticData() {
 // @Param   stepId path string true "要删除的的step的uuid"
 // @Success 200 true
 // @Failure 400 "invalid step id"
-// @router /step/:stepId [delete]
+// @router /api/review/proj/step/:stepId [delete]
 func (c *ApiController) DeleteStep() {
 	if c.RequireSignedIn() {
 		return

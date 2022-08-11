@@ -84,6 +84,7 @@ func initAPI() {
 	// query
 	beego.Router("/api/review/query/proj", &controllers.ApiController{}, "POST:GetProjectList")
 	beego.Router("/api/qbank/query/t_question", &controllers.ApiController{}, "POST:GetTempQuestionList")
+	beego.Router("/api/review/query/user", &controllers.ApiController{}, "POST:GetUserList")
 
 	// qbank
 	// question

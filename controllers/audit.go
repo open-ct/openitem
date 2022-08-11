@@ -14,7 +14,7 @@ import (
 // @Param   auditId path string true "audit id owner/name"
 // @Success 200 {object} &object.Audit
 // @Failure 400 "invalid audit id"
-// @router /audit/:auditId [get]
+// @router /api/review/proj/audit/:auditId [get]
 func (c *ApiController) GetOneAudit() {
 	if c.RequireSignedIn() {
 		return
@@ -40,7 +40,7 @@ func (c *ApiController) GetOneAudit() {
 // @Param   submitId path string true "submit id"
 // @Success 200 {object} &[]object.Audit
 // @Failure 400 "invalid submit uuid"
-// @router /audits/:submitId [get]
+// @router /api/review/proj/audits/:submitId [get]
 func (c *ApiController) GetAuditsInSubmit() {
 	if c.RequireSignedIn() {
 		return
@@ -66,7 +66,7 @@ func (c *ApiController) GetAuditsInSubmit() {
 // @Param   json body object.Audit true "审核信息"
 // @Success 200 {object} object.Audit
 // @Failure 400 "invalid json"
-// @router /audit [post]
+// @router /api/review/proj/audit [post]
 func (c *ApiController) CreateOneAudit() {
 	if c.RequireSignedIn() {
 		return
@@ -97,7 +97,7 @@ func (c *ApiController) CreateOneAudit() {
 // @Param   json body object.Audit true "修改后的审核信息"
 // @Success 200 {object} object.Audit
 // @Failure 400 "invalid json"
-// @router /audit [put]
+// @router /api/review/proj/audit [put]
 func (c *ApiController) CorrectAudit() {
 	if c.RequireSignedIn() {
 		return
@@ -129,7 +129,7 @@ func (c *ApiController) CorrectAudit() {
 // @Param   auditId path string true "要深处的审核记录Id"
 // @Success 200 {object} true
 // @Failure 400 "invalid audit id"
-// @router /audit [delete]
+// @router /api/review/proj/audit [delete]
 func (c *ApiController) DeleteAudit() {
 	if c.RequireSignedIn() {
 		return

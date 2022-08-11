@@ -13,6 +13,11 @@ func main() {
 	object.InitAdapter()
 	casdoor.InitCasdoorAdapter()
 
+	if beego.BConfig.RunMode == "dev" {
+		beego.BConfig.WebConfig.DirectoryIndex = true
+		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	}
+
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"},
@@ -23,7 +28,6 @@ func main() {
 
 	// beego.DelStaticPath("/static")
 	beego.SetStaticPath("/static", "web/build/static")
-	beego.SetStaticPath("/swagger", "swagger")
 	// https://studygolang.com/articles/2303
 	beego.InsertFilter("/", beego.BeforeRouter, routers.TransparentStatic) // must has this for default page
 	beego.InsertFilter("/*", beego.BeforeRouter, routers.TransparentStatic)

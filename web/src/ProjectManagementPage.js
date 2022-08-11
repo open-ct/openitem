@@ -225,7 +225,7 @@ export default class ProjectManagementPage extends Component {
         <div className="project-management-page" data-component="project-management-page" key="project-management-page">
           <PageHeader
             ghost={false}
-            onBack={() => this.props.history.push("/pendingtasks")}
+            onBack={() => this.props.history.push("/pending-tasks")}
             title="项目管理"
             subTitle={this.state.loadingState ? "加载中" : this.state.projectBaseInfo.basic_info.basic_info.name}
             extra={[
@@ -237,7 +237,7 @@ export default class ProjectManagementPage extends Component {
                 <Spin spinning={this.state.loadingState} tip="加载中" />
               ) : (
                 <Tabs defaultActiveKey={`${this.state.projectBaseInfo.steps[0].uuid}_${this.state.projectBaseInfo.steps[0].name}`} type="card" activeKey={this.tabCruuent()} onChange={(e) => {
-                  this.props.history.push(`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`);
+                  this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`);
                 }}>
                   {
                     this.state.projectBaseInfo.steps.map(item => (
@@ -280,10 +280,10 @@ export default class ProjectManagementPage extends Component {
                 <Switch>
                   {
                     this.state.projectBaseInfo.steps.map(item => (
-                      <Route path={`/projectmanagements/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
+                      <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
                     ))
                   }
-                  <Redirect from={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/projectmanagements/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`}></Redirect>
+                  <Redirect from={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`}></Redirect>
                   {/* <Route component={NotFound} key="404"></Route> */}
                 </Switch>
               )

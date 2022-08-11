@@ -102,7 +102,7 @@ type FinalQuestion struct {
 type AddQuestionCommentRequest struct {
 	QuestionId string `json:"question_id"`
 	Comment    string `json:"comment"`
-	Author     string `json:"'author'"`
+	Author     string `json:"author"`
 }
 
 func AddTempQuestion(tempQuestion *TempQuestion) error {

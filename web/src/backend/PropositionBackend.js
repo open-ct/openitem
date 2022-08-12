@@ -30,6 +30,7 @@ export function GetUserTempTestpaper(uid) {
     credentials: "include",
   }).then(res => res.json());
 }
+
 export function CreateNewQuestion(data) {
   let newData = Setting.deepCopy(data);
   return fetch(`${Setting.ServerUrl}/api/qbank/question`, {
@@ -38,6 +39,7 @@ export function CreateNewQuestion(data) {
     body: JSON.stringify(newData),
   }).then(res => res.json());
 }
+
 export function CreateNewTestpaper(data) {
   let newData = Setting.deepCopy(data);
   return fetch(`${Setting.ServerUrl}/api/qbank/testpaper`, {

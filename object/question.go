@@ -64,7 +64,7 @@ type QuestionApplyRecord struct {
 }
 
 type TempQuestion struct {
-	Uuid          string                `json:"uuid"`
+	Uuid          string                `xorm:"varchar(100) notnull pk"  json:"uuid"`
 	IsRoot        bool                  `json:"is_root"`        // 临时题目是否是根
 	Base          string                `json:"base"`           // 若不是root, 需要设置上级题目, 进行版本管理
 	SourceProject string                `json:"source_project"` // 项目来源
@@ -83,7 +83,7 @@ type TempQuestion struct {
 }
 
 type FinalQuestion struct {
-	Uuid          string                `json:"uuid"`
+	Uuid          string                `xorm:"varchar(100) notnull pk"  json:"uuid"`
 	SourceProject string                `json:"source_project"` // 来源项目id
 	FinalVersion  string                `json:"final_version"`  // 录入final的最后一个版本
 	Author        string                `json:"author"`

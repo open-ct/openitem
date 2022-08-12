@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {Button, Form, Input, Modal, Select, Space, Table, Tag, message} from "antd";
 import {withRouter} from "react-router-dom";
+import * as ProjectBackend from "./backend/ProjectBackend";
 import ModalCard from "./ModulaCard";
 import "./BuildTeam.less";
-
 import {WarningTwoTone} from "@ant-design/icons";
 
 const {Search, TextArea} = Input;
@@ -16,6 +16,7 @@ class index extends Component {
     this.state = {
       classes: props,
       loadingState: false,
+      createLoading: false,
       roleChangeForm: {
         show: false,
         assignment_id: "",
@@ -33,7 +34,6 @@ class index extends Component {
         loadingState: false,
         message: "",
         send_time: "",
-        // sender: store.getState().userInfo.name,
         sender: "binary",
         destination: [],
         subject: "",
@@ -51,7 +51,7 @@ class index extends Component {
     title: "年龄",
     align: "center",
     render: (text, record) => (
-      <span>{record.info.age}</span>
+      <span>{record.info.birthday}</span>
     ),
   }, {
     title: "性别",
@@ -63,13 +63,13 @@ class index extends Component {
     title: "专业",
     align: "center",
     render: (text, record) => (
-      <Tag color="processing">{record.info.degree}</Tag>
+      <Tag color="processing">{record.info.owner}</Tag>
     ),
   }, {
     title: "职位",
     align: "center",
     render: (text, record) => (
-      <span>{record.info.position}</span>
+      <span>{record.info.type}</span>
     ),
   }, {
     title: "邮箱",
@@ -87,13 +87,13 @@ class index extends Component {
     title: "组织",
     align: "center",
     render: (text, record) => (
-      <span>{record.info.organization}</span>
+      <span>{record.info.signupApplication}</span>
     ),
   }, {
     title: "位置",
     align: "center",
     render: (text, record) => (
-      <span>{record.info.location}</span>
+      <span>{record.info.region}</span>
     ),
   }, {
     title: "电话",
@@ -116,7 +116,7 @@ class index extends Component {
     render: (text, record) => (
       <>
         {
-          record.info.is_confirmed ? (
+          record.info.isOnline ? (
             <Tag color="#87d068">已确认 √</Tag>
           ) : (
             <Tag color="#f50">未确认 ×</Tag>
@@ -165,7 +165,7 @@ class index extends Component {
             //     });
             //   });
             // },
-            onOk: () => {},
+            onOk: () => { },
             onCancel() {
               message.info("已取消移除");
             },
@@ -181,149 +181,76 @@ class index extends Component {
     this.getProjectMember();
   }
 
-  // getProjectMember = () => {
-  //   this.setState({
-  //     loadingState: true
-  //   });
-  //   let memberList = [];
-  //   request({
-  //     url: baseURL + `/review/proj/assign/${this.props.match.params.project_id}`,
-  //     // url:`http://49.232.73.36:8081/review/proj/assign/${this.props.match.params.project_id}`,
-  //     method: "GET"
-  //   }).then(res => {
-  //     memberList = [...res.data.admins.map(item => {
-  //       item.roleName = "admin";
-  //       return item;
-  //     }), ...res.data.assistants.map(item => {
-  //       item.roleName = "assistant";
-  //       return item;
-  //     }), ...res.data.experts.map(item => {
-  //       item.roleName = "expert";
-  //       return item;
-  //     }), ...res.data.out_experts.map(item => {
-  //       item.roleName = "out_expert";
-  //       return item;
-  //     }), ...res.data.teachers.map(item => {
-  //       item.roleName = "teacher";
-  //       return item;
-  //     })];
-  //     let id_list = memberList.map(item => item.user_id);
-  //     request({
-  //       url: baseURL + "/review/query/user",
-  //       // url:"http://49.232.73.36:8081/review/query/user",
-  //       method: "POST",
-  //       data: {id_list}
-  //     }).then(res => {
-  //       let userInfo_list = Object.values(res.data);
-  //       memberList = memberList.map((item, index) => {
-  //         item.info = userInfo_list[index].profile;
-  //         return item;
-  //       });
-  //       // let memberData = Object.assign(this.state.memberData,{
-  //       //     admins:memberList.filter(item=>item.roleName==="admin"),
-  //       //     assistants:memberList.filter(item=>item.roleName==="assistant"),
-  //       //     experts:memberList.filter(item=>item.roleName==="expert"),
-  //       //     out_experts:memberList.filter(item=>item.roleName==="out_expert"),
-  //       //     teachers:memberList.filter(item=>item.roleName==="teacher"),
-  //       // })
-  //       this.setState({
-  //         memberList,
-  //         loadingState: false
-  //       });
-  //     }).catch(err => {
-  //       this.setState({
-  //         loadingState: false
-  //       });
-  //       message.error(err.message || "请求错误！");
-  //     });
-  //   }).catch(err => {
-  //     this.setState({
-  //       loadingState: false
-  //     });
-  //     message.error(err.message || "请求错误！");
-  //   });
-  // }
   getProjectMember = () => {
     this.setState({
       loadingState: true,
     });
-    let memberList = [];
-    var res = {
-      "operation_code": 1000,
-      "message": "",
-      "data": {
-        "admins": [
-          {
-            "Id": "62e4b170b686c0cf874cf17c",
-            "CreateAt": "2022-07-30T04:20:00.138Z",
-            "UpdateAt": "2022-07-30T04:20:00.138Z",
-            "uuid": "28dc2172-292a-45c0-9cdd-7c74b7cae5db",
-            "user_id": "2ab2770e-b6e7-476b-969c-2db815e878e6",
-            "project_id": "5677cb5a-e047-4be4-9d40-718a6c9371ef",
-            "role": 1,
-            "operator": "system",
-            "is_confirmed": true,
-            "status": 0,
-          },
-        ],
-        "assistants": [],
-        "experts": [],
-        "out_experts": [],
-        "teachers": [],
-      },
-    };
-    memberList = [...res.data.admins.map(item => {
-      item.roleName = "admin";
-      return item;
-    }), ...res.data.assistants.map(item => {
-      item.roleName = "assistant";
-      return item;
-    }), ...res.data.experts.map(item => {
-      item.roleName = "expert";
-      return item;
-    }), ...res.data.out_experts.map(item => {
-      item.roleName = "out_expert";
-      return item;
-    }), ...res.data.teachers.map(item => {
-      item.roleName = "teacher";
-      return item;
-    })];
-    // let id_list = memberList.map(item => item.user_id);
-    var res1 = {
-      "operation_code": 1000,
-      "message": "",
-      "data": {
-        "2ab2770e-b6e7-476b-969c-2db815e878e6": {
-          "Id": "62e4b104b686c0cf874cf17a",
-          "CreateAt": "2022-07-30T04:18:12.557Z",
-          "UpdateAt": "2022-07-30T04:18:12.557Z",
-          "uuid": "2ab2770e-b6e7-476b-969c-2db815e878e6",
-          "profile": {
-            "name": "string",
-            "age": 0,
-            "locaion": "string",
-            "email": "string",
-            "phone": "string",
-            "gender": true,
-            "organization": "",
-            "degree": "string",
-            "position": "string",
-            "employer": "string",
-            "major": "string",
-          },
-          "password": "a6ba7732dfb7c19d1520b1eb0386d1a2",
-          "salt": "371832835a7ea8c50f44c8c8ab333c55",
-        },
-      },
-    };
-    let userInfo_list = Object.values(res1.data);
-    memberList = memberList.map((item, index) => {
-      item.info = userInfo_list[index].profile;
-      return item;
-    });
-    this.setState({
-      memberList,
-      loadingState: false,
+    ProjectBackend.GetProjectAssignments(this.props.match.params.project_id.split("_").join("/")).then(res => {
+      let memberList = [];
+      memberList = [...res.data.admins.map(item => {
+        item.roleName = "admin";
+        return item;
+      }), ...res.data.assistants.map(item => {
+        item.roleName = "assistant";
+        return item;
+      }), ...res.data.experts.map(item => {
+        item.roleName = "expert";
+        return item;
+      }), ...res.data.out_experts.map(item => {
+        item.roleName = "out_expert";
+        return item;
+      }), ...res.data.teachers.map(item => {
+        item.roleName = "teacher";
+        return item;
+      })];
+      let id_list = memberList.map(item => item.user_id);
+      ProjectBackend.GetUserList(id_list).then(res => {
+        let userInfo_list = Object.values(res.data);
+        memberList = memberList.map((item, index) => {
+          item.info = userInfo_list[index];
+          return item;
+        });
+        this.setState({
+          memberList,
+          loadingState: false,
+        });
+      });
+      //   var res1 = {
+      //     "operation_code": 1000,
+      //     "message": "",
+      //     "data": {
+      //       "2ab2770e-b6e7-476b-969c-2db815e878e6": {
+      //         "Id": "62e4b104b686c0cf874cf17a",
+      //         "CreateAt": "2022-07-30T04:18:12.557Z",
+      //         "UpdateAt": "2022-07-30T04:18:12.557Z",
+      //         "uuid": "2ab2770e-b6e7-476b-969c-2db815e878e6",
+      //         "profile": {
+      //           "name": "string",
+      //           "age": 0,
+      //           "locaion": "string",
+      //           "email": "string",
+      //           "phone": "string",
+      //           "gender": true,
+      //           "organization": "",
+      //           "degree": "string",
+      //           "position": "string",
+      //           "employer": "string",
+      //           "major": "string",
+      //         },
+      //         "password": "a6ba7732dfb7c19d1520b1eb0386d1a2",
+      //         "salt": "371832835a7ea8c50f44c8c8ab333c55",
+      //       },
+      //     },
+      //   };
+      //   let userInfo_list = Object.values(res1.data);
+      //   memberList = memberList.map((item, index) => {
+      //     item.info = userInfo_list[index].profile;
+      //     return item;
+      //   });
+      //   this.setState({
+      //     memberList,
+      //     loadingState: false,
+      //   });
     });
   }
 
@@ -387,7 +314,7 @@ class index extends Component {
           //     });
           //   });
           // }}
-          onOk={() => {}}
+          onOk={() => { }}
           onCancel={() => {
             if (this.state.roleChangeForm.updateLoading) {
               message.error("修改中，操作不可中断！");
@@ -501,7 +428,7 @@ class index extends Component {
           //   });
           // }}
 
-          onOk={() => {}}
+          onOk={() => { }}
           onCancel={() => {
             if (this.state.emailForm.loadingState) {
               message.error("发送中，操作不可中断！");

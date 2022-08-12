@@ -1,9 +1,10 @@
 import React, {Component} from "react";
 import {withRouter} from "react-router-dom";
-import {Button, Col, Row, Select, Slider, Spin, Tag} from "antd";
+import {Button, Col, Row, Select, Slider, Spin, Tag, message} from "antd";
 import BraftEditor from "braft-editor";
 import "braft-editor/dist/index.css";
 import "./ChoiceQuestionEditer.less";
+import * as PropositionBackend from "./backend/PropositionBackend";
 
 const {Option} = Select;
 
@@ -17,74 +18,70 @@ class ChoiceQuestionEditer extends Component {
       answer: "",
     },
   }
-
-  upLoadQuestion = () => {
-    // this.setState({
-    //     loadingState:true
-    // });
-    // request({
-    //     url:baseURL1+"/qbank/question",
-    //     // url:"http://49.232.73.36:8082/qbank/question",
-    //     method:"POST",
-    //     data:{
-    //         advanced_props:{
-    //             ctt_diff_1:this.state.questionParams.difficulty,
-    //             ctt_diff_2:this.state.questionParams.difficulty,
-    //             ctt_level:this.state.questionParams.difficulty,
-    //             irt_level:this.state.questionParams.difficulty
-    //         },
-    //         apply_record:{
-    //             grade_fits:this.props.grade_range.join(","),
-    //             participant_count:0,
-    //             test_count:0,
-    //             test_region:[],
-    //             test_year:`${new Date().getFullYear()}`,
-    //         },
-    //         author:store.getState().userInfo.Id,
-    //         basic_props:{
-    //             ability_dimension:this.props.ability.join(","),
-    //             description:"暂无",
-    //             details:this.state.editorState.toHTML(),
-    //             details_dimension:this.props.content.join(","),
-    //             encode:"",
-    //             keywords:[],
-    //             sub_ability_dimension:"",
-    //             sub_details_dimension:"",
-    //             subject:this.state.questionParams.subject,
-    //             subject_requirements:""
-    //         },
-    //         extra_props:{
-    //             is_question_group:false,
-    //             is_scene:true,
-    //             material_length:0,
-    //             reading_material_topic:""
-    //         },
-    //         info:{
-    //             answer:this.state.questionParams.answer,
-    //             body:this.state.editorState.toHTML(),
-    //             solution:"无",
-    //             title:"无",
-    //             type:"选择题"
-    //         },
-    //         source_project:this.props.projectId,
-    //         spec_props:{
-    //             article_type:"无",
-    //             length:"无",
-    //             topic:"无"
-    //         }
-    //     }
-    // }).then(res => {
-    //     this.setState({
-    //         loadingState:false
-    //     });
-    //     this.props.history.push("/home/proposition-paper/home");
-    //     message.success("上传成功");
-    // }).catch(err => {
-    //     this.setState({
-    //         loadingState:false
-    //     });
-    //     message.error(err.message||"请求错误");
-    // });
+  upLoadQuestion = (uid) => {
+    this.setState({
+      loadingState: true,
+    });
+    let data = {
+      advanced_props: {
+        ctt_diff_1: this.state.questionParams.difficulty,
+        ctt_diff_2: this.state.questionParams.difficulty,
+        ctt_level: this.state.questionParams.difficulty,
+        irt_level: this.state.questionParams.difficulty,
+      },
+      apply_record: {
+        grade_fits: this.props.grade_range.join(","),
+        participant_count: 0,
+        test_count: 0,
+        test_region: [],
+        test_year: `${new Date().getFullYear()}`,
+      },
+      author: uid,
+      basic_props: {
+        ability_dimension: this.props.ability.join(","),
+        description: "暂无",
+        details: this.state.editorState.toHTML(),
+        details_dimension: this.props.content.join(","),
+        encode: "",
+        keywords: [],
+        sub_ability_dimension: "",
+        sub_details_dimension: "",
+        subject: this.state.questionParams.subject,
+        subject_requirements: "",
+      },
+      extra_props: {
+        is_question_group: false,
+        is_scene: true,
+        material_length: 0,
+        reading_material_topic: "",
+      },
+      info: {
+        answer: this.state.questionParams.answer,
+        body: this.state.editorState.toHTML(),
+        solution: "无",
+        title: "无",
+        type: "选择题",
+      },
+      source_project: this.props.projectId,
+      spec_props: {
+        article_type: "无",
+        length: "无",
+        topic: "无",
+      },
+    };
+    PropositionBackend.CreateNewQuestion(data).then(res => {
+      this.setState({
+        loadingState: false,
+      });
+    }).then(res => {
+      this.props.history.goBack();
+      message.success("上传成功");
+    }).catch(err => {
+      this.setState({
+        loadingState: false,
+      });
+      message.error(err.message || "请求错误");
+    });
   }
 
   componentDidMount() {
@@ -181,7 +178,7 @@ class ChoiceQuestionEditer extends Component {
           </Row>
           <div className="question-complete-box">
             <Button type="primary" block onClick={() => {
-              this.upLoadQuestion();
+              this.upLoadQuestion(this.props.author);
             }}>完成编辑</Button>
           </div>
         </Spin>

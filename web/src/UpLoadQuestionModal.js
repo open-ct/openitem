@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Form, Modal, Select, Tag, message} from "antd";
 import {withRouter} from "react-router-dom";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
+import * as PorjectBackend from "./backend/ProjectBackend";
 
 const {Option} = Select;
 const {confirm} = Modal;
@@ -56,97 +57,36 @@ class index extends Component {
       type: "update-paper",
       value: "更新试卷信息",
     }]
-
+    componentDidMount() {
+      this.getProjectList();
+    }
     getProjectList = () => {
       this.setState({
         projectLoading: true,
       });
-      var res = {
-        "operation_code": 1000,
-        "message": "",
-        "data": [
-          {
-            "Id": "62e4b170b686c0cf874cf17c",
-            "CreateAt": "2022-07-30T04:20:00.138Z",
-            "UpdateAt": "2022-07-30T04:20:00.138Z",
-            "uuid": "28dc2172-292a-45c0-9cdd-7c74b7cae5db",
-            "user_id": "2ab2770e-b6e7-476b-969c-2db815e878e6",
-            "project_id": "5677cb5a-e047-4be4-9d40-718a6c9371ef",
-            "role": 1,
-            "operator": "system",
-            "is_confirmed": true,
-            "status": 0,
-          },
-        ],
-      };
-      let id_list = [];
-      for (let i = 0; i < res.data.length; i++) {
-        id_list.push(res.data[i].project_id);
-      }
-      var res1 = {
-        "operation_code": 1000,
-        "message": "",
-        "data": {
-          "5677cb5a-e047-4be4-9d40-718a6c9371ef": {
-            "Id": "62e4b170b686c0cf874cf17b",
-            "CreateAt": "2022-07-30T04:20:00.137Z",
-            "UpdateAt": "2022-07-30T04:20:00.137Z",
-            "uuid": "5677cb5a-e047-4be4-9d40-718a6c9371ef",
-            "creator": "2ab2770e-b6e7-476b-969c-2db815e878e6",
-            "status": 0,
-            "basic_info": {
-              "name": "demo",
-              "description": "无",
-              "requirement": "无",
-              "target": "无",
-              "grade_range": [
-                "大一",
-              ],
-              "subjects": [
-                "数学",
-              ],
-              "summary": "无",
-            },
-          },
-        },
-      };
-      this.setState({
-        projectList: Object.values(res1.data),
-        projectLoading: false,
+      let uid = this.props.uid ? this.props.uid : this.props.match.params.uid;
+      PorjectBackend.GetUserAssignments(uid).then(res => {
+        let id_list = [];
+        for(let i = 0;i < res.data.length;i++) {
+          id_list.push(res.data[i].project_id);
+        }
+        PorjectBackend.GetProjectList(id_list).then(res => {
+          this.setState({
+            projectList: Object.values(res.data),
+            projectLoading: false,
+          });
+        }).catch(err => {
+          message.error(err.message || "加载失败，请重试");
+          this.setState({
+            projectLoading: false,
+          });
+        });
+      }).catch(err => {
+        message.error(err.message || "加载失败，请重试");
+        this.setState({
+          projectLoading: false,
+        });
       });
-      // this.setState({
-      //     projectLoading:true
-      // });
-      // request({
-      //     url:baseURL+`/review/proj/user/${store.getState().userInfo.Id}`,
-      //     // url:`http://49.232.73.36:8081/review/proj/user/${store.getState().userInfo.Id}`,
-      //     method:"GET"
-      // }).then(res => {
-      //     let id_list = [];
-      //     for(let i=0;i<res.data.length;i++) {
-      //         id_list.push(res.data[i].project_id);
-      //     }
-      //     request({
-      //         url:baseURL+"/review/query/proj",
-      //         method:"POST",
-      //         data:{id_list}
-      //     }).then(res => {
-      //         this.setState({
-      //             projectList:Object.values(res.data),
-      //             projectLoading:false
-      //         });
-      //     }).catch(err => {
-      //         message.error(err.message||"加载失败，请重试");
-      //         this.setState({
-      //             projectLoading:false
-      //         });
-      //     });
-      // }).catch(err => {
-      //     message.error(err.message||"加载失败，请重试");
-      //     this.setState({
-      //         projectLoading:false
-      //     });
-      // });
     }
 
     tagRender = (props) => {
@@ -179,7 +119,7 @@ class index extends Component {
           onOk={() => {
             this.formRef.current.validateFields().then(data => {
               if(this.props.type === "create") {
-                this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}`);
+                this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
               }else if(this.props.type === "update") {
                 let that = this;
                 confirm({
@@ -187,7 +127,7 @@ class index extends Component {
                   content: "此操作将覆盖当前撰写的试题，是否继续？",
                   onOk() {
                     that.props.onClose();
-                    that.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}`);
+                    that.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
                   },
                   onCancel() {
                     that.props.onClose();
@@ -197,7 +137,7 @@ class index extends Component {
                 console.log("开始保存");
                 this.props.onClose();
               }else if(this.props.type === "create-paper") {
-                this.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}`);
+                this.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
               }else if(this.props.type === "update-paper") {
                 let that = this;
                 confirm({
@@ -205,7 +145,7 @@ class index extends Component {
                   content: "此操作将覆盖当前撰写的试卷，是否继续？",
                   onOk() {
                     that.props.onClose();
-                    that.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}`);
+                    that.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
                   },
                   onCancel() {
                     that.props.onClose();
@@ -250,7 +190,7 @@ class index extends Component {
                   this.state.projectLoading ? (
                     <></>
                   ) : this.state.projectList.map(item => (
-                    <Option key={item.Id} value={item.uuid}>{item.basic_info.name}</Option>
+                    <Option key={item.basic_info.owner + item.basic_info.name} value={item.basic_info.name}>{item.basic_info.name}</Option>
                   ))
                 }
               </Select>
@@ -273,7 +213,7 @@ class index extends Component {
                 {
                   !this.state.form.project ? (
                     <></>
-                  ) : this.state.projectList[this.state.projectList.findIndex(item => item.uuid === this.state.form.project)].basic_info.subjects.map((item, index) => (
+                  ) : this.state.projectList[this.state.projectList.findIndex(item => item.name === this.state.form.project)].basic_info.subjects.map((item, index) => (
                     <Option key={index} value={item}>{item}</Option>
                   ))
                 }

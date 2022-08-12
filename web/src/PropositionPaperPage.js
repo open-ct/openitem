@@ -11,14 +11,22 @@ export default class PropositionPaperHome extends Component {
       classes: props,
     };
   }
+  componentDidMount() {
+    this.props.history.push({
+      path: "/proposition-paper/home",
+      state: {
+        account: this.props.account,
+      },
+    });
+  }
   render() {
     return (
       <div className="proposition-paper-page" data-component="proposition-paper-page" style={{width: "100%", height: "100%"}}>
         <Switch>
-          <Redirect from="/proposition-paper" to="/proposition-paper/home" exact></Redirect>
-          <Route path="/proposition-paper/home" component={Home} exact></Route>
-          <Route path="/proposition-paper/create-paper/:project/:subject/:ability/:content/:type" component={CreatePaper} ></Route>
-          <Route path="/proposition-paper/upload-questions/:project/:subject/:ability/:content/:type" component={UploadQuestions}></Route>
+          <Route path="/proposition-paper/home" component={Home} ></Route>
+          <Route path="/proposition-paper/create-paper/:project/:subject/:ability/:content/:type/:uid" component={CreatePaper} ></Route>
+          <Route path="/proposition-paper/upload-questions/:project/:subject/:ability/:content/:type/:uid" component={UploadQuestions}></Route>
+          <Redirect to="/proposition-paper/home" ></Redirect>
         </Switch>
       </div>
     );

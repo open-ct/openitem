@@ -274,3 +274,21 @@ func GetProjecgtFinalTestpaper(pid string) ([]FinalTestpaper, error) {
 	}
 	return testPapers, nil
 }
+
+func DeleteTempTestpaper(tid string) error {
+	_, err := adapter.engine.ID(tid).Delete(&TempTestpaper{})
+	if err != nil {
+		log.Printf("[delete temptestpaper] delete temptestpaper error: %s\n", err.Error())
+		return err
+	}
+	return nil
+}
+
+func DeleteFinalTestpaper(tid string) error {
+	_, err := adapter.engine.ID(tid).Delete(&FinalTestpaper{})
+	if err != nil {
+		log.Printf("[delete finaltestpaper] delete finaltestpaper error: %s\n", err.Error())
+		return err
+	}
+	return nil
+}

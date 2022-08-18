@@ -248,3 +248,29 @@ func (c *ApiController) GetProjectFinalTestpaper() {
 
 	c.ResponseOk(resp)
 }
+
+// DeleteTempTestpaper
+// @Title DeleteTempTestpaper
+// @Description 删除temptestpaper
+// @Param   uid path string true "testpaper id"
+// @Success 200 {string}
+// @router /api/qbank/testpaper/temp [delete]
+func (c *ApiController) DeleteTempTestpaper() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	tid := c.GetString(":tid")
+	if tid == "" {
+		c.ResponseError("invalid id")
+		return
+	}
+
+	err := object.DeleteTempTestpaper(tid)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk("ok")
+}

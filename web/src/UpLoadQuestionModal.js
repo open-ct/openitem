@@ -67,8 +67,10 @@ class index extends Component {
       let uid = this.props.uid ? this.props.uid : this.props.match.params.uid;
       PorjectBackend.GetUserAssignments(uid).then(res => {
         let id_list = [];
-        for(let i = 0;i < res.data.length;i++) {
-          id_list.push(res.data[i].project_id);
+        if(res.data) {
+          for(let i = 0;i < res.data.length;i++) {
+            id_list.push(res.data[i].project_id);
+          }
         }
         PorjectBackend.GetProjectList(id_list).then(res => {
           this.setState({
@@ -134,7 +136,6 @@ class index extends Component {
                   },
                 });
               }else if(this.props.type === "edit") {
-                console.log("开始保存");
                 this.props.onClose();
               }else if(this.props.type === "create-paper") {
                 this.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);

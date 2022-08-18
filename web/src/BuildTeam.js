@@ -27,7 +27,8 @@ class index extends Component {
         show: false,
         loadingState: false,
         role: 1,
-        user_id: "",
+        user_id: null,
+        userInfo: null,
       },
       emailForm: {
         show: false,
@@ -215,42 +216,6 @@ class index extends Component {
           loadingState: false,
         });
       });
-      //   var res1 = {
-      //     "operation_code": 1000,
-      //     "message": "",
-      //     "data": {
-      //       "2ab2770e-b6e7-476b-969c-2db815e878e6": {
-      //         "Id": "62e4b104b686c0cf874cf17a",
-      //         "CreateAt": "2022-07-30T04:18:12.557Z",
-      //         "UpdateAt": "2022-07-30T04:18:12.557Z",
-      //         "uuid": "2ab2770e-b6e7-476b-969c-2db815e878e6",
-      //         "profile": {
-      //           "name": "string",
-      //           "age": 0,
-      //           "locaion": "string",
-      //           "email": "string",
-      //           "phone": "string",
-      //           "gender": true,
-      //           "organization": "",
-      //           "degree": "string",
-      //           "position": "string",
-      //           "employer": "string",
-      //           "major": "string",
-      //         },
-      //         "password": "a6ba7732dfb7c19d1520b1eb0386d1a2",
-      //         "salt": "371832835a7ea8c50f44c8c8ab333c55",
-      //       },
-      //     },
-      //   };
-      //   let userInfo_list = Object.values(res1.data);
-      //   memberList = memberList.map((item, index) => {
-      //     item.info = userInfo_list[index].profile;
-      //     return item;
-      //   });
-      //   this.setState({
-      //     memberList,
-      //     loadingState: false,
-      //   });
     });
   }
 
@@ -301,7 +266,6 @@ class index extends Component {
           //       new_role: this.state.roleChangeForm.new_role,
           //     }
           //   }).then(res => {
-          //     console.log(res);
           //     this.setState({
           //       roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false, show: false})
           //     });
@@ -348,7 +312,20 @@ class index extends Component {
           maskClosable={!this.state.addMemberForm.loadingState}
           confirmLoading={this.state.addMemberForm.loadingState}
           onOk={() => {
-
+            this.setState({
+              addMemberForm: Object.assign(this.state.addMemberForm, {loadingState: true}),
+            });
+            let data = new Object();
+            data.project_id = this.props.match.params.project_id.split("_").join("/");
+            data.user_id = this.state.addMemberForm.user_id;
+            data.role = this.state.addMemberForm.role;
+            ProjectBackend.MakeOneAssignment(data).then(res => {
+              message.success("success");
+              this.setState({
+                addMemberForm: Object.assign(this.state.addMemberForm, {userInfo: null, loadingState: false, show: false}),
+              });
+              this.getProjectMember();
+            });
           }}
           onCancel={() => {
             if (this.state.addMemberForm.loadingState) {
@@ -361,12 +338,32 @@ class index extends Component {
           }}
         >
           <label style={{lineHeight: ".6rem"}}>查找用户：</label>
-          <Search placeholder="请输入被添加用户账号" onSearch={() => {
+          <Search placeholder="请输入被添加用户账号" onSearch={(e) => {
+            this.setState({
+              addMemberForm: Object.assign(this.state.addMemberForm, {loadingState: true}),
+            });
+            let id_list = new Array();
+            id_list.push(e);
+            ProjectBackend.GetUserList(id_list).then(res => {
+              let userInfo = res.data[Object.keys(res.data)[0]];
+              if(userInfo) {
+                this.setState({
+                  addMemberForm: Object.assign(this.state.addMemberForm, {user_id: userInfo.id, userInfo: userInfo, loadingState: false}),
+                });
+              }else{
+                message.warn("查无此人！");
+                this.setState({
+                  addMemberForm: Object.assign(this.state.addMemberForm, {loadingState: false}),
+                });
+              }
 
+            });
           }} enterButton />
           {
-            this.state.addMemberForm.user_id === "" ? "" : (
+            this.state.addMemberForm.userInfo != null ? (
               <>
+                <label style={{lineHeight: ".6rem"}}>用户名</label>
+                <div>{this.state.addMemberForm.userInfo.name}</div>
                 <label style={{lineHeight: ".6rem"}}>角色分配：</label>
                 <Select value={this.state.addMemberForm.role} style={{width: "100%"}} onChange={(e) => {
                   this.setState({
@@ -380,7 +377,7 @@ class index extends Component {
                   <Option value={5}>外审人员</Option>
                 </Select>
               </>
-            )
+            ) : (<></>)
           }
         </Modal>
         <Modal

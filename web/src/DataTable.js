@@ -270,7 +270,6 @@ export default class index extends Component {
       //     method: "GET",
       //     responseType:"blob"
       // }).then(res => {
-      //     console.log(res);
       //     const filename = res.headers["content-disposition"];
       //     const blob = new Blob([res.data]);
       //     var downloadElement = document.createElement("a");
@@ -320,7 +319,6 @@ export default class index extends Component {
       });
       // request({method:"GET", url:baseURL+`/review/proj/submits/${this.props.stepId}`}).then(res => {
       // // request({ method:'GET', url:`http://49.232.73.36:8081/review/proj/submits/${this.props.stepId}`}).then(res=>{
-      //     console.log(res.data);
       //     this.setState({
       //         data:res.data,
       //         loadingState:false

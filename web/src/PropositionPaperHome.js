@@ -1,7 +1,7 @@
 import React, {Component} from "react";
-import {Button, Card, Col, Modal, Pagination, Radio, Row, Space, Spin, Table, message} from "antd";
+import {Button, Card, Col, Modal, Pagination, Popconfirm, Radio, Row, Space, Spin, Table, message} from "antd";
 import UpLoadQuestionModal from "./UpLoadQuestionModal";
-import {EditOutlined, EllipsisOutlined, LockOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, EllipsisOutlined} from "@ant-design/icons";
 import "./PropositionPaperHome.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 
@@ -11,6 +11,8 @@ export default class PropositionPaperHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      paperShowConfirm: -1,
+      questionShowConfirm: -1,
       account: props.location.state.account,
       mode: "testpaper",
       questionData: [],
@@ -251,72 +253,127 @@ export default class PropositionPaperHome extends Component {
   loadQuestionData = () => {
     if (this.state.mode === "questions") {
       return this.state.questionData.map((item, index) => (
-        <Card key={index}
-          style={{width: 300, float: "left"}}
-          actions={[
-            <LockOutlined key="lock" />,
-            <EditOutlined key="edit" onClick={() => {
+        <div key={index} style={{float: "left"}}>
+          <Popconfirm className="confirm"
+            title="Are you sure to delete this testpaper?"
+            onConfirm={(index) => {
+              // PropositionBackend.DeleteTempTestpaper(this.state.testpaperData[index].uuid).then(res => {
+              // });
+            }}
+            onCancel={() => {
               this.setState({
-                upLoadQuestionModalParams: {
-                  type: "update",
-                  show: true,
-                },
+                questionShowConfirm: -1,
               });
-            }} />,
-            <EllipsisOutlined key="ellipsis" onClick={() => {
-              this.setState({
-                modifyRecordVisible: true,
-              });
-              this.getQuestionRecord(item.uuid);
-            }} />,
-          ]}
-        >
-          <Meta
-            title={(
-              <div className="header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-                <span>{item.basic_props.subject || "未知"}</span>
-                <span>{this.timeFilter(item.create_at)}</span>
-              </div>
-            )}
-            description={item.info.title}
-          />
-        </Card>
+            }}
+            okText="Yes"
+            cancelText="No"
+            visible={this.state.questionShowConfirm == index}
+            placement="rightTop"
+          >
+          </Popconfirm>
+          <Card key={index}
+            style={{width: 300}}
+            actions={[
+              <DeleteOutlined key="delete" onClick={() => {
+                this.setState({
+                  questionShowConfirm: index,
+                });
+              }} />,
+              <EditOutlined key="edit" onClick={() => {
+                this.setState({
+                  upLoadQuestionModalParams: {
+                    type: "update",
+                    show: true,
+                  },
+                });
+              }} />,
+              <EllipsisOutlined key="ellipsis" onClick={() => {
+                this.setState({
+                  modifyRecordVisible: true,
+                });
+                this.getQuestionRecord(item.uuid);
+              }} />,
+            ]}
+          >
+            <Meta
+              title={(
+                <div className="header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+                  <span>{item.basic_props.subject || "未知"}</span>
+                  <span>{this.timeFilter(item.create_at)}</span>
+                </div>
+              )}
+              description={item.info.title}
+            />
+          </Card>
+        </div>
       ));
     } else {
       return this.state.testpaperData.map((item, index) => (
-        <Card key={index}
-          style={{width: 300, float: "left"}}
-          actions={[
-            <LockOutlined key="lock" />,
-            <EditOutlined key="edit" onClick={() => {
-              this.setState({
-                upLoadQuestionModalParams: {
-                  type: "update-paper",
-                  show: true,
-                },
+        <div key={index}>
+          <Popconfirm
+            title="Are you sure to delete this task?"
+            onConfirm={() => {
+              PropositionBackend.DeleteTempTestpaper(item.uuid).then(res => {
+                if(res.status == "ok") {
+                  message.success("删除成功！");
+                  this.setState({paperShowConfirm: -1});
+                  this.getUserTestpaperList(this.state.account.id);
+                }else{
+                  message.success("删除失败");
+                  this.setState({paperShowConfirm: -1});
+                  this.getUserTestpaperList(this.state.account.id);
+                }
               });
-            }} />,
-            <EllipsisOutlined key="ellipsis" onClick={() => {
+            }}
+            onCancel={() => {
               this.setState({
-                testpaperVisible: Object.assign(this.state.testpaperVisible, {id_list: item.info[0].question_list.map(item => item.question_id), show: true}),
+                paperShowConfirm: -1,
               });
-              this.getQuestionListInfo();
-            }} />,
-          ]}
-        >
-          <Meta
-            title={(
-              <div className="header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-                <span>{item.props.subjects[0] || "未知"}</span>
-                <span>{this.timeFilter(item.create_at)}</span>
-              </div>
-            )}
-            description={item.info[0].description}
-          />
-        </Card>
+            }}
+            okText="Yes"
+            cancelText="No"
+            visible={this.state.paperShowConfirm == index}
+            placement="rightTop"
+          >
+          </Popconfirm>
+          <Card key={index}
+            style={{width: 300, float: "left"}}
+            actions={[
+              <DeleteOutlined key="delete" onClick={() => {
+                this.setState({
+                  paperShowConfirm: index,
+                });
+              }} />,
+              <EditOutlined key="edit" onClick={() => {
+                this.setState({
+                  upLoadQuestionModalParams: {
+                    type: "update-paper",
+                    show: true,
+                  },
+                });
+              }} />,
+              <EllipsisOutlined key="ellipsis" onClick={() => {
+                this.setState({
+                  testpaperVisible: Object.assign(this.state.testpaperVisible, {id_list: item.info[0].question_list.map(item => item.question_id), show: true}),
+                });
+                this.getQuestionListInfo();
+              }} />,
+            ]}
+          >
+            <Meta
+              title={(
+                <div className="header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+                  <span>{item.props.subjects[0] || "未知"}</span>
+                  <span>{this.timeFilter(item.create_at)}</span>
+                </div>
+              )}
+              description={item.info[0].description}
+            />
+          </Card>
+        </div>
+
       ));
     }
-
   }
 
   timeFilter = (time) => {
@@ -405,8 +462,8 @@ export default class PropositionPaperHome extends Component {
           <div className="main">
             <Spin spinning={this.state.loadingState} tip="加载中">
               {
-                this.state.loadingState ? "" : this.loadQuestionData()
-              }
+                this.state.loadingState ? "" : this.loadQuestionData(this.state.account.id)
+              },
             </Spin>
           </div>
         </div>

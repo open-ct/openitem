@@ -6,6 +6,12 @@ import (
 	"github.com/open-ct/openitem/object"
 )
 
+type CreateNewQuestionRequest struct {
+	Body     object.Task `json:"body"`
+	Answer   object.Task `json:"answer"`
+	Solution object.Task `json:"solution"`
+}
+
 // CreateNewQuestion
 // @Title CreateNewQuestion
 // @Description 创建新的题目（临时题目）
@@ -18,13 +24,32 @@ func (c *ApiController) CreateNewQuestion() {
 		return
 	}
 
-	var request object.TempQuestion
+	var request CreateNewQuestionRequest
+	// var request object.TempQuestion
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &request)
+
+	tempQuestion := object.TempQuestion{
+		SourceProject: request.Body.SourceProject,
+		Author:        request.Body.Owner,
+		Info: object.QuestionInfo{
+			Title:    request.Body.Name,
+			Type:     request.Body.Type,
+			Body:     request.Body.Text,
+			Answer:   request.Answer.Text,
+			Solution: request.Solution.Text,
+		},
+		BasicProps:    object.QuestionBasicProps{},
+		SpecProps:     object.QuestionSpecProps{},
+		ExtraProps:    object.QuestionExtraProps{},
+		AdvancedProps: object.QuestionAdvancedProps{},
+		ApplyRecord:   object.QuestionApplyRecord{},
+	}
+
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
-	resp, err := object.CreateNewTempQuestion(&request)
+	resp, err := object.CreateNewTempQuestion(&tempQuestion)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

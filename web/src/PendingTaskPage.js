@@ -243,7 +243,6 @@ export default class PeddingTasks extends Component {
                     isCreateProjectVisible: false,
                   });
                 }).catch(err => {
-                  console.log("err:" + err);
                   this.setState({
                     createLoading: false,
                   });

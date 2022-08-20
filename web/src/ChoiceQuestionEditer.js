@@ -101,7 +101,7 @@ class ChoiceQuestionEditer extends Component {
                 this.setState({editorState});
               }}
               onSave={() => {
-                console.log("保存题目");
+
               }}
             />
           </Row>

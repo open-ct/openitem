@@ -248,7 +248,7 @@ export default class CreatePaper extends Component {
                                 this.setState({questionList});
                               }}
                               onSave={() => {
-                                console.log("保存题目");
+
                               }}
                             />
                           ) : (

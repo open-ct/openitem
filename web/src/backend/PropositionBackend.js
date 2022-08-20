@@ -48,3 +48,9 @@ export function CreateNewTestpaper(data) {
     body: JSON.stringify(newData),
   }).then(res => res.json());
 }
+export function DeleteTempTestpaper(tid) {
+  return fetch(`${Setting.ServerUrl}/api/qbank/testpaper/temp?:tid=${tid}`, {
+    method: "DELETE",
+    credentials: "include",
+  }).then(res => res.json());
+}

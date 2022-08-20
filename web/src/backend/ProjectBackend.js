@@ -72,3 +72,10 @@ export function GetUserList(id_list) {
     body: JSON.stringify(data),
   }).then(res => res.json());
 }
+export function MakeOneAssignment(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/assign`, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(data),
+  }).then(res => res.json());
+}

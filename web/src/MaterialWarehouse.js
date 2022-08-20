@@ -25,7 +25,6 @@ export default class inedx extends Component {
       //     method: "GET",
       //     responseType:"blob"
       // }).then(res => {
-      //     console.log(res);
       //     const filename = res.headers["content-disposition"];
       //     const blob = new Blob([res.data]);
       //     var downloadElement = document.createElement("a");

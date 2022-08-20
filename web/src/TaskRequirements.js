@@ -41,7 +41,6 @@ export default class index extends Component {
       //              step_id:this.props.stepId
       //          }
       //      }).then(res => {
-      //          console.log(res);
       //          this.setState({
       //              upLoadState:false
       //          });
@@ -72,7 +71,6 @@ export default class index extends Component {
         //      method: "GET",
         //      responseType:"blob"
         //  }).then(res => {
-        //      console.log(res);
         //      const filename = res.headers["content-disposition"];
         //      const blob = new Blob([res.data]);
         //      var downloadElement = document.createElement("a");

@@ -36,7 +36,6 @@ export default class index extends Component {
       //         "Content-Type":"multipart/form-data;"
       //     }
       // }).then(res => {
-      //     console.log(res);
       //     let upLoadFileList = Object.assign(this.state.upLoadFileList, {});
       //     upLoadFileList[upLoadFileList.length-1].status = "done";
       //     upLoadFileList[upLoadFileList.length-1].id = res.data.uuid;
@@ -209,7 +208,6 @@ export default class index extends Component {
                     this.setState({
                       upLoadFileList,
                     });
-                    console.log(this.state.upLoadFileList);
                   }}
                 >
                   <p className="ant-upload-drag-icon">

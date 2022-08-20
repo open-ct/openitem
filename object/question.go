@@ -9,58 +9,83 @@ import (
 )
 
 type QuestionInfo struct {
-	Title    string `json:"title" bson:"title"`
-	Type     string `json:"type" bson:"type"`
-	Body     string `json:"body" bson:"body"`
-	Answer   string `json:"answer" bson:"answer"`
-	Solution string `json:"solution" bson:"solution"`
+	Title    string `json:"title"`
+	Type     string `json:"type"`
+	Body     string `json:"body"`
+	Answer   string `json:"answer"`
+	Solution string `json:"solution"`
 }
 
 type QuestionBasicProps struct {
-	Encode              string   `json:"encode" bson:"encode"`
-	Subject             string   `json:"subject" bson:"subject"`
-	DetailsDimension    string   `json:"details_dimension" bson:"details_dimension"`
-	SubDetailsDimension string   `json:"sub_details_dimension" bson:"sub_details_dimension"`
-	AbilityDimension    string   `json:"ability_dimension" bson:"ability_dimension"`
-	SubAbilityDimension string   `json:"sub_ability_dimension" bson:"sub_ability_dimension"`
-	Description         string   `json:"description" bson:"description"`
-	SubjectRequirements string   `json:"subject_requirements" bson:"subject_requirements"`
-	Details             string   `json:"details" bson:"details"`
-	Keywords            []string `json:"keywords" bson:"keywords"`
+	Encode              string   `json:"encode"`
+	Subject             string   `json:"subject"`
+	DetailsDimension    string   `json:"details_dimension"`
+	SubDetailsDimension string   `json:"sub_details_dimension"`
+	AbilityDimension    string   `json:"ability_dimension"`
+	SubAbilityDimension string   `json:"sub_ability_dimension"`
+	Description         string   `json:"description"`
+	SubjectRequirements string   `json:"subject_requirements"`
+	Details             string   `json:"details"`
+	Keywords            []string `json:"keywords"`
 }
 
 type QuestionSpecProps struct {
-	Topic       string `json:"topic" bson:"topic"`
-	ArticleType string `json:"article_type" bson:"article_type"`
-	Length      string `json:"length" bson:"length"`
+	Topic       string `json:"topic"`
+	ArticleType string `json:"article_type"`
+	Length      string `json:"length"`
 }
 
 type QuestionExtraProps struct {
-	IsScene              bool   `json:"is_scene" bson:"is_scene"`
-	IsQuestionGroup      bool   `json:"is_question_group" bson:"is_question_group"`
-	ReadingMaterialTopic string `json:"reading_material_topic" bson:"reading_material_topic"`
-	MaterialLength       int    `json:"material_length" bson:"material_length"`
+	IsScene              bool   `json:"is_scene"`
+	IsQuestionGroup      bool   `json:"is_question_group"`
+	ReadingMaterialTopic string `json:"reading_material_topic"`
+	MaterialLength       int    `json:"material_length"`
 }
 
 type QuestionAdvancedProps struct {
-	CttLevel  float64 `json:"ctt_level" bson:"ctt_level"`
-	CttDiff_1 float64 `json:"ctt_diff_1" bson:"ctt_diff_1"`
-	CttDiff_2 float64 `json:"ctt_diff_2" bson:"ctt_diff_2"`
-	IrtLevel  float64 `json:"irt_level" bson:"irt_level"`
+	CttLevel  float64 `json:"ctt_level"`
+	CttDiff_1 float64 `json:"ctt_diff_1"`
+	CttDiff_2 float64 `json:"ctt_diff_2"`
+	IrtLevel  float64 `json:"irt_level"`
 }
 
 type QuestionComment struct {
-	TimePoint time.Time `json:"time_point" bson:"time_point"`
-	Comment   string    `json:"comment" bson:"comment"`
-	Author    string    `json:"author" bson:"author"`
+	TimePoint time.Time `json:"time_point"`
+	Comment   string    `json:"comment"`
+	Author    string    `json:"author"`
 }
 
 type QuestionApplyRecord struct {
-	GradeFits        string   `json:"grade_fits" bson:"grade_fits"`
-	TestYear         string   `json:"test_year" bson:"test_year"`
-	TestRegion       []string `json:"test_region" bson:"test_region"`
-	ParticipantCount int      `json:"participant_count" bson:"participant_count"`
-	TestCount        int      `json:"test_count" bson:"test_count"`
+	GradeFits        string   `json:"grade_fits"`
+	TestYear         string   `json:"test_year"`
+	TestRegion       []string `json:"test_region"`
+	ParticipantCount int      `json:"participant_count"`
+	TestCount        int      `json:"test_count"`
+}
+
+type Task struct {
+	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
+	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
+	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+
+	Preface string   `xorm:"mediumtext" json:"preface"`
+	Text    string   `xorm:"mediumtext" json:"text"`
+	Type    string   `xorm:"varchar(100)" json:"type"`
+	Canvas  string   `xorm:"mediumtext" json:"canvas"`
+	Basic   string   `xorm:"mediumtext" json:"basic"`
+	Video   string   `xorm:"mediumtext" json:"video"`
+	Slides  string   `xorm:"mediumtext" json:"slides"`
+	Sketch  string   `xorm:"mediumtext" json:"sketch"`
+	Frame   string   `xorm:"mediumtext" json:"frame"`
+	Three   string   `xorm:"mediumtext" json:"three"`
+	Game    string   `xorm:"mediumtext" json:"game"`
+	Deck    string   `xorm:"mediumtext" json:"deck"`
+	Extras  []string `xorm:"varchar(1000)" json:"extras"`
+
+	Options []string `xorm:"varchar(100)" json:"options"`
+	Answer  []string `xorm:"varchar(100)" json:"answer"`
+
+	SourceProject string `json:"source_project"` // 项目来源
 }
 
 type TempQuestion struct {

@@ -10,6 +10,15 @@ type CreateNewQuestionRequest struct {
 	Body     object.Task `json:"body"`
 	Answer   object.Task `json:"answer"`
 	Solution object.Task `json:"solution"`
+
+	SourceProject string                       `json:"source_project"` // 项目来源
+	Author        string                       `json:"author"`
+	Info          object.QuestionInfo          `json:"info"`
+	BasicProps    object.QuestionBasicProps    `json:"basic_props"`
+	SpecProps     object.QuestionSpecProps     `json:"spec_props"`
+	ExtraProps    object.QuestionExtraProps    `json:"extra_props"`
+	AdvancedProps object.QuestionAdvancedProps `json:"advanced_props"`
+	ApplyRecord   object.QuestionApplyRecord   `json:"apply_record"`
 }
 
 // CreateNewQuestion
@@ -32,17 +41,17 @@ func (c *ApiController) CreateNewQuestion() {
 		SourceProject: request.Body.SourceProject,
 		Author:        request.Body.Owner,
 		Info: object.QuestionInfo{
-			Title:    request.Body.Name,
-			Type:     request.Body.Type,
+			Title:    request.Info.Title,
+			Type:     request.Info.Type,
 			Body:     request.Body.Text,
 			Answer:   request.Answer.Text,
 			Solution: request.Solution.Text,
 		},
-		BasicProps:    object.QuestionBasicProps{},
-		SpecProps:     object.QuestionSpecProps{},
-		ExtraProps:    object.QuestionExtraProps{},
-		AdvancedProps: object.QuestionAdvancedProps{},
-		ApplyRecord:   object.QuestionApplyRecord{},
+		BasicProps:    request.BasicProps,
+		SpecProps:     request.SpecProps,
+		ExtraProps:    request.ExtraProps,
+		AdvancedProps: request.AdvancedProps,
+		ApplyRecord:   request.ApplyRecord,
 	}
 
 	if err != nil {

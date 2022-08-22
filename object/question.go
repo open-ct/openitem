@@ -374,3 +374,15 @@ func QueryTempQuestions(idList []string) map[string]TempQuestion {
 	}
 	return questionsMap
 }
+
+func SearchQuestion(bodyString string) ([]FinalQuestion, error) {
+	var questions []FinalQuestion
+
+	err := adapter.engine.Where("info like ?", "%\\\"body\\\":\\\"%"+bodyString+"%\\\"%").Find(&questions)
+	if err != nil {
+		log.Printf("search final-question error: %s\n", err.Error())
+		return nil, err
+	}
+
+	return questions, nil
+}

@@ -266,3 +266,29 @@ func (c *ApiController) GetProjectFinalQuestions() {
 
 	c.ResponseOk(resp)
 }
+
+// SearchFinalQuestion
+// @Title SearchFinalQuestion
+// @Description 根据字符串模糊匹配题目题干
+// @Param   bodyString path string true "题干描述字符串"
+// @Success 200 {[]object.FinalQuestion}
+// @Failure 400 "invalid qid"
+// @router /api/qbank/question/search/:bodyString [get]
+func (c *ApiController) SearchFinalQuestion() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	bodyString := c.GetString(":bodyString")
+	if bodyString == "" {
+		c.ResponseError("null string")
+		return
+	}
+	resp, err := object.SearchQuestion(bodyString)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(resp)
+}

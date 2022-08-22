@@ -97,6 +97,7 @@ func initAPI() {
 	beego.Router("/api/qbank/question/user_f", &controllers.ApiController{}, "GET:GetUserFinalQuestions")
 	beego.Router("/api/qbank/question/proj_t", &controllers.ApiController{}, "GET:GetProjectTempQuestions")
 	beego.Router("/api/qbank/question/proj_f", &controllers.ApiController{}, "GET:GetProjectFinalQuestions")
+	beego.Router("/api/qbank/question/search", &controllers.ApiController{}, "GET:SearchFinalQuestion")
 
 	// testpaper
 	beego.Router("/api/qbank/testpaper", &controllers.ApiController{}, "POST:CreateNewTestpaper")

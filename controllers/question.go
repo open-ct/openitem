@@ -38,8 +38,8 @@ func (c *ApiController) CreateNewQuestion() {
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &request)
 
 	tempQuestion := object.TempQuestion{
-		SourceProject: request.Body.SourceProject,
-		Author:        request.Body.Owner,
+		SourceProject: request.SourceProject,
+		Author:        request.Author,
 		Info: object.QuestionInfo{
 			Title:    request.Info.Title,
 			Type:     request.Info.Type,

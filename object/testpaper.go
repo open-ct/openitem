@@ -2,6 +2,7 @@ package object
 
 import (
 	"log"
+	"sort"
 	"time"
 
 	"github.com/open-ct/openitem/util"
@@ -9,23 +10,40 @@ import (
 )
 
 type QuestionItem struct {
-	QuestionId string `json:"question_id"`
-	Score      int    `json:"score"`
-	Comment    string `json:"comment"`
+	SmallQuestionNumber int    `json:"small_question_number"`
+	QuestionId          string `json:"question_id"`
+	Score               int    `json:"score"`
+	Comment             string `json:"comment"`
+}
+
+type QuestionItemV1 struct {
+	SmallQuestionNumber int          `json:"small_question_number"`
+	Question            TempQuestion `json:"question"`
+	Score               int          `json:"score"`
+	Comment             string       `json:"comment"`
 }
 
 type TestpaperPart struct {
-	Title        string         `json:"title"`
-	Description  string         `json:"description"`
-	QuestionList []QuestionItem `xorm:"mediumtext" json:"question_list"`
-	Score        int            `json:"score"`
+	BigQuestionNumber int            `json:"big_question_number"`
+	Title             string         `json:"title"`
+	Description       string         `json:"description"`
+	QuestionList      []QuestionItem `xorm:"mediumtext" json:"question_list"`
+	Score             int            `json:"score"`
+}
+
+type TestpaperPartV1 struct {
+	BigQuestionNumber int              `json:"big_question_number"`
+	Title             string           `json:"title"`
+	Description       string           `json:"description"`
+	QuestionList      []QuestionItemV1 `xorm:"mediumtext" json:"question_list"`
+	Score             int              `json:"score"`
 }
 
 type TestpaperProps struct {
-	GradeRange []string `xorm:"mediumtext notnull pk" json:"grade_range"`
-	Subjects   []string `xorm:"mediumtext notnull pk" json:"subjects"`
-	Difficulty string   `xorm:"notnull pk" json:"difficulty"`
-	TimeLimit  string   `xorm:"notnull pk" json:"time_limit"`
+	GradeRange []string `xorm:"mediumtext" json:"grade_range"`
+	Subjects   []string `xorm:"mediumtext" json:"subjects"`
+	Difficulty string   `json:"difficulty"`
+	TimeLimit  string   `json:"time_limit"`
 }
 
 type TestpaperComment struct {
@@ -67,6 +85,18 @@ type AddTestpaperCommentRequest struct {
 	TestpaperId string `json:"testpaper_id"`
 	Comment     string `json:"comment"`
 	Author      string `json:"author"`
+}
+
+type TempTestpaperResponse struct {
+	Uuid          string             `xorm:"varchar(100) notnull pk" json:"uuid"`
+	IsRoot        bool               `json:"is_root"`
+	Base          string             `json:"base"`
+	SourceProject string             `json:"source_project"`
+	Author        string             `json:"author"`
+	Title         string             `json:"title"`
+	Info          []TestpaperPartV1  `xorm:"mediumtext" json:"info"`
+	Props         TestpaperProps     `xorm:"mediumtext json" json:"props"`
+	CommentRecord []TestpaperComment `xorm:"mediumtext" json:"comment_record"`
 }
 
 func AddTempTestpaper(tempTestpaper *TempTestpaper) error {
@@ -291,4 +321,72 @@ func DeleteFinalTestpaper(tid string) error {
 		return err
 	}
 	return nil
+}
+
+func GetTempTestPaperDetail(tid string) (*TempTestpaperResponse, error) {
+	var tempTestpaper TempTestpaper
+
+	_, err := adapter.engine.ID(tid).Get(&tempTestpaper)
+	if err != nil {
+		log.Printf("[get temptestpaper] get temptestpaper error: %s\n", err.Error())
+		return nil, err
+	}
+
+	var infoV1 []TestpaperPartV1
+
+	for _, part := range tempTestpaper.Info {
+		testpaperPart := TestpaperPartV1{
+			BigQuestionNumber: part.BigQuestionNumber,
+			Title:             part.Title,
+			Description:       part.Description,
+			QuestionList:      []QuestionItemV1{},
+			Score:             part.Score,
+		}
+
+		for _, question := range part.QuestionList {
+			var tempQuestion TempQuestion
+			_, err := adapter.engine.ID(question.QuestionId).Get(&tempQuestion)
+			if err != nil {
+				return nil, err
+			}
+			testpaperPart.QuestionList = append(testpaperPart.QuestionList, QuestionItemV1{
+				SmallQuestionNumber: question.SmallQuestionNumber,
+				Question:            tempQuestion,
+				Score:               question.Score,
+				Comment:             question.Comment,
+			})
+		}
+
+		questionList := &testpaperPart.QuestionList
+
+		sort.Slice(*questionList, func(i, j int) bool {
+			if (*questionList)[i].SmallQuestionNumber < (*questionList)[j].SmallQuestionNumber {
+				return true
+			}
+			return false
+		})
+
+		infoV1 = append(infoV1, testpaperPart)
+	}
+
+	sort.Slice(infoV1, func(i, j int) bool {
+		if infoV1[i].BigQuestionNumber < infoV1[j].BigQuestionNumber {
+			return true
+		}
+		return false
+	})
+
+	res := &TempTestpaperResponse{
+		Uuid:          tempTestpaper.Uuid,
+		IsRoot:        tempTestpaper.IsRoot,
+		Base:          tempTestpaper.Base,
+		SourceProject: tempTestpaper.SourceProject,
+		Author:        tempTestpaper.Author,
+		Title:         tempTestpaper.Title,
+		Info:          infoV1,
+		Props:         tempTestpaper.Props,
+		CommentRecord: tempTestpaper.CommentRecord,
+	}
+
+	return res, nil
 }

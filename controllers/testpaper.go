@@ -274,3 +274,30 @@ func (c *ApiController) DeleteTempTestpaper() {
 
 	c.ResponseOk("ok")
 }
+
+// GetTempTestPaperDetail
+// @Title GetProjectFinalTestpaper
+// @Description 根据id获取tempTestPaper
+// @Param   uid path string true "tempTestpaper id"
+// @Success 200 {[]object.FinalTestpaper}
+// @Failure 400 "invalid qid"
+// @router /api/qbank/testpaper/:tid [get]
+func (c *ApiController) GetTempTestPaperDetail() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	tid := c.GetString(":tid")
+	if tid == "" {
+		c.ResponseError("invalid id")
+		return
+	}
+
+	resp, err := object.GetTempTestPaperDetail(tid)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(resp)
+}

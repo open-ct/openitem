@@ -94,6 +94,8 @@ type TempQuestion struct {
 	Base          string                `json:"base"`           // 若不是root, 需要设置上级题目, 进行版本管理
 	SourceProject string                `json:"source_project"` // 项目来源
 	Author        string                `json:"author"`
+	IsNew         bool                  `json:"is_new"`
+	FinalBase     string                `json:"final_base"`
 	Info          QuestionInfo          `xorm:"mediumtext json" json:"info"`
 	BasicProps    QuestionBasicProps    `xorm:"mediumtext json" json:"basic_props"`
 	SpecProps     QuestionSpecProps     `xorm:"mediumtext json" json:"spec_props"`
@@ -172,6 +174,8 @@ func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 		IsRoot:        true,
 		SourceProject: request.SourceProject,
 		Author:        request.Author,
+		IsNew:         true,
+		FinalBase:     "",
 		Info:          request.Info,
 		BasicProps:    request.BasicProps,
 		SpecProps:     request.SpecProps,
@@ -227,6 +231,25 @@ func UpdateQuestion(request *TempQuestion) (string, error) {
 	updatedId := newTempQuestion.Uuid
 	log.Printf("temp-question updated: %s\n", updatedId)
 	return updatedId, nil
+}
+
+func UpdateFinalQuestion(request *TempQuestion) error {
+	newFinalQuestion := FinalQuestion{
+		FinalVersion:  request.Uuid,
+		Info:          request.Info,
+		BasicProps:    request.BasicProps,
+		SpecProps:     request.SpecProps,
+		ExtraProps:    request.ExtraProps,
+		AdvancedProps: request.AdvancedProps,
+		ApplyRecord:   request.ApplyRecord,
+	}
+
+	_, err := adapter.engine.ID(request.FinalBase).Update(&newFinalQuestion)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TraceQuestionVersion(qid string) ([]TempQuestion, error) {

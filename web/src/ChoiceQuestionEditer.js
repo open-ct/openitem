@@ -1,22 +1,42 @@
 import React, {Component} from "react";
-import {withRouter} from "react-router-dom";
-import {Button, Col, Row, Select, Slider, Spin, Tag, message} from "antd";
+import {Button, Col, Row, Select, Slider, Spin, Tabs, Tag, message} from "antd";
 import BraftEditor from "braft-editor";
 import "braft-editor/dist/index.css";
 import "./ChoiceQuestionEditer.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 
 const {Option} = Select;
+const {TabPane} = Tabs;
 
 class ChoiceQuestionEditer extends Component {
-  state = {
-    editorState: BraftEditor.createEditorState(null),
-    loadingState: false,
-    questionParams: {
-      subject: "",
-      difficulty: 1,
-      answer: "",
-    },
+  constructor(props) {
+    super(props);
+    this.fillEditor = this.fillEditor.bind();
+    this.state = {
+      question: {},
+      classes: props,
+      editorState: {
+        body: BraftEditor.createEditorState(null),
+        answer: BraftEditor.createEditorState(null),
+        solution: BraftEditor.createEditorState(null),
+      },
+      loadingState: false,
+      questionParams: {
+        subject: "",
+        difficulty: 1,
+        answer: "",
+      },
+    };
+  }
+  fillEditor=(question) => {
+    const {body, answer, solution} = question.info;
+    this.setState({
+      editorState: {
+        body: BraftEditor.createEditorState(body),
+        answer: BraftEditor.createEditorState(answer),
+        solution: BraftEditor.createEditorState(solution),
+      },
+    });
   }
   upLoadQuestion = (uid) => {
     this.setState({
@@ -40,7 +60,7 @@ class ChoiceQuestionEditer extends Component {
       basic_props: {
         ability_dimension: this.props.ability.join(","),
         description: "暂无",
-        details: this.state.editorState.toHTML(),
+        details: this.state.editorState.body.toHTML(),
         details_dimension: this.props.content.join(","),
         encode: "",
         keywords: [],
@@ -57,7 +77,7 @@ class ChoiceQuestionEditer extends Component {
       },
       info: {
         answer: this.state.questionParams.answer,
-        body: this.state.editorState.toHTML(),
+        body: this.state.editorState.body.toHTML(),
         solution: "无",
         title: "无",
         type: "选择题",
@@ -69,12 +89,21 @@ class ChoiceQuestionEditer extends Component {
         topic: "无",
       },
     };
+    Object.assign(data, {body: {
+      text: this.state.editorState.body.toHTML(),
+    }});
+    Object.assign(data, {answer: {
+      text: this.state.editorState.answer.toHTML(),
+    }});
+    Object.assign(data, {solution: {
+      text: this.state.editorState.solution.toHTML(),
+    }});
     PropositionBackend.CreateNewQuestion(data).then(res => {
       this.setState({
         loadingState: false,
       });
     }).then(res => {
-      this.props.history.goBack();
+      this.props.classes.history.goBack();
       message.success("上传成功");
     }).catch(err => {
       this.setState({
@@ -83,28 +112,50 @@ class ChoiceQuestionEditer extends Component {
       message.error(err.message || "请求错误");
     });
   }
-
   componentDidMount() {
     this.setState({
       questionParams: Object.assign(this.state.questionParams, {subject: this.props.defaultSubjectValue}),
     });
   }
+  onChange=() => {
 
+  }
   render() {
     return (
       <div className="choice-question-editer" data-component="choice-question-editer" id="choice-question-edit-box">
         <Spin spinning={this.state.loadingState} tip="上传试题中">
-          <Row>
-            <BraftEditor
-              value={this.state.editorState}
-              onChange={(editorState) => {
-                this.setState({editorState});
-              }}
-              onSave={() => {
-
-              }}
-            />
-          </Row>
+          <Tabs onChange={this.onChange} type="card">
+            <TabPane tab="主体" key="1">
+              <BraftEditor
+                value={this.state.editorState.body}
+                onChange={(value) => {
+                  this.setState({editorState: Object.assign(this.state.editorState, {body: value})});
+                }}
+                onSave={() => {
+                }}
+              />
+            </TabPane>
+            <TabPane tab="答案" key="2">
+              <BraftEditor
+                value={this.state.editorState.answer}
+                onChange={(value) => {
+                  this.setState({editorState: Object.assign(this.state.editorState, {answer: value})});
+                }}
+                onSave={() => {
+                }}
+              />
+            </TabPane>
+            <TabPane tab="解析" key="3">
+              <BraftEditor
+                value={this.state.editorState.solution}
+                onChange={(value) => {
+                  this.setState({editorState: Object.assign(this.state.editorState, {solution: value})});
+                }}
+                onSave={() => {
+                }}
+              />
+            </TabPane>
+          </Tabs>
           <Row className="question-params">
             <div className="title">
               <span>参数编辑</span>
@@ -186,5 +237,4 @@ class ChoiceQuestionEditer extends Component {
     );
   }
 }
-
-export default withRouter(ChoiceQuestionEditer);
+export default ChoiceQuestionEditer;

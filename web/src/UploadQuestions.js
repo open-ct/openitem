@@ -1,16 +1,27 @@
-import React, {Component} from "react";
+import React, {Component, createRef} from "react";
 import {Button, Descriptions, Input, Layout, Menu, PageHeader, Pagination, Spin, message} from "antd";
 import ChoiceQuestionEditer from "./ChoiceQuestionEditer";
 import HistoryQuestion from "./HistoryQuestion";
 import UpLoadQuestionModal from "./UpLoadQuestionModal";
 import "./UploadQuestions.less";
 import * as ProjectBackend from "./backend/ProjectBackend";
+import * as PropositionBackend from "./backend/PropositionBackend";
 
 const {Search} = Input;
 const {Sider, Content} = Layout;
 
 export default class UploadQuestions extends Component {
-    state = {
+
+  constructor(props) {
+    super(props);
+    this.historyCom = createRef();
+    this.ChoiceComp = createRef();
+    this.onIndex = this.onIndex.bind(this);
+    this.state = {
+      classes: props,
+      question: {},
+      historyQuestions: [],
+      serchLoading: false,
       difficultyValue: 4,
       createTime: 0,
       projectInfo: {},
@@ -19,14 +30,33 @@ export default class UploadQuestions extends Component {
         show: false,
         type: "update",
       },
-    }
+    };
+  }
 
-    componentDidMount() {
-      let t = new Date();
+  componentDidMount() {
+    let t = new Date();
+    this.setState({
+      createTime: `${t.getFullYear()}-${t.getMonth().toString().padStart(2, "0")}-${t.getDate().toString().padStart(2, "0")} ${t.getHours().toString().padStart(2, "0")}:${t.getMinutes().toString().padStart(2, "0")}:${t.getSeconds().toString().padStart(2, "0")}`,
+    });
+    this.getProjectInfo();
+  }
+
+    searchFinishQuestion=(value) => {
       this.setState({
-        createTime: `${t.getFullYear()}-${t.getMonth().toString().padStart(2, "0")}-${t.getDate().toString().padStart(2, "0")} ${t.getHours().toString().padStart(2, "0")}:${t.getMinutes().toString().padStart(2, "0")}:${t.getSeconds().toString().padStart(2, "0")}`,
+        serchLoading: true,
       });
-      this.getProjectInfo();
+      PropositionBackend.SearchFinalQuestion(value).then(res => {
+        this.setState({
+          historyQuestions: res.data,
+          serchLoading: false,
+        });
+        this.historyCom.current.getQuestionInfo(res.data);
+      }).catch(err => {
+        message.error(err.message);
+        this.setState({
+          serchLoading: false,
+        });
+      });
     }
 
     getProjectInfo=() => {
@@ -40,11 +70,16 @@ export default class UploadQuestions extends Component {
         this.setState({
           initLoading: false,
         });
-        this.props.history.goBack();
+        this.classes.history.goBack();
         message.error("编辑器加载失败！");
       });
     }
-
+    onIndex=(indexQuestion) => {
+      this.setState({
+        question: indexQuestion,
+      });
+      this.ChoiceComp.fillEditor(indexQuestion);
+    }
     render() {
       return (
         <div className="upLoad-question-page" data-component="upLoad-question-page">
@@ -104,7 +139,7 @@ export default class UploadQuestions extends Component {
                   theme="light"
                   onClick = {(e) => {
                     let data = this.props.match.params;
-                    this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${e.key}`);
+                    this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.key}/${data.uid}`);
                   }}
                 >
                   <Menu.Item key="1">选择题</Menu.Item>
@@ -114,6 +149,8 @@ export default class UploadQuestions extends Component {
               </Sider>
               <Content style={{backgroundColor: "white"}} className="content">
                 <ChoiceQuestionEditer
+                  ref={(el) => {this.ChoiceComp = el;}}
+                  classes={this.props}
                   author={this.props.match.params.uid}
                   defaultSubjectValue={this.props.match.params.subject}
                   subjectList={this.state.initLoading ? [] : this.state.projectInfo.basic_info.subjects}
@@ -128,17 +165,12 @@ export default class UploadQuestions extends Component {
                   <div className="title">相关题目</div>
                   <div className="filter-box">
                     <span>筛选</span>
-                    <Search placeholder="input search text" style={{width: 200}} size="small" />
+                    <Search placeholder="input search text" style={{width: 200}} size="small" loading={this.state.serchLoading} onSearch={this.searchFinishQuestion} />
                   </div>
-                  <HistoryQuestion
-
-                  />
-                  <HistoryQuestion
-
-                  />
-                  <HistoryQuestion
-
-                  />
+                  {this.state.historyQuestions ?
+                    <HistoryQuestion ref={this.historyCom} onIndex={this.onIndex} />
+                    : <></>
+                  }
                   <Pagination defaultCurrent={1} total={50} className="page-spare" />
                 </div>
               </Sider>

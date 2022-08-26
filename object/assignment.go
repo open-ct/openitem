@@ -10,12 +10,12 @@ import (
 
 type Assignment struct {
 	Uuid        string `xorm:"varchar(100) notnull pk" json:"uuid"`
-	UserId      string `json:"user_id" bson:"user_id"`
-	ProjectId   string `json:"project_id" bson:"project_id"`
-	Role        int    `json:"role" bson:"role"`
-	Operator    string `json:"operator" bson:"operator"`
-	IsConfirmed bool   `json:"is_confirmed" bson:"is_confirmed"`
-	Status      int    `json:"status" bson:"status"`
+	UserId      string `json:"user_id"`
+	ProjectId   string `json:"project_id"`
+	Role        int    `json:"role"`
+	Operator    string `json:"operator"`
+	IsConfirmed bool   `json:"is_confirmed"`
+	Status      int    `json:"status"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`

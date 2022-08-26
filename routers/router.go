@@ -102,6 +102,7 @@ func initAPI() {
 	// testpaper
 	beego.Router("/api/qbank/testpaper", &controllers.ApiController{}, "POST:CreateNewTestpaper")
 	beego.Router("/api/qbank/testpaper", &controllers.ApiController{}, "PUT:UpdateTestpaper")
+	beego.Router("/api/qbank/testpaper", &controllers.ApiController{}, "GET:GetTempTestPaperDetail")
 	beego.Router("/api/qbank/testpaper/temp", &controllers.ApiController{}, "DELETE:DeleteTempTestpaper")
 	beego.Router("/api/qbank/testpaper/comment", &controllers.ApiController{}, "POST:AddTestpaperComment")
 	beego.Router("/api/qbank/testpaper/trace", &controllers.ApiController{}, "GET:TraceTestpaperVersion")

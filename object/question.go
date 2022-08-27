@@ -212,7 +212,7 @@ func UpdateQuestion(request *TempQuestion) (string, error) {
 		IsRoot:        false,
 		Base:          request.Base,
 		SourceProject: oldQuestion.SourceProject,
-		Author:        request.Author,
+		Author:        oldQuestion.Author,
 		Info:          request.Info,
 		BasicProps:    request.BasicProps,
 		SpecProps:     request.SpecProps,

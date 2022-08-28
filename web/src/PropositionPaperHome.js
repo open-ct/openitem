@@ -153,6 +153,7 @@ export default class PropositionPaperHome extends Component {
         id_list: [],
         loadingState: false,
         questionList: [],
+        testpaperDetailData: [],
       },
     };
   }
@@ -234,20 +235,32 @@ export default class PropositionPaperHome extends Component {
     });
   }
 
-  getQuestionListInfo = () => {
+  getTestpaperRecord = (tid) => {
     this.setState({
       testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: true}),
     });
-    PropositionBackend.GetTempQuestionList(this.state.testpaperVisible.id_list).then(res => {
+    PropositionBackend.GetTempTestpaperDetail(tid).then(res => {
       this.setState({
-        testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, questionList: Object.values(res.data)}),
+        testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, testpaperDetailData: res.data.info}),
       });
+      // console.log(res.data, "resdata");
+      console.log(this.state.testpaperVisible.testpaperDetailData, "...");
     }).catch(err => {
       this.setState({
         testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, show: false}),
       });
       message.error(err.message || "请求错误");
     });
+    // PropositionBackend.GetTempQuestionList(this.state.testpaperVisible.id_list).then(res => {
+    //   this.setState({
+    //     testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, questionList: Object.values(res.data)}),
+    //   });
+    // }).catch(err => {
+    //   this.setState({
+    //     testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, show: false}),
+    //   });
+    //   message.error(err.message || "请求错误");
+    // });
   }
 
   loadQuestionData = () => {
@@ -314,11 +327,11 @@ export default class PropositionPaperHome extends Component {
             title="Are you sure to delete this task?"
             onConfirm={() => {
               PropositionBackend.DeleteTempTestpaper(item.uuid).then(res => {
-                if(res.status == "ok") {
+                if (res.status == "ok") {
                   message.success("删除成功！");
                   this.setState({paperShowConfirm: -1});
                   this.getUserTestpaperList(this.state.account.id);
-                }else{
+                } else {
                   message.success("删除失败");
                   this.setState({paperShowConfirm: -1});
                   this.getUserTestpaperList(this.state.account.id);
@@ -356,18 +369,18 @@ export default class PropositionPaperHome extends Component {
                 this.setState({
                   testpaperVisible: Object.assign(this.state.testpaperVisible, {id_list: item.info[0].question_list.map(item => item.question_id), show: true}),
                 });
-                this.getQuestionListInfo();
+                this.getTestpaperRecord(item.uuid);
               }} />,
             ]}
           >
             <Meta
               title={(
                 <div className="header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-                  <span>{item.props.subjects[0] || "未知"}</span>
+                  <span>{item.title || "未知"}</span>
                   <span>{this.timeFilter(item.create_at)}</span>
                 </div>
               )}
-              description={item.info[0].description}
+              description="这里是描述"
             />
           </Card>
         </div>
@@ -541,56 +554,71 @@ export default class PropositionPaperHome extends Component {
             });
           }}
         >
-          <Spin spinning={this.state.testpaperVisible.loadingState} tip="加载中">
-            {
-              this.state.testpaperVisible.loadingState ? "" : (
-                <>
-                  {
-                    this.state.testpaperVisible.questionList.map((item, index) => (
-                      <div className="paper-question-item" key={item.id}>
-                        <Row className="header">
-                          <Col span="4">
-                            <span>序号：<span style={{fontWeight: "bold", color: "red"}}>{index + 1}</span></span>
-                          </Col>
-                          <Col span="6">
-                            <span>
-                              测试年份：<span style={{fontWeight: "bold", color: "green"}}>{item.apply_record.test_year}</span>
-                            </span>
-                          </Col>
-                          <Col span="4">
-                            <span>
-                              试题难度：<span style={{fontWeight: "bold", color: "blue"}}>{item.advanced_props.irt_level}</span>
-                            </span>
-                          </Col>
-                          <Col span="4">
-                            <span>
-                              试题类型：{item.info.type}
-                            </span>
-                          </Col>
-                          <Col span="4">
-                            <span>
-                              题目答案：{item.info.answer || "无"}
-                            </span>
-                          </Col>
-                        </Row>
-                        <div className="body" dangerouslySetInnerHTML={{__html: item.info.body}}></div>
-                        <div className="footer">
-                          <Button type="primary" style={{float: "right"}} onClick={() => {
-                            this.getQuestionRecord(item.uuid);
-                            this.setState({
-                              modifyRecordVisible: true,
-                            });
-                          }}>查看历史版本</Button>
-                        </div>
-                        <br />
-                        <br />
+          {/* <Spin spinning={this.state.testpaperVisible.loadingState} tip="加载中"> */}
+          {
+            this.state.testpaperVisible.loadingState ? "" : (
+              <>
+                {
+                  this.state.testpaperVisible.testpaperDetailData.map((question_stem, index) => (
+                    <div className="paper-question-stem" key={index}>
+                      <Row className="header">
+                        <Col>
+                          <span style={{fontWeight: "bold"}}>{question_stem.title}{question_stem.description}</span>
+                        </Col>
+                      </Row>
+                      <div>
+                        <>
+                          {question_stem.question_list.map((question_item, index) => {
+                            return (
+                              <div className="paper-question-item" key={index}>
+                                <Row className="header">
+                                  <Col span="4">
+                                    <span>序号：<span style={{fontWeight: "bold", color: "red"}}>{index + 1}</span></span>
+                                  </Col>
+                                  <Col span="6">
+                                    <span>
+                                      测试年份：<span style={{fontWeight: "bold", color: "green"}}>{question_item.question.apply_record.test_year}</span>
+                                    </span>
+                                  </Col>
+                                  <Col span="4">
+                                    <span>
+                                      试题难度：<span style={{fontWeight: "bold", color: "blue"}}>{question_item.question.advanced_props.irt_level}</span>
+                                    </span>
+                                  </Col>
+                                  <Col span="4">
+                                    <span>
+                                      试题类型：{question_item.question.info.type}
+                                    </span>
+                                  </Col>
+                                  {/* <Col span="4">
+                                    <span>
+                                    题目答案：{question_item.question.info.answer || "无"}
+                                    </span>
+                                  </Col> */}
+                                </Row>
+                                <div className="body" dangerouslySetInnerHTML={{__html: question_item.question.info.body}}></div>
+                                <div className="footer">
+                                  <Button type="primary" style={{float: "right"}} onClick={() => {
+                                    this.getQuestionRecord(question_item.question.uuid);
+                                    this.setState({
+                                      modifyRecordVisible: true,
+                                    });
+                                  }}>查看历史版本</Button>
+                                </div>
+                                <br />
+                                <br />
+                              </div>
+                            );
+                          })}
+                        </>
                       </div>
-                    ))
-                  }
-                </>
-              )
-            }
-          </Spin>
+                    </div>
+                  ))
+                }
+              </>
+            )
+          }
+          {/* </Spin> */}
         </Modal>
       </div>
     );

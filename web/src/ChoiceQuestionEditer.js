@@ -28,7 +28,7 @@ class ChoiceQuestionEditer extends Component {
       },
     };
   }
-  fillEditor=(question) => {
+  fillEditor = (question) => {
     const {body, answer, solution} = question.info;
     this.setState({
       editorState: {
@@ -89,22 +89,44 @@ class ChoiceQuestionEditer extends Component {
         topic: "无",
       },
     };
-    Object.assign(data, {body: {
-      text: this.state.editorState.body.toHTML(),
-    }});
-    Object.assign(data, {answer: {
-      text: this.state.editorState.answer.toHTML(),
-    }});
-    Object.assign(data, {solution: {
-      text: this.state.editorState.solution.toHTML(),
-    }});
+    Object.assign(data, {
+      body: {
+        text: this.state.editorState.body.toHTML(),
+      },
+    });
+    Object.assign(data, {
+      answer: {
+        text: this.state.editorState.answer.toHTML(),
+      },
+    });
+    Object.assign(data, {
+      solution: {
+        text: this.state.editorState.solution.toHTML(),
+      },
+    });
     PropositionBackend.CreateNewQuestion(data).then(res => {
       this.setState({
         loadingState: false,
       });
-    }).then(res => {
-      this.props.classes.history.goBack();
-      message.success("上传成功");
+      let stateData = this.props.classes.location.state;
+      if (stateData) {
+        stateData.dataSource.map((i) => {
+          if (i.key === stateData.key) {
+            i.question_list.map((ii) => {
+              if (ii.key === stateData.otherKey) {
+                return Object.assign(ii, {question_id: res.data});
+              } else {return ii;}
+            });
+            return i;
+          } else {return i;}
+        });
+        message.success("上传成功");
+        let params = this.props.classes.match.params;
+        this.props.classes.history.push(`/proposition-paper/create-paper/${params.project}/${params.subject}/${params.ability}/${params.content}/${params.type}/${params.uid}`, this.props.classes.location.state);
+      } else {
+        window.location.href = "/proposition-paper";
+        message.success("上传成功");
+      }
     }).catch(err => {
       this.setState({
         loadingState: false,
@@ -116,9 +138,6 @@ class ChoiceQuestionEditer extends Component {
     this.setState({
       questionParams: Object.assign(this.state.questionParams, {subject: this.props.defaultSubjectValue}),
     });
-  }
-  onChange=() => {
-
   }
   render() {
     return (
@@ -205,8 +224,8 @@ class ChoiceQuestionEditer extends Component {
               <Col span="20" className="value">
                 <div className="tag-list">
                   {
-                    this.props.ability.map(item => (
-                      <Tag key={item.id}>{item}</Tag>
+                    this.props.ability.map((item, index) => (
+                      <Tag key={index}>{item}</Tag>
                     ))
                   }
                 </div>
@@ -219,8 +238,8 @@ class ChoiceQuestionEditer extends Component {
               <Col span="20" className="value">
                 <div className="tag-list">
                   {
-                    this.props.content.map(item => (
-                      <Tag key={item.id}>{item}</Tag>
+                    this.props.content.map((item, index) => (
+                      <Tag key={index}>{item}</Tag>
                     ))
                   }
                 </div>

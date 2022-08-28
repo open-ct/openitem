@@ -49,6 +49,15 @@ export function CreateNewTestpaper(data) {
   }).then(res => res.json());
 }
 
+export function UpdateTestpaper(data) {
+  let newData = Setting.deepCopy(data);
+  return fetch(`${Setting.ServerUrl}/api/qbank/testpaper`, {
+    method: "PUT",
+    credentials: "include",
+    body: JSON.stringify(newData),
+  }).then(res => res.json());
+}
+
 export function DeleteTempTestpaper(tid) {
   return fetch(`${Setting.ServerUrl}/api/qbank/testpaper/temp?:tid=${tid}`, {
     method: "DELETE",
@@ -58,6 +67,13 @@ export function DeleteTempTestpaper(tid) {
 
 export function SearchFinalQuestion(data) {
   return fetch(`${Setting.ServerUrl}/api/qbank/question/search?:bodyString=${data}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function GetTempTestpaperDetail(tid) {
+  return fetch(`${Setting.ServerUrl}/api/qbank/testpaper?:tid=${tid}`, {
     method: "GET",
     credentials: "include",
   }).then(res => res.json());

@@ -90,8 +90,9 @@ type Task struct {
 
 type TempQuestion struct {
 	Uuid          string                `xorm:"varchar(100) notnull pk"  json:"uuid"`
-	IsRoot        bool                  `json:"is_root"`        // 临时题目是否是根
-	Base          string                `json:"base"`           // 若不是root, 需要设置上级题目, 进行版本管理
+	IsRoot        bool                  `json:"is_root"` // 临时题目是否是根
+	Base          string                `json:"base"`    // 若不是root, 需要设置上级题目, 进行版本管理
+	Next          string                `json:"next"`
 	SourceProject string                `json:"source_project"` // 项目来源
 	Author        string                `json:"author"`
 	IsNew         bool                  `json:"is_new"`
@@ -103,6 +104,7 @@ type TempQuestion struct {
 	AdvancedProps QuestionAdvancedProps `xorm:"mediumtext json" json:"advanced_props"`
 	ApplyRecord   QuestionApplyRecord   `xorm:"mediumtext json" json:"apply_record"`
 	CommentRecord []QuestionComment     `xorm:"mediumtext" json:"comment_record"`
+	ChangeLog     string                `json:"change_log"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
@@ -174,6 +176,7 @@ func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 		IsRoot:        true,
 		SourceProject: request.SourceProject,
 		Author:        request.Author,
+		Next:          "null",
 		IsNew:         true,
 		FinalBase:     "",
 		Info:          request.Info,
@@ -182,6 +185,7 @@ func CreateNewTempQuestion(request *TempQuestion) (string, error) {
 		ExtraProps:    request.ExtraProps,
 		AdvancedProps: request.AdvancedProps,
 		ApplyRecord:   request.ApplyRecord,
+		ChangeLog:     request.ChangeLog,
 		CommentRecord: nil,
 	}
 	newTempQuestion.Base = newTempQuestion.Uuid
@@ -211,14 +215,18 @@ func UpdateQuestion(request *TempQuestion) (string, error) {
 		Uuid:          util.GenUuidV4(),
 		IsRoot:        false,
 		Base:          request.Base,
+		Next:          "null",
 		SourceProject: oldQuestion.SourceProject,
 		Author:        oldQuestion.Author,
+		IsNew:         oldQuestion.IsNew,
+		FinalBase:     oldQuestion.FinalBase,
 		Info:          request.Info,
 		BasicProps:    request.BasicProps,
 		SpecProps:     request.SpecProps,
 		ExtraProps:    request.ExtraProps,
 		AdvancedProps: request.AdvancedProps,
 		ApplyRecord:   request.ApplyRecord,
+		ChangeLog:     request.ChangeLog,
 		CommentRecord: nil,
 	}
 
@@ -229,6 +237,12 @@ func UpdateQuestion(request *TempQuestion) (string, error) {
 	}
 
 	updatedId := newTempQuestion.Uuid
+
+	_, err = adapter.engine.ID(request.Base).Cols("next").Update(&TempQuestion{Next: updatedId})
+	if err != nil {
+		return "", err
+	}
+
 	log.Printf("temp-question updated: %s\n", updatedId)
 	return updatedId, nil
 }
@@ -341,7 +355,7 @@ func FinishTempQuestion(qid string) (string, error) {
 func GetUserTempQuestions(uid string) ([]TempQuestion, error) {
 	var questions []TempQuestion
 
-	err := adapter.engine.Where(builder.Eq{"author": uid}).Find(&questions)
+	err := adapter.engine.Where(builder.Eq{"author": uid, "next": "null"}).Find(&questions)
 	if err != nil {
 		log.Printf("find user's temp-question error: %s\n", err.Error())
 		return nil, err
@@ -363,7 +377,7 @@ func GetUserFinalQuestions(uid string) ([]FinalQuestion, error) {
 func GetProjectTempQuestions(pid string) ([]TempQuestion, error) {
 	var questions []TempQuestion
 
-	err := adapter.engine.Where(builder.Eq{"source_project": pid}).Find(&questions)
+	err := adapter.engine.Where(builder.Eq{"source_project": pid, "next": "null"}).Find(&questions)
 	if err != nil {
 		log.Printf("find project's temp-question error: %s\n", err.Error())
 		return nil, err

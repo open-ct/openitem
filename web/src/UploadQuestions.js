@@ -1,5 +1,5 @@
 import React, {Component, createRef} from "react";
-import {Button, Descriptions, Input, Layout, Menu, PageHeader, Pagination, Spin, message} from "antd";
+import {Button, Descriptions, Input, Layout, PageHeader, Pagination, Spin, message} from "antd";
 import ChoiceQuestionEditer from "./ChoiceQuestionEditer";
 import HistoryQuestion from "./HistoryQuestion";
 import UpLoadQuestionModal from "./UpLoadQuestionModal";
@@ -26,6 +26,7 @@ export default class UploadQuestions extends Component {
       createTime: 0,
       projectInfo: {},
       initLoading: true,
+      currentPage: 1,
       upLoadQuestionModalParams: {
         show: false,
         type: "update",
@@ -41,16 +42,23 @@ export default class UploadQuestions extends Component {
     this.getProjectInfo();
   }
 
-    searchFinishQuestion=(value) => {
+    searchFinishQuestion=(value, e) => {
       this.setState({
         serchLoading: true,
       });
       PropositionBackend.SearchFinalQuestion(value).then(res => {
-        this.setState({
-          historyQuestions: res.data,
-          serchLoading: false,
-        });
-        this.historyCom.current.getQuestionInfo(res.data);
+        if(res.data) {
+          this.setState({
+            historyQuestions: res.data,
+            serchLoading: false,
+          });
+          this.historyCom.current.getQuestionInfo(res.data);
+        }else{
+          message.warning("未检索到相关问题！");
+          this.setState({
+            serchLoading: false,
+          });
+        }
       }).catch(err => {
         message.error(err.message);
         this.setState({
@@ -84,6 +92,7 @@ export default class UploadQuestions extends Component {
       return (
         <div className="upLoad-question-page" data-component="upLoad-question-page">
           <PageHeader
+            style={{backgroundColor: "F5F5F5"}}
             ghost={false}
             onBack={() => this.props.history.goBack()}
             title="命题组卷"
@@ -105,13 +114,9 @@ export default class UploadQuestions extends Component {
               ) : (
                 <Descriptions size="small" column={3}>
                   <Descriptions.Item label="创建时间" key="createAt">{this.state.createTime}</Descriptions.Item>
-                  <Descriptions.Item label="项目" key="peojects">{this.state.projectInfo.basic_info.name}</Descriptions.Item>
-                  <Descriptions.Item label="学科" key="subjects">{
-                    this.state.projectInfo.basic_info.subjects.map((item, index) => (
-                      <span key={index}>{item}{index === this.state.projectInfo.basic_info.subjects.length - 1 ? "" : "、"}</span>
-                    ))
-                  }</Descriptions.Item>
-
+                  <Descriptions.Item label="项目" key="peoject">{this.props.match.params.project}</Descriptions.Item>
+                  <Descriptions.Item label="学科" key="subject">{this.props.match.params.subject}</Descriptions.Item>
+                  <Descriptions.Item label="类型" key="type">{this.props.match.params.type}</Descriptions.Item>
                   <Descriptions.Item label="内容纬度" key="content">{
                     this.props.match.params.content.split(",").map((item, index) => (
                       <span key={index}>{item}{index === this.props.match.params.content.split(",").length - 1 ? "" : "、"}</span>
@@ -130,24 +135,7 @@ export default class UploadQuestions extends Component {
           </PageHeader>
           <div className="main">
             <Layout className="container">
-              <Sider theme="light" width="2.4rem" style={{backgroundColor: "#FAFAFA"}}>
-                <Menu
-                  style={{width: "2.4rem"}}
-                  defaultSelectedKeys={[this.props.match.params.type]}
-                  defaultOpenKeys={[this.props.match.params.type]}
-                  mode="vertical"
-                  theme="light"
-                  onClick = {(e) => {
-                    let data = this.props.match.params;
-                    this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.key}/${data.uid}`);
-                  }}
-                >
-                  <Menu.Item key="1">选择题</Menu.Item>
-                  <Menu.Item key="2">填空题</Menu.Item>
-                  <Menu.Item key="3">阅读题</Menu.Item>
-                </Menu>
-              </Sider>
-              <Content style={{backgroundColor: "white"}} className="content">
+              <Content style={{backgroundColor: "white", padding: "5px", borderRadius: "10px"}} className="content">
                 <ChoiceQuestionEditer
                   ref={(el) => {this.ChoiceComp = el;}}
                   classes={this.props}
@@ -160,18 +148,26 @@ export default class UploadQuestions extends Component {
                   projectId={this.props.match.params.project}
                 />
               </Content>
-              <Sider theme="light" width="7.47rem" className="question-box">
+              <Sider theme="light" width="7rem" className="question-box">
                 <div className="question-content-box">
-                  <div className="title">相关题目</div>
+                  <div className="title">
+                    <img src="https://openitem.oss-cn-beijing.aliyuncs.com/img/search.png" style={{marginRight: "16px"}} width="80px" height="80px"></img>
+                    <span style={{fontWeight: "bolder", color: "#72AEF7"}}>Search</span>
+                    <div style={{color: "cadetblue", fontSize: "12px", marginLeft: "200px"}}>从题库中导入题目到编辑器中,以达到快速命题的效果</div>
+                  </div>
                   <div className="filter-box">
-                    <span>筛选</span>
-                    <Search placeholder="input search text" style={{width: 200}} size="small" loading={this.state.serchLoading} onSearch={this.searchFinishQuestion} />
+                    <Search placeholder="input search text" style={{width: "100%"}} enterButton size="large" loading={this.state.serchLoading} onSearch={this.searchFinishQuestion} />
                   </div>
                   {this.state.historyQuestions ?
                     <HistoryQuestion ref={this.historyCom} onIndex={this.onIndex} />
                     : <></>
                   }
-                  <Pagination defaultCurrent={1} total={50} className="page-spare" />
+                  <Pagination current={this.state.currentPage} total={this.state.historyQuestions ? this.state.historyQuestions.length : 0} pageSize={2} hideOnSinglePage showQuickJumper={true} onChange={(page) => {
+                    this.setState({
+                      currentPage: page,
+                    });
+                    this.historyCom.current.setPageNum(page);
+                  }} className="page-spare" />
                 </div>
               </Sider>
             </Layout>

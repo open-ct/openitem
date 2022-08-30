@@ -7,6 +7,7 @@ export class NewCreatePaper extends Component {
   constructor(props) {
     super(props);
     this.formRef = React.createRef();
+    this.questionItemRef = React.createRef();
   }
   state = {
     initLoading: false,
@@ -62,7 +63,6 @@ export class NewCreatePaper extends Component {
   }
   componentDidMount() {
     let t = new Date();
-    console.log(this.props.location.state, "回传");
     this.setState({
       createTime: `${t.getFullYear()}-${t.getMonth().toString().padStart(2, "0")}-${t.getDate().toString().padStart(2, "0")} ${t.getHours().toString().padStart(2, "0")}:${t.getMinutes().toString().padStart(2, "0")}:${t.getSeconds().toString().padStart(2, "0")}`,
       dataSource: this.props.location.state !== undefined ? [].concat(this.props.location.state.dataSource) : [],
@@ -127,7 +127,6 @@ export class NewCreatePaper extends Component {
       comment_record: [],
       title: "无",
     });
-    console.log(data, "上传数据");
     PropositionBackend.CreateNewTestpaper(data).then(res => {
       message.success("上传成功");
       window.location.href = "/proposition-paper";
@@ -343,7 +342,6 @@ export class NewCreatePaper extends Component {
               span: 16,
             }}
             onFinish={(value) => {
-              console.log(this.state.dataSource);
               Object.assign(value, {key: this.state.key});
               let data = this.state.dataSource.map((item) => {
                 return item.key === value.key ? Object.assign(value, {question_list: item.question_list}) : item;
@@ -460,8 +458,8 @@ export class NewCreatePaper extends Component {
                 dataSource: [].concat(data),
                 addQuestionVisible: false,
               });
-              const {project, subject, ability, content, type, uid} = this.props.match.params;
-              this.props.history.push(`/proposition-paper/upload-questions/${project}/${subject}/${ability}/${content}/${type}/${uid}`, Object.assign({}, {dataSource: this.state.dataSource, key: this.state.key, otherKey: this.state.otherKey}));
+              const {project, subject, ability, content, uid} = this.props.match.params;
+              this.props.history.push(`/proposition-paper/upload-questions/${project}/${subject}/${ability}/${content}/${value.type}/${uid}`, Object.assign({}, {dataSource: this.state.dataSource, key: this.state.key, otherKey: this.state.otherKey}));
             }}
           >
             <Form.Item
@@ -528,22 +526,30 @@ export class NewCreatePaper extends Component {
             });
           }}>
           <Form
+            ref={this.questionItemRef}
             // forceRender={true}
             name="editQuestion"
             wrapperCol={{
               span: 16,
             }}
             onFinish={(value) => {
-              value.key = this.state.key;
-              let data = this.state.dataSource;
+              this.state.dataSource.map((i) => {
+                return Object.assign(i, {question_list: i.question_list.map((ii) => {
+                  if(ii.key === this.state.key) {
+                    return Object.assign(ii, {...value});
+                  }else{
+                    return ii;
+                  }
+                }),
+                });
+              });
               this.setState({
-                dataSource: Object.assign({}, data),
                 editQuestionVisible: false,
               });
             }}
           >
             <Form.Item
-              label="问题序号"
+              label="序号"
               name="small_question_number"
               rules={[
                 {
@@ -552,22 +558,10 @@ export class NewCreatePaper extends Component {
                 },
               ]}
             >
-              <Input />
+              <InputNumber />
             </Form.Item>
             <Form.Item
-              label="小题名称"
-              name="name"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your name!",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label="大题类型"
+              label="类型"
               name="type"
               rules={[
                 {
@@ -577,6 +571,18 @@ export class NewCreatePaper extends Component {
               ]}
             >
               <Input />
+            </Form.Item>
+            <Form.Item
+              label="分值"
+              name="score"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your score!",
+                },
+              ]}
+            >
+              <InputNumber />
             </Form.Item>
             <div style={{marginRight: "10px"}}>
               <Space>

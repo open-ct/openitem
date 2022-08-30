@@ -1,11 +1,11 @@
 import React, {Component} from "react";
-import {Button, Col, Row, Select, Slider, Spin, Tabs, Tag, message} from "antd";
+import {Button, Col, Row, Slider, Spin, Tabs, Tag, message} from "antd";
+import {BulbOutlined, KeyOutlined, ReadOutlined} from "@ant-design/icons";
 import BraftEditor from "braft-editor";
 import "braft-editor/dist/index.css";
 import "./ChoiceQuestionEditer.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 
-const {Option} = Select;
 const {TabPane} = Tabs;
 
 class ChoiceQuestionEditer extends Component {
@@ -143,8 +143,8 @@ class ChoiceQuestionEditer extends Component {
     return (
       <div className="choice-question-editer" data-component="choice-question-editer" id="choice-question-edit-box">
         <Spin spinning={this.state.loadingState} tip="上传试题中">
-          <Tabs onChange={this.onChange} type="card">
-            <TabPane tab="主体" key="1">
+          <Tabs onChange={this.onChange} size="large" tabBarGutter="10">
+            <TabPane tab={<span><ReadOutlined />问题</span>} key="1">
               <BraftEditor
                 value={this.state.editorState.body}
                 onChange={(value) => {
@@ -154,7 +154,7 @@ class ChoiceQuestionEditer extends Component {
                 }}
               />
             </TabPane>
-            <TabPane tab="答案" key="2">
+            <TabPane tab={<span><KeyOutlined />答案</span>} key="2">
               <BraftEditor
                 value={this.state.editorState.answer}
                 onChange={(value) => {
@@ -164,7 +164,7 @@ class ChoiceQuestionEditer extends Component {
                 }}
               />
             </TabPane>
-            <TabPane tab="解析" key="3">
+            <TabPane tab={<span><BulbOutlined />解析</span>} key="3">
               <BraftEditor
                 value={this.state.editorState.solution}
                 onChange={(value) => {
@@ -184,24 +184,9 @@ class ChoiceQuestionEditer extends Component {
                 <span>学科</span>
               </Col>
               <Col span="20" className="value">
-                <Select
-                  placeholder="选择学科"
-                  value={this.state.questionParams.subject}
-                  defaultValue={this.props.defaultSubjectValue}
-                  onSelect={(e) => {
-                    let questionParams = Object.assign(this.state.questionParams, {subject: e});
-                    this.setState({
-                      questionParams,
-                    });
-                  }}
-                  size="small"
-                >
-                  {
-                    this.props.subjectList.map((item, index) => (
-                      <Option value={item} key={index + Math.random(100)}>{item}</Option>
-                    ))
-                  }
-                </Select>
+                <div className="subject">
+                  <Tag key="subject">{this.state.questionParams.subject}</Tag>
+                </div>
               </Col>
             </Row>
             <Row className="param-item" style={{marginTop: ".17rem"}}>

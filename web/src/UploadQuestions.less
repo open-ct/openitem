@@ -19,8 +19,9 @@
         border-right: 3px solid #1890ff;
     }
     .content{
+        background-color: #69C0FF;
         box-sizing: border-box;
-        padding: .3rem .3rem 0rem .3rem;
+        margin: .3rem .3rem 0rem .3rem;
         > .title{
             width: 100%;
             > p{
@@ -249,17 +250,19 @@
     }
     .question-box{
         box-sizing: border-box;
-        padding:0rem 1.03rem .57rem .27rem;
+        // margin:0rem 1.03rem .57rem .27rem;
+        background-color: #F0F2F5;
         .question-content-box{
             height: 100%;
             box-sizing: border-box;
-            background-color: #F5FBFF;
-            padding: .35rem .16rem 0px .1rem;
-            border: 1px solid #1890FF;
+            background-color: white;
+            padding: .35rem .16rem 0px .4rem;
+            margin-top: 20px;
+            border-radius: 10px;
             > .title{
                 width: 100%;
-                text-align: center;
-                font-size: .14rem;
+                text-align: left;
+                font-size: .64rem;
             }
             > .filter-box{
                 display: flex;
@@ -268,23 +271,13 @@
                 margin-top: .27rem;
                 > span{
                     font-size: .14rem;
-                    margin-right: .2rem;
+                    // margin-right: .2rem;
                 }
             }
             .page-spare{
                 position: absolute;
-                bottom: .6rem;
+                bottom: .3rem;
                 margin: .2rem;
-                .ant-pagination-item-link,.ant-pagination-item{
-                    background: #91D5FF;
-                    border: 1px solid #FFFEFE;
-                    box-sizing: border-box;
-                    border-radius: 2px;
-                    .anticon{
-                        color: white;
-                    }
-                }
-                
             }
         }
     }

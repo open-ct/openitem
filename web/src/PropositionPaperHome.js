@@ -243,24 +243,12 @@ export default class PropositionPaperHome extends Component {
       this.setState({
         testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, testpaperDetailData: res.data.info}),
       });
-      // console.log(res.data, "resdata");
-      console.log(this.state.testpaperVisible.testpaperDetailData, "...");
     }).catch(err => {
       this.setState({
         testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, show: false}),
       });
       message.error(err.message || "请求错误");
     });
-    // PropositionBackend.GetTempQuestionList(this.state.testpaperVisible.id_list).then(res => {
-    //   this.setState({
-    //     testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, questionList: Object.values(res.data)}),
-    //   });
-    // }).catch(err => {
-    //   this.setState({
-    //     testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, show: false}),
-    //   });
-    //   message.error(err.message || "请求错误");
-    // });
   }
 
   loadQuestionData = () => {

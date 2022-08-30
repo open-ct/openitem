@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Form, Modal, Select, Tag, message} from "antd";
+import {Form, Input, Modal, Select, Tag, message} from "antd";
 import {withRouter} from "react-router-dom";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import * as PorjectBackend from "./backend/ProjectBackend";
@@ -263,16 +263,12 @@ class index extends Component {
               label="题型"
               rules={[{required: true, message: "请选择题型"}]}
             >
-              <Select placeholder="选择题型" onSelect={(e) => {
+              <Input onBlur={(e) => {
                 let form = Object.assign(this.state.form, {type: e});
                 this.setState({
                   form,
                 });
-              }}>
-                <Option value="1">选择题</Option>
-                <Option value="2">填空题</Option>
-                <Option value="3">简答题</Option>
-              </Select>
+              }}></Input>
             </Form.Item>
           </Form>
         </Modal>

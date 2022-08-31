@@ -78,3 +78,10 @@ export function GetTempTestpaperDetail(tid) {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function FinishTempQuestion(qid) {
+  return fetch(`${Setting.ServerUrl}/api/qbank/question/finish?:qid=${qid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}

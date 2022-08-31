@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {Button, Card, Col, Modal, Pagination, Popconfirm, Radio, Row, Space, Spin, Table, message} from "antd";
 import UpLoadQuestionModal from "./UpLoadQuestionModal";
-import {DeleteOutlined, EditOutlined, EllipsisOutlined} from "@ant-design/icons";
+import {CheckCircleOutlined, DeleteOutlined, EditOutlined, EllipsisOutlined} from "@ant-design/icons";
 import "./PropositionPaperHome.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 
@@ -237,14 +237,17 @@ export default class PropositionPaperHome extends Component {
 
   getTestpaperRecord = (tid) => {
     this.setState({
+      loadingState: true,
       testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: true}),
     });
     PropositionBackend.GetTempTestpaperDetail(tid).then(res => {
       this.setState({
+        loadingState: false,
         testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, testpaperDetailData: res.data.info}),
       });
     }).catch(err => {
       this.setState({
+        loadingState: false,
         testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, show: false}),
       });
       message.error(err.message || "请求错误");
@@ -256,14 +259,29 @@ export default class PropositionPaperHome extends Component {
       return this.state.questionData.map((item, index) => (
         <div key={index} style={{float: "left"}}>
           <Popconfirm className="confirm"
-            title="Are you sure to delete this testpaper?"
+            title="Are you sure to finish this question?"
             onConfirm={(index) => {
-              // PropositionBackend.DeleteTempTestpaper(this.state.testpaperData[index].uuid).then(res => {
-              // });
+              this.setState({
+                loadingState: true,
+              });
+              PropositionBackend.FinishTempQuestion(item.uuid).then(res => {
+                message.success("这个题目已通过！");
+                this.setState({
+                  questionShowConfirm: -1,
+                  loadingState: false,
+                });
+              }).catch(err => {
+                message.error(err.message);
+                this.setState({
+                  questionShowConfirm: -1,
+                  loadingState: false,
+                });
+              });
             }}
             onCancel={() => {
               this.setState({
                 questionShowConfirm: -1,
+                loadingState: false,
               });
             }}
             okText="Yes"
@@ -275,7 +293,7 @@ export default class PropositionPaperHome extends Component {
           <Card key={index}
             style={{width: 300}}
             actions={[
-              <DeleteOutlined key="delete" onClick={() => {
+              <CheckCircleOutlined key="delete" onClick={() => {
                 this.setState({
                   questionShowConfirm: index,
                 });
@@ -314,14 +332,21 @@ export default class PropositionPaperHome extends Component {
           <Popconfirm
             title="Are you sure to delete this task?"
             onConfirm={() => {
+              this.setState({
+                loadingState: true,
+              });
               PropositionBackend.DeleteTempTestpaper(item.uuid).then(res => {
                 if (res.status == "ok") {
                   message.success("删除成功！");
-                  this.setState({paperShowConfirm: -1});
+                  this.setState({
+                    paperShowConfirm: -1,
+                  });
                   this.getUserTestpaperList(this.state.account.id);
                 } else {
                   message.success("删除失败");
-                  this.setState({paperShowConfirm: -1});
+                  this.setState({
+                    paperShowConfirm: -1,
+                  });
                   this.getUserTestpaperList(this.state.account.id);
                 }
               });
@@ -542,71 +567,71 @@ export default class PropositionPaperHome extends Component {
             });
           }}
         >
-          {/* <Spin spinning={this.state.testpaperVisible.loadingState} tip="加载中"> */}
-          {
-            this.state.testpaperVisible.loadingState ? "" : (
-              <>
-                {
-                  this.state.testpaperVisible.testpaperDetailData.map((question_stem, index) => (
-                    <div className="paper-question-stem" key={index}>
-                      <Row className="header">
-                        <Col>
-                          <span style={{fontWeight: "bold"}}>{question_stem.title}{question_stem.description}</span>
-                        </Col>
-                      </Row>
-                      <div>
-                        <>
-                          {question_stem.question_list.map((question_item, index) => {
-                            return (
-                              <div className="paper-question-item" key={index}>
-                                <Row className="header">
-                                  <Col span="4">
-                                    <span>序号：<span style={{fontWeight: "bold", color: "red"}}>{index + 1}</span></span>
-                                  </Col>
-                                  <Col span="6">
-                                    <span>
+          <Spin spinning={this.state.testpaperVisible.loadingState} tip="加载中">
+            {
+              this.state.testpaperVisible.loadingState ? "" : (
+                <>
+                  {
+                    this.state.testpaperVisible.testpaperDetailData.map((question_stem, index) => (
+                      <div className="paper-question-stem" key={index}>
+                        <Row className="header">
+                          <Col>
+                            <span style={{fontWeight: "bold"}}>{question_stem.title}{question_stem.description}</span>
+                          </Col>
+                        </Row>
+                        <div>
+                          <>
+                            {question_stem.question_list.map((question_item, index) => {
+                              return (
+                                <div className="paper-question-item" key={index}>
+                                  <Row className="header">
+                                    <Col span="4">
+                                      <span>序号：<span style={{fontWeight: "bold", color: "red"}}>{index + 1}</span></span>
+                                    </Col>
+                                    <Col span="6">
+                                      <span>
                                       测试年份：<span style={{fontWeight: "bold", color: "green"}}>{question_item.question.apply_record.test_year}</span>
-                                    </span>
-                                  </Col>
-                                  <Col span="4">
-                                    <span>
+                                      </span>
+                                    </Col>
+                                    <Col span="4">
+                                      <span>
                                       试题难度：<span style={{fontWeight: "bold", color: "blue"}}>{question_item.question.advanced_props.irt_level}</span>
-                                    </span>
-                                  </Col>
-                                  <Col span="4">
-                                    <span>
+                                      </span>
+                                    </Col>
+                                    <Col span="4">
+                                      <span>
                                       试题类型：{question_item.question.info.type}
-                                    </span>
-                                  </Col>
-                                  {/* <Col span="4">
+                                      </span>
+                                    </Col>
+                                    {/* <Col span="4">
                                     <span>
                                     题目答案：{question_item.question.info.answer || "无"}
                                     </span>
                                   </Col> */}
-                                </Row>
-                                <div className="body" dangerouslySetInnerHTML={{__html: question_item.question.info.body}}></div>
-                                <div className="footer">
-                                  <Button type="primary" style={{float: "right"}} onClick={() => {
-                                    this.getQuestionRecord(question_item.question.uuid);
-                                    this.setState({
-                                      modifyRecordVisible: true,
-                                    });
-                                  }}>查看历史版本</Button>
+                                  </Row>
+                                  <div className="body" dangerouslySetInnerHTML={{__html: question_item.question.info.body}}></div>
+                                  <div className="footer">
+                                    <Button type="primary" style={{float: "right"}} onClick={() => {
+                                      this.getQuestionRecord(question_item.question.uuid);
+                                      this.setState({
+                                        modifyRecordVisible: true,
+                                      });
+                                    }}>查看历史版本</Button>
+                                  </div>
+                                  <br />
+                                  <br />
                                 </div>
-                                <br />
-                                <br />
-                              </div>
-                            );
-                          })}
-                        </>
+                              );
+                            })}
+                          </>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                }
-              </>
-            )
-          }
-          {/* </Spin> */}
+                    ))
+                  }
+                </>
+              )
+            }
+          </Spin>
         </Modal>
       </div>
     );

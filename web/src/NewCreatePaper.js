@@ -114,6 +114,9 @@ export class NewCreatePaper extends Component {
     message.success("删除成功！");
   }
   confirm = () => {
+    this.setState({
+      loadingState: true,
+    });
     let data = Object.assign({}, {
       author: this.props.match.params.uid,
       info: [].concat(this.state.dataSource),
@@ -128,9 +131,15 @@ export class NewCreatePaper extends Component {
       title: "无",
     });
     PropositionBackend.CreateNewTestpaper(data).then(res => {
+      this.setState({
+        loadingState: false,
+      });
       message.success("上传成功");
       window.location.href = "/proposition-paper";
     }).catch(err => {
+      this.setState({
+        loadingState: false,
+      });
       message.error(err.message);
     });
   }

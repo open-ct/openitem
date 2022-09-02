@@ -14,7 +14,6 @@ export default class ProjectManagementPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      demo: "Hello",
       classes: props,
       projectBaseInfo: {},
       loadingState: true,
@@ -122,7 +121,7 @@ export default class ProjectManagementPage extends Component {
               <Switch>
                 {
                   this.state.projectBaseInfo.steps.map(item => (
-                    <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.Id}></Route>
+                    <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.uuid}></Route>
                   ))
                 }
                 <Redirect from={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`}></Redirect>

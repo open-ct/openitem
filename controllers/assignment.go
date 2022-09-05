@@ -114,3 +114,33 @@ func (c *ApiController) ChangeAssignment() {
 
 	c.ResponseOk(true)
 }
+
+// MakeOneTpAssignment
+// @Title MakeOneTpAssignment
+// @Description 分配试卷流程处理员
+// @Param   json body object.MakeOneTpAssignmentRequest true "assignment information"
+// @Success 200 {object} response.Default
+// @Failure 400 "invalid token(body)"
+// @router /api/review/proj/tpassign [post]
+func (c *ApiController) MakeOneTpAssignment() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	var newAssign object.MakeOneTpAssignmentRequest
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &newAssign)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	user := c.GetSessionUser()
+
+	newAssign.Operator = user.Id
+	resp, err := object.MakeOneTpAssignment(&newAssign)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(resp)
+}

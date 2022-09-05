@@ -45,36 +45,42 @@ class index extends Component {
   columns = [{
     title: "姓名",
     align: "center",
+    key: "name",
     render: (text, record) => (
       <span>{record.info.name}</span>
     ),
   }, {
     title: "年龄",
     align: "center",
+    key: "age",
     render: (text, record) => (
       <span>{record.info.birthday}</span>
     ),
   }, {
     title: "性别",
     align: "center",
+    key: "gender",
     render: (text, record) => (
       <span>{record.info.gender ? "男" : "女"}</span>
     ),
   }, {
     title: "专业",
     align: "center",
+    key: "specialty",
     render: (text, record) => (
       <Tag color="processing">{record.info.owner}</Tag>
     ),
   }, {
     title: "职位",
     align: "center",
+    key: "post",
     render: (text, record) => (
       <span>{record.info.type}</span>
     ),
   }, {
     title: "邮箱",
     align: "center",
+    key: "email",
     render: (text, record) => (
       <Button type="link" onClick={() => {
         this.setState({
@@ -87,24 +93,28 @@ class index extends Component {
   }, {
     title: "组织",
     align: "center",
+    key: "organization",
     render: (text, record) => (
       <span>{record.info.signupApplication}</span>
     ),
   }, {
     title: "位置",
     align: "center",
+    key: "position",
     render: (text, record) => (
       <span>{record.info.region}</span>
     ),
   }, {
     title: "电话",
     align: "center",
+    key: "phone",
     render: (text, record) => (
       <span>{record.info.phone}</span>
     ),
   }, {
     title: "项目角色",
     align: "center",
+    key: "role",
     render: (text, record) => {
       let roleList = ["管理员", "专家", "学科助理", "教师", "外审专家"];
       return (
@@ -114,6 +124,7 @@ class index extends Component {
   }, {
     title: "状态",
     align: "center",
+    key: "state",
     render: (text, record) => (
       <>
         {
@@ -128,12 +139,13 @@ class index extends Component {
   }, {
     title: "管理",
     align: "center",
+    key: "management",
     render: (text, record) => (
       <Space size="middle">
         <Button type="link" onClick={() => {
           this.setState({
             roleChangeForm: Object.assign(this.state.roleChangeForm, {
-              assignment_id: record.Id,
+              assignment_id: record.uuid,
               new_role: record.role,
               show: true,
             }),
@@ -145,28 +157,23 @@ class index extends Component {
             content: "该删除操作不可逆，是否继续？",
             okText: "确认移除",
             cancelText: "取消移除",
-            // onOk: () => {
-            //   this.setState({
-            //     loadingState: true
-            //   });
-            //   request({
-            //     url: baseURL + `/review/proj/assign/${record.uuid}`,
-            //     //   url:`http://49.232.73.36:8081/review/proj/assign/${record.uuid}`,
-            //     method: "DELETE"
-            //   }).then(res => {
-            //     this.setState({
-            //       loadingState: false
-            //     });
-            //     message.success("删除成功！");
-            //     this.getProjectMember();
-            //   }).catch(err => {
-            //     message.error(err.message || "请求错误！");
-            //     this.setState({
-            //       loadingState: false
-            //     });
-            //   });
-            // },
-            onOk: () => { },
+            onOk: () => {
+              this.setState({
+                loadingState: true,
+              });
+              ProjectBackend.RemoveAssignment(record.uuid).then(res => {
+                this.setState({
+                  loadingState: false,
+                });
+                message.success("删除成功！");
+                this.getProjectMember();
+              }).catch(err => {
+                message.error(err.message || "请求错误！");
+                this.setState({
+                  loadingState: false,
+                });
+              });
+            },
             onCancel() {
               message.info("已取消移除");
             },
@@ -206,9 +213,10 @@ class index extends Component {
       })];
       let id_list = memberList.map(item => item.user_id);
       ProjectBackend.GetUserList(id_list).then(res => {
-        let userInfo_list = Object.values(res.data);
+        let userInfo_list = res.data;
         memberList = memberList.map((item, index) => {
-          item.info = userInfo_list[index];
+          item.info = userInfo_list[item.user_id];
+          item.key = index.toString();
           return item;
         });
         this.setState({
@@ -234,9 +242,7 @@ class index extends Component {
         >
           <div className="member-list">
             <Table
-              key="admins"
               columns={this.columns}
-              rowKey="Id"
               pagination={false}
               dataSource={this.state.memberList}
               size="small"
@@ -253,32 +259,27 @@ class index extends Component {
           keyboard={!this.state.roleChangeForm.updateLoading}
           maskClosable={!this.state.roleChangeForm.updateLoading}
           confirmLoading={this.state.roleChangeForm.updateLoading}
-          // onOk={() => {
-          //   this.setState({
-          //     roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: true})
-          //   });
-          //   request({
-          //     url: baseURL + "/review/proj/assign",
-          //     // url:"http://49.232.73.36:8081/review/proj/assign",
-          //     method: "PATCH",
-          //     data: {
-          //       assignment_id: this.state.roleChangeForm.assignment_id,
-          //       new_role: this.state.roleChangeForm.new_role,
-          //     }
-          //   }).then(res => {
-          //     this.setState({
-          //       roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false, show: false})
-          //     });
-          //     this.getProjectMember();
-          //     message.success("修改成功！");
-          //   }).catch(err => {
-          //     message.error(err.message || "请求错误！");
-          //     this.setState({
-          //       roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false})
-          //     });
-          //   });
-          // }}
-          onOk={() => { }}
+          onOk={() => {
+            this.setState({
+              roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: true}),
+            });
+            let data = {
+              assignment_id: this.state.roleChangeForm.assignment_id,
+              new_role: this.state.roleChangeForm.new_role,
+            };
+            ProjectBackend.ChangeAssignment(data).then(res => {
+              this.setState({
+                roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false, show: false}),
+              });
+              this.getProjectMember();
+              message.success("修改成功！");
+            }).catch(err => {
+              message.error(err.message || "请求错误！");
+              this.setState({
+                roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false}),
+              });
+            });
+          }}
           onCancel={() => {
             if (this.state.roleChangeForm.updateLoading) {
               message.error("修改中，操作不可中断！");

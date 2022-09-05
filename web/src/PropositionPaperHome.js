@@ -222,6 +222,9 @@ export default class PropositionPaperHome extends Component {
       recordLoading: true,
     });
     PropositionBackend.TraceQuestionVersion(qid).then(res => {
+      res.data.map((item, index) => {
+        item.key = index;
+      });
       this.setState({
         questionRecord: Object.assign(this.state.questionRecord, {recordList: res.data, viewIndex: 0}),
         recordLoading: false,
@@ -489,7 +492,7 @@ export default class PropositionPaperHome extends Component {
             <Spin spinning={this.state.loadingState} tip="加载中">
               {
                 this.state.loadingState ? "" : this.loadQuestionData(this.state.account.id)
-              },
+              }
             </Spin>
           </div>
         </div>

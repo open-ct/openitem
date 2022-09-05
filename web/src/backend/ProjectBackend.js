@@ -72,10 +72,26 @@ export function GetUserList(id_list) {
     body: JSON.stringify(data),
   }).then(res => res.json());
 }
+
 export function MakeOneAssignment(data) {
   return fetch(`${Setting.ServerUrl}/api/review/proj/assign`, {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(data),
+  }).then(res => res.json());
+}
+
+export function ChangeAssignment(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/assign`, {
+    method: "PATCH",
+    credentials: "include",
+    body: JSON.stringify(data),
+  }).then(res => res.json());
+}
+
+export function RemoveAssignment(aid) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/assign?:aid=${aid}`, {
+    method: "DELETE",
+    credentials: "include",
   }).then(res => res.json());
 }

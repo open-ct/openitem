@@ -46,11 +46,6 @@ export default class PeddingTasks extends Component {
       align: "center",
       width: 210,
       render: (text, record) => (
-        // <Space size="middle">
-        //   <Button type="link" onClick={this.seekProjectManagement.bind(this,record)}>{
-        //     record.basic_info.name
-        //   }</Button>
-        // </Space>
         <span key={1}>{record.basic_info.name}</span>
       ),
     },
@@ -157,14 +152,18 @@ export default class PeddingTasks extends Component {
 
   getProjectList = (account) => {
     ProjectBackend.GetUserAssignments(account.id).then(res => {
-      let id_list = res.data.map(item => item.project_id);
-      let role_lits = res.data.map(item => item.role);
-      let project_id_list = res.data.map(item => item.project_id);
+      let resData = res.data ? res.data : [];
+      let id_list = resData.map(item => item.project_id);
+      let obj = {};
+      resData.forEach(e => {
+        obj[e.project_id] = e;
+      });
       ProjectBackend.GetProjectList(id_list).then(res => {
         let data = Object.values(res.data);
         data = data.map((item, index) => {
-          item.role = role_lits[index];
-          item.project_id = project_id_list[index];
+          item.role = obj[item.owner + "/" + item.name].role;
+          item.project_id = obj[item.owner + "/" + item.name].project_id;
+          item.key = index.toString();
           return item;
         });
         this.setState({
@@ -201,9 +200,8 @@ export default class PeddingTasks extends Component {
             loading={this.state.loadingState}
             columns={this.columns}
             dataSource={this.state.data}
-            rowSelection={{}}
             size="small"
-            rowKey={record => record.num}
+            rowKey={record => record.key}
             pagination={false}
             scroll={{y: "calc(100vh - 2.2rem)"}}
           />

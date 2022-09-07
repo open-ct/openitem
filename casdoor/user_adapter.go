@@ -78,3 +78,27 @@ func QueryUsers(ids []string) map[string]*auth.User {
 	}
 	return users
 }
+
+func GetUserById(id string) *auth.User {
+	owner := CasdoorOrganization
+
+	if adapter == nil {
+		panic("casdoor adapter is nil")
+	}
+
+	if owner == "" || id == "" {
+		return nil
+	}
+
+	user := auth.User{Owner: owner, Id: id}
+	existed, err := adapter.Engine.Get(&user)
+	if err != nil {
+		panic(err)
+	}
+
+	if existed {
+		return &user
+	} else {
+		return nil
+	}
+}

@@ -75,6 +75,7 @@ func initAPI() {
 	beego.Router("/api/review/proj/assign", &controllers.ApiController{}, "DELETE:DeleteAssignment")
 	beego.Router("/api/review/proj/assign", &controllers.ApiController{}, "PATCH:ChangeAssignment")
 	beego.Router("/api/review/proj/tpassign", &controllers.ApiController{}, "POST:MakeOneTpAssignment")
+	beego.Router("/api/review/proj/tpassign", &controllers.ApiController{}, "GET:GetTpAssignment")
 
 	// file
 	beego.Router("/api/review/file", &controllers.ApiController{}, "POST:UploadFile")

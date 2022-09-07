@@ -1,9 +1,13 @@
 package object
 
 import (
-	"github.com/open-ct/openitem/util"
 	"log"
 	"time"
+
+	"github.com/casdoor/casdoor-go-sdk/auth"
+	"github.com/open-ct/openitem/casdoor"
+	"github.com/open-ct/openitem/util"
+	"xorm.io/builder"
 )
 
 type TpAssignment struct {
@@ -42,4 +46,23 @@ func MakeOneTpAssignment(req *MakeOneTpAssignmentRequest) (string, error) {
 	}
 	log.Printf("Created new tpassignment: %s", newAssign.Uuid)
 	return newAssign.Uuid, nil
+}
+
+func GetTestpaperAssignment(tid string) (map[string]auth.User, error) {
+	var tpassignments []TpAssignment
+
+	err := adapter.engine.Where(builder.Eq{"testpaper_id": tid}).Find(&tpassignments)
+	if err != nil {
+		return nil, err
+	}
+
+	umap := make(map[string]auth.User)
+
+	for _, assign := range tpassignments {
+		user := casdoor.GetUserById(assign.UserId)
+
+		umap[assign.Role] = *user
+	}
+
+	return umap, nil
 }

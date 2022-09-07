@@ -144,3 +144,30 @@ func (c *ApiController) MakeOneTpAssignment() {
 
 	c.ResponseOk(resp)
 }
+
+// GetTpAssignment
+// @Title GetTpAssignment
+// @Description 分配试卷流程处理员
+// @Param   tid path string true "uuid of testpaper"
+// @Success 200 {object} response.Default
+// @Failure 400 "invalid token(body)"
+// @router /api/review/proj/tpassign/:tid [get]
+func (c *ApiController) GetTpAssignment() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	tid := c.GetString(":tid")
+	if tid == "" {
+		c.ResponseError("invalid id")
+		return
+	}
+
+	resp, err := object.GetTestpaperAssignment(tid)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(resp)
+}

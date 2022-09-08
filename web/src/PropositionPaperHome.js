@@ -324,7 +324,7 @@ export default class PropositionPaperHome extends Component {
                   <span>{this.timeFilter(item.create_at)}</span>
                 </div>
               )}
-              description={item.info.title}
+              description={item.basic_props.description || "暂无描述"}
             />
           </Card>
         </div>

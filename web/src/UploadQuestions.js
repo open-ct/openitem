@@ -69,7 +69,7 @@ export default class UploadQuestions extends Component {
 
     getProjectInfo=() => {
       let newParms = this.props.match.params;
-      ProjectBackend.GetDetailedInfo(newParms.uid + "/" + newParms.project).then(res => {
+      ProjectBackend.GetDetailedInfo(newParms.owner + "/" + newParms.project).then(res => {
         this.setState({
           projectInfo: res.data.basic_info,
           initLoading: false,
@@ -145,7 +145,7 @@ export default class UploadQuestions extends Component {
                   ability={this.props.match.params.ability.split(",")}
                   content={this.props.match.params.content.split(",")}
                   grade_range={this.state.initLoading ? [] : this.state.projectInfo.basic_info.grade_range}
-                  projectId={this.props.match.params.project}
+                  projectId={this.props.location.state.owner + "/" + this.props.match.params.project}
                 />
               </Content>
               <Sider theme="light" width="7rem" className="question-box">

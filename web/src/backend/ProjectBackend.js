@@ -95,3 +95,25 @@ export function RemoveAssignment(aid) {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function GetProjectTempTestpaper(pid) {
+  return fetch(`${Setting.ServerUrl}/api/qbank/testpaper/proj_t/?:pid=${pid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function MakeOneTpAssignment(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/tpassign`, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(data),
+  }).then(res => res.json());
+}
+
+export function GetOneTpAssignment(tid) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/tpassign?:tid=${tid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}

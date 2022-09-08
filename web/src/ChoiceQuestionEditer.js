@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Button, Col, Row, Slider, Spin, Tabs, Tag, message} from "antd";
+import {Button, Col, Input, Row, Slider, Spin, Tabs, Tag, message} from "antd";
 import {BulbOutlined, KeyOutlined, ReadOutlined} from "@ant-design/icons";
 import BraftEditor from "braft-editor";
 import "braft-editor/dist/index.css";
@@ -7,6 +7,7 @@ import "./ChoiceQuestionEditer.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 
 const {TabPane} = Tabs;
+const {TextArea} = Input;
 
 class ChoiceQuestionEditer extends Component {
   constructor(props) {
@@ -25,6 +26,7 @@ class ChoiceQuestionEditer extends Component {
         subject: "",
         difficulty: 1,
         answer: "",
+        description: "",
       },
     };
   }
@@ -50,7 +52,8 @@ class ChoiceQuestionEditer extends Component {
         irt_level: this.state.questionParams.difficulty,
       },
       apply_record: {
-        grade_fits: this.props.grade_range.join(","),
+        // grade_fits: this.props.grade_range.join(","),
+        grade_fits: "无",
         participant_count: 0,
         test_count: 0,
         test_region: [],
@@ -59,7 +62,7 @@ class ChoiceQuestionEditer extends Component {
       author: uid,
       basic_props: {
         ability_dimension: this.props.ability.join(","),
-        description: "暂无",
+        description: this.state.questionParams.description,
         details: this.state.editorState.body.toHTML(),
         details_dimension: this.props.content.join(","),
         encode: "",
@@ -80,7 +83,7 @@ class ChoiceQuestionEditer extends Component {
         body: this.state.editorState.body.toHTML(),
         solution: "无",
         title: "无",
-        type: "选择题",
+        type: this.props.match.params.type,
       },
       source_project: this.props.projectId,
       spec_props: {
@@ -108,12 +111,13 @@ class ChoiceQuestionEditer extends Component {
       this.setState({
         loadingState: false,
       });
-      let stateData = this.props.classes.location.state;
+      let stateData = this.props.classes.location.state.dataSource;
+      let state = this.props.classes.location.state;
       if (stateData) {
-        stateData.dataSource.map((i) => {
-          if (i.key === stateData.key) {
+        stateData.map((i) => {
+          if (i.key === state.key) {
             i.question_list.map((ii) => {
-              if (ii.key === stateData.otherKey) {
+              if (ii.key === state.otherKey) {
                 return Object.assign(ii, {question_id: res.data});
               } else {return ii;}
             });
@@ -122,17 +126,18 @@ class ChoiceQuestionEditer extends Component {
         });
         message.success("上传成功");
         let params = this.props.classes.match.params;
-        this.props.classes.history.push(`/proposition-paper/create-paper/${params.project}/${params.subject}/${params.ability}/${params.content}/${params.type}/${params.uid}`, this.props.classes.location.state);
+        this.props.classes.history.push(`/proposition-paper/create-paper/${params.project}/${params.subject}/${params.ability}/${params.content}/${this.props.classes.location.state.title}/${params.uid}`, this.props.classes.location.state);
       } else {
         window.location.href = "/proposition-paper";
         message.success("上传成功");
       }
-    }).catch(err => {
-      this.setState({
-        loadingState: false,
-      });
-      message.error(err.message || "请求错误");
     });
+    // .catch(err => {
+    //   this.setState({
+    //     loadingState: false,
+    //   });
+    //   message.error(err.message || "请求错误");
+    // });
   }
   componentDidMount() {
     this.setState({
@@ -227,6 +232,23 @@ class ChoiceQuestionEditer extends Component {
                       <Tag key={index}>{item}</Tag>
                     ))
                   }
+                </div>
+              </Col>
+            </Row>
+            <Row className="param-item" style={{marginTop: ".17rem"}}>
+              <Col span="4" className="label">
+                <span>问题描述</span>
+              </Col>
+              <Col span="20" className="value">
+                <div className="tag-list">
+                  <TextArea allowClear onChange={(e) => {
+                    console.log(e.currentTarget.value);
+                    let questionParams = Object.assign(this.state.questionParams, {description: e.currentTarget.value});
+                    this.setState({
+                      questionParams,
+                    });
+                  }}
+                  ></TextArea>
                 </div>
               </Col>
             </Row>

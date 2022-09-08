@@ -1,7 +1,7 @@
 import React, {Component} from "react";
-import {Form, Input, Modal, Select, Tag, message} from "antd";
+import {Button, Divider, Form, Input, Modal, Select, Space, Tag, message} from "antd";
 import {withRouter} from "react-router-dom";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import * as PorjectBackend from "./backend/ProjectBackend";
 
 const {Option} = Select;
@@ -19,25 +19,25 @@ class index extends Component {
       },
       projectLoading: false,
       projectList: [],
+      uid: null,
+      name: null,
+      contentOption: [{
+        value: "数与代数",
+      }, {
+        value: "历史认知",
+      }, {
+        value: "积累与运用",
+      }],
+      abilityOption: [{
+        value: "听力",
+      }, {
+        value: "了解",
+      }, {
+        value: "认识与知识",
+      }, {
+        value: "古诗文积累",
+      }],
     }
-
-    contentOption = [{
-      value: "数与代数",
-    }, {
-      value: "历史认知",
-    }, {
-      value: "积累与运用",
-    }]
-
-    abilityOption = [{
-      value: "听力",
-    }, {
-      value: "了解",
-    }, {
-      value: "认识与知识",
-    }, {
-      value: "古诗文积累",
-    }]
 
     formRef = React.createRef()
 
@@ -57,6 +57,7 @@ class index extends Component {
       type: "update-paper",
       value: "更新试卷信息",
     }]
+
     componentDidMount() {
       this.getProjectList();
     }
@@ -90,7 +91,6 @@ class index extends Component {
         });
       });
     }
-
     tagRender = (props) => {
       let colorList = ["gold", "lime", "green", "cyan"];
       const {label, closable, onClose} = props;
@@ -110,7 +110,35 @@ class index extends Component {
         </Tag>
       );
     }
-
+    onNameChange = (event) => {
+      this.setState({
+        name: event.target.value,
+      });
+    };
+    firstAddItem = (e) => {
+      e.preventDefault();
+      if (this.state.name.length > 0 && (this.state.contentOption.map(item => item.value).indexOf(this.state.name) === -1)) {
+        this.setState({
+          contentOption: this.state.contentOption.concat({value: (this.state.name)}),
+          name: "",
+        });
+      }
+      setTimeout(() => {
+        this.inputRef.current?.focus();
+      }, 0);
+    };
+    secondAddItem = (e) => {
+      e.preventDefault();
+      if(this.state.name.length > 0 && (this.state.abilityOption.map(item => item.value).indexOf(this.state.name) === -1)) {
+        this.setState({
+          abilityOption: this.state.abilityOption.concat({value: (this.state.name)}),
+          name: "",
+        });
+      }
+      setTimeout(() => {
+        this.inputRef.current?.focus();
+      }, 0);
+    };
     render() {
       return (
         <Modal
@@ -121,7 +149,7 @@ class index extends Component {
           onOk={() => {
             this.formRef.current.validateFields().then(data => {
               if(this.props.type === "create") {
-                this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
+                this.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}/$`, {owner: this.state.owner});
               }else if(this.props.type === "update") {
                 let that = this;
                 confirm({
@@ -129,7 +157,7 @@ class index extends Component {
                   content: "此操作将覆盖当前撰写的试题，是否继续？",
                   onOk() {
                     that.props.onClose();
-                    that.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
+                    that.props.history.push(`/proposition-paper/upload-questions/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}`, {owner: this.state.owner});
                   },
                   onCancel() {
                     that.props.onClose();
@@ -138,7 +166,7 @@ class index extends Component {
               }else if(this.props.type === "edit") {
                 this.props.onClose();
               }else if(this.props.type === "create-paper") {
-                this.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
+                this.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`, {owner: this.state.owner});
               }else if(this.props.type === "update-paper") {
                 let that = this;
                 confirm({
@@ -146,7 +174,7 @@ class index extends Component {
                   content: "此操作将覆盖当前撰写的试卷，是否继续？",
                   onOk() {
                     that.props.onClose();
-                    that.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`);
+                    that.props.history.push(`/proposition-paper/create-paper/${data.project}/${data.subject}/${data.ability}/${data.content}/${data.type}/${this.props.uid}`, {owner: this.state.owner});
                   },
                   onCancel() {
                     that.props.onClose();
@@ -167,7 +195,7 @@ class index extends Component {
           }}
         >
           <div className="upLoad-question-title">
-            <span>试题编号编号:absnahghj（自动生成）</span>
+            <span>该信息用于标记本张试卷</span>
           </div>
           <Form
             labelCol={{span: 5}}
@@ -181,17 +209,18 @@ class index extends Component {
               label="项目"
               rules={[{required: true, message: "请选择项目名称"}]}
             >
-              <Select placeholder="选择项目名称" loading={this.state.projectLoading} onFocus={this.getProjectList} onSelect={(e) => {
+              <Select placeholder="选择项目名称" loading={this.state.projectLoading} onFocus={this.getProjectList} onSelect={(e, data) => {
                 let from = Object.assign(this.state.form, {project: e});
                 this.setState({
                   from,
+                  owner: data.owner,
                 });
               }}>
                 {
                   this.state.projectLoading ? (
                     <></>
                   ) : this.state.projectList.map(item => (
-                    <Option key={item.basic_info.owner + item.basic_info.name} value={item.basic_info.name}>{item.basic_info.name}</Option>
+                    <Option key={item.owner + "/" + item.name} owner={item.owner} value={item.basic_info.name}>{item.basic_info.name}</Option>
                   ))
                 }
               </Select>
@@ -230,13 +259,38 @@ class index extends Component {
                 showArrow
                 tagRender={this.tagRender}
                 style={{width: "100%"}}
-                options={this.contentOption}
+                options={this.state.contentOption}
                 onChange={(e) => {
                   let form = Object.assign(this.state.form, {content: e});
                   this.setState({
                     form,
                   });
                 }}
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <Divider
+                      style={{
+                        margin: "8px 0",
+                      }}
+                    />
+                    <Space
+                      style={{
+                        padding: "0 8px 4px",
+                      }}
+                    >
+                      <Input
+                        placeholder="添加标签"
+                        ref={this.inputRef}
+                        value={this.state.name}
+                        onChange={this.onNameChange}
+                      />
+                      <Button type="text" icon={<PlusOutlined />} onClick={this.firstAddItem}>
+                      填入
+                      </Button>
+                    </Space>
+                  </>
+                )}
               />
             </Form.Item>
             <Form.Item
@@ -249,18 +303,43 @@ class index extends Component {
                 showArrow
                 tagRender={this.tagRender}
                 style={{width: "100%"}}
-                options={this.abilityOption}
+                options={this.state.abilityOption}
                 onChange={(e) => {
                   let form = Object.assign(this.state.form, {ability: e});
                   this.setState({
                     form,
                   });
                 }}
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <Divider
+                      style={{
+                        margin: "8px 0",
+                      }}
+                    />
+                    <Space
+                      style={{
+                        padding: "0 8px 4px",
+                      }}
+                    >
+                      <Input
+                        placeholder="添加标签"
+                        ref={this.inputRef}
+                        value={this.state.name}
+                        onChange={this.onNameChange}
+                      />
+                      <Button type="text" icon={<PlusOutlined />} onClick={this.secondAddItem}>
+                      填入
+                      </Button>
+                    </Space>
+                  </>
+                )}
               />
             </Form.Item>
             <Form.Item
               name="type"
-              label="题型"
+              label={this.props.type === "create-paper" ? "标题" : "题型"}
               rules={[{required: true, message: "请选择题型"}]}
             >
               <Input onBlur={(e) => {

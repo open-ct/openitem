@@ -5,6 +5,7 @@ import * as ProjectBackend from "./backend/ProjectBackend";
 import ChangeTags from "./ChangeTags";
 import Step from "./Step";
 import BuildTeam from "./BuildTeam";
+import ProcessManagement from "./ProcessManagement";
 import "./ProjectManagementPage.less";
 
 const {TabPane} = Tabs;
@@ -53,6 +54,7 @@ export default class ProjectManagementPage extends Component {
 
   tabCruuent = () => {
     let path_list = this.props.location.pathname.split("/");
+    if(path_list[path_list.length - 1] == "流程管理") {return "流程管理";}
     return `${path_list[path_list.length - 1]}_${path_list[path_list.length - 2]}`;
   }
 
@@ -78,8 +80,13 @@ export default class ProjectManagementPage extends Component {
               <Spin spinning={this.state.loadingState} tip="加载中" />
             ) : (
               <Tabs defaultActiveKey={`${this.state.projectBaseInfo.steps[0].uuid}_${this.state.projectBaseInfo.steps[0].name}`} type="card" activeKey={this.tabCruuent()} onChange={(e) => {
-                this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`, this.state.classes.account);
+                if(e === "流程管理") {
+                  this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e}`, {account: this.props.account});
+                } else {
+                  this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`, this.state.classes.account);
+                }
               }}>
+                <TabPane key="流程管理" tab="流程管理"></TabPane>
                 {
                   this.state.projectBaseInfo.steps.map(item => (
                     <TabPane key={`${item.uuid}_${item.name}`} tab={item.name}></TabPane>
@@ -119,6 +126,7 @@ export default class ProjectManagementPage extends Component {
           {
             this.state.loadingState ? (<></>) : (
               <Switch>
+                <Route path={"/project-management/:project_id/:role/流程管理"} component={ProcessManagement} key="流程管理"></Route>
                 {
                   this.state.projectBaseInfo.steps.map(item => (
                     <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.uuid}></Route>

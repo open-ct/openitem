@@ -65,7 +65,7 @@ export class NewCreatePaper extends Component {
     let t = new Date();
     this.setState({
       createTime: `${t.getFullYear()}-${t.getMonth().toString().padStart(2, "0")}-${t.getDate().toString().padStart(2, "0")} ${t.getHours().toString().padStart(2, "0")}:${t.getMinutes().toString().padStart(2, "0")}:${t.getSeconds().toString().padStart(2, "0")}`,
-      dataSource: this.props.location.state !== undefined ? [].concat(this.props.location.state.dataSource) : [],
+      dataSource: this.props.location.state.dataSource !== undefined ? [].concat(this.props.location.state.dataSource) : [],
     });
   }
   uuid = (len, radix) => {
@@ -117,6 +117,12 @@ export class NewCreatePaper extends Component {
     this.setState({
       loadingState: true,
     });
+    let flag = "";
+    if(this.state.dataSource.length === 0) {message.warn("未写入大题！");return;}
+    this.state.dataSource.forEach(item => {
+      if(item.question_list.length <= 0) {flag = "exit";}
+    });
+    if(flag === "exit") {message.warn("存在空大题项！");return;}
     let data = Object.assign({}, {
       author: this.props.match.params.uid,
       info: [].concat(this.state.dataSource),
@@ -126,9 +132,9 @@ export class NewCreatePaper extends Component {
         subjects: [],
         time_limit: "0",
       },
-      source_project: `${this.props.match.params.uid}/${this.props.match.params.project}`,
-      comment_record: [],
-      title: "无",
+      source_project: `${this.props.location.state.owner}/${this.props.match.params.project}`,
+      // comment_record: "这里是备注",
+      title: this.props.match.params.type,
     });
     PropositionBackend.CreateNewTestpaper(data).then(res => {
       this.setState({
@@ -195,11 +201,9 @@ export class NewCreatePaper extends Component {
                 <Descriptions.Item label="创建时间" key="createAt">{this.state.createTime}</Descriptions.Item>
                 <Descriptions.Item label="项目" key="peojects">{this.props.match.params.project}</Descriptions.Item>
                 <Descriptions.Item label="学科" key="subjects">{this.props.match.params.subject}</Descriptions.Item>
-
-                <Descriptions.Item label="内容纬度" key="content">{
-                  this.props.match.params.content.split(",").map((item, index) => (
-                    <span key={index}>{item}{index === this.props.match.params.content.split(",").length - 1 ? "" : "、"}</span>
-                  ))
+                <Descriptions.Item label="标题" key="title">{this.props.match.params.type}</Descriptions.Item>
+                <Descriptions.Item label="内容纬度" key="content" style={{width: "100px"}}>{
+                  this.props.match.params.content.split(",").join("、 ")
                 }</Descriptions.Item>
                 <Descriptions.Item label="能力纬度" key="ability">
                   {
@@ -468,7 +472,12 @@ export class NewCreatePaper extends Component {
                 addQuestionVisible: false,
               });
               const {project, subject, ability, content, uid} = this.props.match.params;
-              this.props.history.push(`/proposition-paper/upload-questions/${project}/${subject}/${ability}/${content}/${value.type}/${uid}`, Object.assign({}, {dataSource: this.state.dataSource, key: this.state.key, otherKey: this.state.otherKey}));
+              this.props.history.push(`/proposition-paper/upload-questions/${project}/${subject}/${ability}/${content}/${value.type}/${uid}`, Object.assign({}, {
+                dataSource: this.state.dataSource,
+                key: this.state.key,
+                otherKey: this.state.otherKey,
+                owner: this.props.location.state.owner,
+                title: this.props.match.params.type}));
             }}
           >
             <Form.Item

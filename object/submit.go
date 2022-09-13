@@ -22,6 +22,7 @@ type Submit struct {
 	Submitter   string    `json:"submitter"`
 	Contents    []Content `xorm:"mediumtext" json:"contents"`
 	Status      int       `json:"status"`
+	File        string    `json:"file"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
@@ -58,6 +59,11 @@ type WithdrawContentInSubmit struct {
 type SetSubmitStatusRequest struct {
 	SubmitId  string `json:"submit_id"`
 	NewStatus int    `json:"new_status"`
+}
+
+type UpdateFileRequest struct {
+	SubmitId   string `json:"submit_id"`
+	NewFileUrl string `json:"new_file_url"`
 }
 
 func getSubmit(owner string, name string) *Submit {
@@ -127,6 +133,7 @@ func MakeOneSubmit(req *Submit) (*Submit, error) {
 		Title:       req.Title,
 		Description: req.Description,
 		Submitter:   req.Submitter,
+		File:        req.File,
 	}
 
 	err := AddSubmit(&newSubmit)
@@ -139,6 +146,16 @@ func MakeOneSubmit(req *Submit) (*Submit, error) {
 
 	log.Printf("[Insert] %s", insertedSubmitId)
 	return &newSubmit, nil
+}
+
+func UpdateSubmitFile(req *UpdateFileRequest) error {
+	owner, name := util.GetOwnerAndNameFromId(req.SubmitId)
+	_, err := adapter.engine.ID(core.PK{owner, name}).Cols("file").Update(&Submit{File: req.NewFileUrl})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func AppendContent(req *AppendContentInSubmit) (*[]Content, error) {

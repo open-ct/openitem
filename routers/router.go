@@ -67,6 +67,7 @@ func initAPI() {
 	beego.Router("/api/review/proj/submit/content", &controllers.ApiController{}, "DELETE:WithdrawContentInStep")
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "PUT:SetSubmitStatus")
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "DELETE:DeleteSubmit")
+	beego.Router("/api/review/proj/submit/updatefile", &controllers.ApiController{}, "PUT:UpdateSubmitFile")
 
 	// assignment
 	beego.Router("/api/review/proj/user", &controllers.ApiController{}, "GET:GetUserAssignments")

@@ -222,3 +222,30 @@ func (c *ApiController) DeleteSubmit() {
 
 	c.ResponseOk(true)
 }
+
+// UpdateSubmitFile
+// @Title UpdateSubmitFile
+// @Description 更新submit中的文件
+// @Param   json body object.UpdateFileRequest "submit id 和 修改后的文件url"
+// @Success 200 true
+// @Failure 400 "invalid submit id"
+// @router /api/review/proj/submit/updatefile [put]
+func (c *ApiController) UpdateSubmitFile() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	var req *object.UpdateFileRequest
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	err = object.UpdateSubmitFile(req)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(true)
+}

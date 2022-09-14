@@ -21,8 +21,8 @@ type Submit struct {
 	Description string    `json:"description"`
 	Submitter   string    `json:"submitter"`
 	Contents    []Content `xorm:"mediumtext" json:"contents"`
-	Status      int       `json:"status"`
-	File        string    `json:"file"`
+	Status      string    `json:"status"`
+	File        []string  `json:"file"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
@@ -58,12 +58,12 @@ type WithdrawContentInSubmit struct {
 
 type SetSubmitStatusRequest struct {
 	SubmitId  string `json:"submit_id"`
-	NewStatus int    `json:"new_status"`
+	NewStatus string `json:"new_status"`
 }
 
 type UpdateFileRequest struct {
-	SubmitId   string `json:"submit_id"`
-	NewFileUrl string `json:"new_file_url"`
+	SubmitId   string   `json:"submit_id"`
+	NewFileUrl []string `json:"new_file_url"`
 }
 
 func getSubmit(owner string, name string) *Submit {
@@ -133,6 +133,7 @@ func MakeOneSubmit(req *Submit) (*Submit, error) {
 		Title:       req.Title,
 		Description: req.Description,
 		Submitter:   req.Submitter,
+		Status:      fmt.Sprintf("%s", "未通过"),
 		File:        req.File,
 	}
 

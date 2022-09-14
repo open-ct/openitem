@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"mime/multipart"
-	"net/url"
 	"path"
 	"strings"
 
@@ -46,7 +45,6 @@ func (c *ApiController) UploadFile() {
 	defer file.Close()
 
 	fileName := fileHeader.Filename
-	fileName = url.QueryEscape(fileName)
 	fileBytes := getFileBytes(&file)
 
 	fileDescription := c.GetString("description")

@@ -35,7 +35,7 @@ func AddFile(fileItem *FileItem) error {
 func UploadFileToStorage(req *FileItem, fileBytes []byte) (string, string) {
 	tag := "file"
 	parent := "UploadFile"
-	fullFilePath := fmt.Sprintf("openitem/file/%s/%s/%s", req.Owner, "uploadfile", req.Name)
+	fullFilePath := fmt.Sprintf(req.Name)
 	fileUrl, objectKey, err := auth.UploadResource(req.Owner, tag, parent, fullFilePath, fileBytes)
 	if err != nil {
 		panic(err)

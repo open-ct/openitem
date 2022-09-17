@@ -236,3 +236,25 @@ func DeleteSubmit(submitId string) error {
 
 	return nil
 }
+
+func GetProjectSubmit(pid string) ([]Submit, error) {
+	var steps []Step
+
+	err := adapter.engine.Where(builder.Eq{"project_id": pid}).Find(&steps)
+	if err != nil {
+		return nil, err
+	}
+
+	var submits []Submit
+
+	for _, step := range steps {
+		var tempSubmits []Submit
+		err := adapter.engine.Where(builder.Eq{"step_id": step.Uuid}).Find(&tempSubmits)
+		if err != nil {
+			return nil, err
+		}
+		submits = append(submits, tempSubmits...)
+	}
+
+	return submits, nil
+}

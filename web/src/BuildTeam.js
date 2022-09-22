@@ -26,7 +26,7 @@ class index extends Component {
       addMemberForm: {
         show: false,
         loadingState: false,
-        role: 1,
+        role: 2,
         user_id: null,
         userInfo: null,
       },
@@ -343,10 +343,8 @@ class index extends Component {
             this.setState({
               addMemberForm: Object.assign(this.state.addMemberForm, {loadingState: true}),
             });
-            let id_list = new Array();
-            id_list.push(e);
-            ProjectBackend.GetUserList(id_list).then(res => {
-              let userInfo = res.data[Object.keys(res.data)[0]];
+            ProjectBackend.GetUserByName(e).then(res => {
+              let userInfo = res;
               if(userInfo) {
                 this.setState({
                   addMemberForm: Object.assign(this.state.addMemberForm, {user_id: userInfo.id, userInfo: userInfo, loadingState: false}),
@@ -364,14 +362,13 @@ class index extends Component {
             this.state.addMemberForm.userInfo != null ? (
               <>
                 <label style={{lineHeight: ".6rem"}}>用户名</label>
-                <div>{this.state.addMemberForm.userInfo.name}</div>
+                <div>{this.state.addMemberForm.userInfo.displayName}</div>
                 <label style={{lineHeight: ".6rem"}}>角色分配：</label>
                 <Select value={this.state.addMemberForm.role} style={{width: "100%"}} onChange={(e) => {
                   this.setState({
                     addMemberForm: Object.assign(this.state.addMemberForm, {role: e}),
                   });
                 }}>
-                  <Option value={1}>管理员</Option>
                   <Option value={2}>专家</Option>
                   <Option value={3}>学科助理</Option>
                   <Option value={4}>教师</Option>

@@ -83,7 +83,7 @@ class ChoiceQuestionEditer extends Component {
         body: this.state.editorState.body.toHTML(),
         solution: "无",
         title: "无",
-        type: this.props.match.params.type,
+        type: this.props.classes.match.params.type,
       },
       source_project: this.props.projectId,
       spec_props: {
@@ -131,13 +131,36 @@ class ChoiceQuestionEditer extends Component {
         window.location.href = "/proposition-paper";
         message.success("上传成功");
       }
+    }).catch(err => {
+      this.setState({
+        loadingState: false,
+      });
+      message.error(err.message || "请求错误");
     });
-    // .catch(err => {
-    //   this.setState({
-    //     loadingState: false,
-    //   });
-    //   message.error(err.message || "请求错误");
-    // });
+  }
+  myUploadFn = (param) => {
+    let formData = new FormData();
+    var newFile = new File([param.file], param.id + "+" + param.file.name, {type: param.file.type});
+    formData.append("file", newFile);
+    formData.append("id", param.id);
+    PropositionBackend.UploadFile(formData).then(res => {
+      param.success({
+        url: res.data,
+        meta: {
+          id: param.id,
+          title: param.file.name,
+          alt: param.file.name,
+          loop: true, // 指定音视频是否循环播放
+          autoPlay: true, // 指定音视频是否自动播放
+          controls: true, // 指定音视频是否显示控制栏
+          poster: "http://xxx/xx.png", // 指定视频播放器的封面
+        },
+      });
+    }).catch(err => {
+      param.error({
+        msg: err,
+      });
+    });
   }
   componentDidMount() {
     this.setState({
@@ -156,6 +179,9 @@ class ChoiceQuestionEditer extends Component {
                   this.setState({editorState: Object.assign(this.state.editorState, {body: value})});
                 }}
                 onSave={() => {
+                }}
+                media={{
+                  uploadFn: this.myUploadFn,
                 }}
               />
             </TabPane>
@@ -242,7 +268,6 @@ class ChoiceQuestionEditer extends Component {
               <Col span="20" className="value">
                 <div className="tag-list">
                   <TextArea allowClear onChange={(e) => {
-                    console.log(e.currentTarget.value);
                     let questionParams = Object.assign(this.state.questionParams, {description: e.currentTarget.value});
                     this.setState({
                       questionParams,

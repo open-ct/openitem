@@ -85,3 +85,11 @@ export function FinishTempQuestion(qid) {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function UploadFile(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/file`, {
+    method: "POST",
+    body: data,
+    credentials: "include",
+  }).then(res => res.json());
+}

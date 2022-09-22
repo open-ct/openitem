@@ -1,6 +1,6 @@
 // 封装的材料仓库组件
 import React, {Component} from "react";
-import {Empty, Input, Pagination, Upload, message} from "antd";
+import {Empty, Input, Pagination, Upload} from "antd";
 import ModulaCard from "./ModulaCard";
 import UpLoadModal from "./UpLoadModal";
 import {FileExcelFilled, FileMarkdownFilled, FilePptFilled, FileTextFilled, FileZipFilled, PlusOutlined} from "@ant-design/icons";
@@ -15,31 +15,6 @@ export default class inedx extends Component {
       fileList: [],
       upLoadVisible: false,
       getFileLoading: false,
-    }
-
-    downLoadFile = (file_id) => {
-      message.info(`开始下载文件：${file_id}！`);
-      // request({
-      //     url:baseURL+`/review/file/${file_id}`,
-      //     // url:`http://49.232.73.36:8081/review/file/${file_id}`,
-      //     method: "GET",
-      //     responseType:"blob"
-      // }).then(res => {
-      //     const filename = res.headers["content-disposition"];
-      //     const blob = new Blob([res.data]);
-      //     var downloadElement = document.createElement("a");
-      //     var href = window.URL.createObjectURL(blob);
-      //     downloadElement.href = href;
-      //     downloadElement.download = decodeURIComponent(filename.split("filename*=")[1].replace("utf-8''", ""));
-      //     document.body.appendChild(downloadElement);
-      //     downloadElement.click();
-      //     document.body.removeChild(downloadElement);
-      //     window.URL.revokeObjectURL(href);
-      //     message.success("文件下载成功！");
-      // }).catch(err => {
-      //     message.error("文件下载失败！");
-      // });
-      message.success("文件下载成功");
     }
 
     componentDidMount() {
@@ -80,13 +55,13 @@ export default class inedx extends Component {
     }
 
     fileViewLoader = () => {
-      if(this.props.role === "2" && this.state.fileList.length === 0) {
+      if(this.props.role === "1" && this.state.fileList.length === 0) {
         return (
           <div className="empty-state-box">
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           </div>
         );
-      }else if((this.props.role === "2" && this.state.fileList.length !== 0) || this.props.role === "3" || this.props.role === "4") {
+      }else if((this.props.role === "1" && this.state.fileList.length !== 0) || this.props.role === "1" || this.props.role === "1") {
         return this.state.fileList.map(item => (
           <div className="file-item" key={item.Id} onClick={this.downLoadFile.bind(this, item.uuid)}>
             <div className="icon">
@@ -109,7 +84,9 @@ export default class inedx extends Component {
           <div className="material-warehouse-box" data-component="material-warehouse-box">
             <div className="container">
               {
-                this.props.role === "3" || (this.props.role === "4" && this.props.stepName !== "测试框架与论证报告") ? (
+                // this.props.role === "3" || (this.props.role === "4" && this.props.stepName !== "测试框架与论证报告") ? (
+                // this.props.stepName == "测试框架与论证报告" ? (
+                this.props.role ? (
                   <div className="upload-download-box" onClick={() => {
                     this.setState({
                       upLoadVisible: true,
@@ -141,6 +118,7 @@ export default class inedx extends Component {
                 show={this.state.upLoadVisible}
                 projectId={this.props.projectId}
                 stepId = {this.props.stepId}
+                account={this.props.account}
                 onClose={() => {
                   this.setState({
                     upLoadVisible: false,
@@ -149,6 +127,7 @@ export default class inedx extends Component {
                 onUpdate = {() => {
                   this.getFileList();
                 }}
+                getDataList={this.props.getDataList}
               ></UpLoadModal>
             </div>
             <div className="footer">

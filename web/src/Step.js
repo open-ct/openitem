@@ -7,7 +7,13 @@ import DataTable from "./DataTable";
 import "./Step.less";
 
 export default class index extends Component {
-
+  dataRef = React.createRef();
+  constructor(props) {
+    super(props);
+  }
+  updateData=() => {
+    this.dataRef.current.getDataList();
+  }
   render() {
     return (
       <div className="step-page" data-component="step-page">
@@ -18,6 +24,7 @@ export default class index extends Component {
                 role={this.props.match.params.role}
                 stepId={this.props.match.params.step_id}
                 projectId={this.props.match.params.project_id}
+                account={this.props.location.state}
               ></TaskRequirements>
             </Row>
             <Row style={{height: "1.9rem", marginBottom: ".12rem"}}>
@@ -32,6 +39,8 @@ export default class index extends Component {
                 projectId = {this.props.match.params.project_id}
                 stepId = {this.props.match.params.step_id}
                 stepName = {this.props.location.pathname.split("/")[this.props.location.pathname.split("/").length - 2]}
+                account={this.props.location.state}
+                getDataList={this.updateData}
               >
               </MaterialWarehouse>
             </Row>
@@ -42,6 +51,8 @@ export default class index extends Component {
               stepName={this.props.location.pathname.split("/")[this.props.location.pathname.split("/").length - 2]}
               role={this.props.match.params.role}
               stepId={this.props.match.params.step_id}
+              projectId = {this.props.match.params.project_id}
+              ref={this.dataRef}
             >
             </DataTable>
           </Col>

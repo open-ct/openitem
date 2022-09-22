@@ -1,13 +1,14 @@
 import React, {Component} from "react";
-import {Button, Modal, Pagination, Radio, Space, Table, Tag, Upload, message} from "antd";
+import {Modal, Pagination, Radio, Space, Table, Tag, message} from "antd";
+import {FileTextTwoTone} from "@ant-design/icons";
 import ModulaCard from "./ModulaCard";
 import ModifyRecordModal from "./ModifyRecordModal";
-import {FileTextTwoTone, UploadOutlined} from "@ant-design/icons";
 import "./DataTable.less";
+import * as ProjectBackend from "./backend/ProjectBackend";
 
 export default class index extends Component {
-
     state = {
+      showFiles: false,
       data: [],
       loadingState: false,
       reviewResultsVisible: false,
@@ -22,268 +23,94 @@ export default class index extends Component {
 
     modifyRecordRef = React.createRef()
 
-    colums = [[{
+    columns=[{
       title: "上传时间",
-      key: "CreateAt",
+      dataIndex: "create_at",
+      key: "create_at",
       align: "center",
       width: 150,
       render: (text, record) => (
-        <span>{this.dateFilter(record.CreateAt)}</span>
+        <span>{this.dateFilter(record.create_at)}</span>
       ),
     }, {
       title: "上传用户",
-      dataIndex: "user",
-      key: "user",
+      dataIndex: "user_name",
+      key: "user_name",
       align: "center",
       width: 120,
     }, {
-      title: "评审材料",
-      key: "contents",
+      title: "所属试卷",
+      dataIndex: "testpaper_id",
+      key: "testpaper_id",
       align: "center",
-      width: 220,
+    }, {
+      title: "材料标题",
+      dataIndex: "name",
+      key: "name",
+      align: "center",
+    }, {
+      title: "评审材料",
+      key: "file",
+      dataIndex: "file",
+      align: "center",
       render: (text, record) => (
         <Space size="middle">
           {
-            record.contents ? (
-              <span style={{cursor: "pointer"}} onClick={this.downLoadFile.bind(this, record.contents[0].item_id)}>{record.contents[0].comment} <FileTextTwoTone /></span>
+            record.file ? (
+              <span style={{cursor: "pointer"}} onClick={() => {
+                this.setState({
+                  showFiles: true,
+                  file: record.file,
+                });
+              }}>点击查看<FileTextTwoTone /></span>
             ) : "无"
           }
         </Space>
       ),
     }, {
-      title: "评审结果",
+      title: "评审",
       key: "status",
+      dataIndex: "status",
       align: "center",
       width: 100,
       render: (text, record) => {
         let levelList = [{
-          mode: "等待审核",
+          mode: "未审核",
           color: "default",
         }, {
           mode: "通过",
           color: "#87D068",
-        }, {
-          mode: "再修改",
-          color: "#2DB7F5",
         }, {
           mode: "驳回",
           color: "#FF5500",
         }];
         return (
           <Space size="middle">
-            <Tag color={levelList[record.status].color} onClick={() => {
+            <Tag color={levelList.filter(item => {return item.mode == record.status;})[0].color} onClick={() => {
               this.setState({
                 reviewResultsVisible: true,
                 statusChangeParams: {
-                  submitId: record.uuid,
+                  submitId: record.owner + "/" + record.name,
                   value: record.status,
                 },
               });
-            }} style={{cursor: "pointer"}}>{levelList[record.status].mode}</Tag>
+            }} style={{cursor: "pointer"}}>{record.status}</Tag>
           </Space>
         );
       },
     }, {
       title: "反馈批注材料",
-      dataIndex: "feedback-material",
-      key: "feedback-material",
+      dataIndex: "description",
+      key: "description",
       align: "center",
       render: (text, record) => {
-        if (!record.feedbackMaterial) {
-          return (
-            <Space size="middle">
-              <Upload>
-                <Button icon={<UploadOutlined />} size="small">上传批注</Button>
-              </Upload>
-            </Space>
-          );
-        }
-        return (
-          <Space size="middle">
-            <span>{record.feedbackMaterial}</span><FileTextTwoTone />
-          </Space>
-        );
+        return (<div>反馈批注材料</div>);
       },
-    }], [{
-      title: "材料编号",
-      dataIndex: "uuid",
-      key: "id",
-      align: "center",
-    }, {
-      title: "上传时间",
-      key: "date",
-      align: "center",
-      render: (text, record) => (
-        <Space size="middle">
-          <span>{this.dateFilter(record.CreateAt)}</span>{record.isDelay ? (<Tag color="error">延时提交</Tag>) : ""}
-        </Space>
-      ),
-    }, {
-      title: "评审材料",
-      key: "review-materials",
-      width: 220,
-      align: "center",
-      render: (text, record) => (
-        <Space size="middle">
-          {
-            record.contents ? (
-              <span style={{cursor: "pointer"}} onClick={this.downLoadFile.bind(this, record.contents[0].item_id)}>{record.contents[0].comment} <FileTextTwoTone /></span>
-            ) : "无"
-          }
-        </Space>
-      ),
-    }, {
-      title: "评审结果",
-      key: "result",
-      align: "center",
-      render: (text, record) => {
-        let levelList = [{
-          mode: "等待评审",
-          color: "default",
-        }, {
-          mode: "通过",
-          color: "#87D068",
-        }, {
-          mode: "再修改",
-          color: "#2DB7F5",
-        }, {
-          mode: "驳回",
-          color: "#FF5500",
-        }];
-        return (
-          <Space size="middle">
-            <Tag color={levelList[record.status].color} style={{cursor: "pointer"}}>{levelList[record.status].mode}</Tag>
-          </Space>
-        );
-      },
-    }, {
-      title: "反馈意见",
-      key: "feedback",
-      align: "center",
-      render: (text, record) => {
-        if (record.feedback === "") {
-          return (
-            <Space size="middle">
-              <span style={{cursor: "pointer"}}>等待评审...</span>
-            </Space>
-          );
-        }
-        return (
-          <Space size="middle">
-            {/* <span style={{cursor:'pointer'}} onClick={this.downLoadFile}>{record.feedback}</span><FileTextTwoTone /> */}
-            <span>无</span>
-          </Space>
-        );
-      },
-    }, {
-      title: "修改记录",
-      key: "isModify",
-      align: "center",
-      width: 80,
-      render: (text, record) => (
-        <Space size="middle">
-          {record.contents ? (<Button type="link" onClick={() => {
-            this.setState({
-              selectedSubmitId: record.uuid,
-              modifyRecordVisible: true,
-            });
-            this.modifyRecordRef.current.getRecordList();
-          }}>查看</Button>) : (<span>无</span>)}
-        </Space>
-      ),
-    }], [{
-      title: "上传时间",
-      dataIndex: "CreateAt",
-      key: "CreateAt",
-      align: "center",
-      width: 150,
-    }, {
-      title: "上传用户",
-      dataIndex: "user",
-      key: "user",
-      align: "center",
-      width: 120,
-    }, {
-      title: "评审材料",
-      key: "contents",
-      align: "center",
-      width: 220,
-      render: (text, record) => (
-        <Space size="middle">
-          {
-            record.contents ? (
-              <span style={{cursor: "pointer"}} onClick={this.downLoadFile.bind(this, record.contents[0].item_id)}>{record.contents[0].comment} <FileTextTwoTone /></span>
-            ) : "无"
-          }
-        </Space>
-      ),
-    }, {
-      title: "评审结果",
-      key: "status",
-      align: "center",
-      width: 100,
-      render: (text, record) => {
-        let levelList = [{
-          mode: "等待审核",
-          color: "default",
-        }, {
-          mode: "通过",
-          color: "#87D068",
-        }, {
-          mode: "再修改",
-          color: "#2DB7F5",
-        }, {
-          mode: "驳回",
-          color: "#FF5500",
-        }];
-        return (
-          <Space size="middle">
-            <Tag color={levelList[record.status].color} style={{cursor: "pointer"}}>{levelList[record.status].mode}</Tag>
-          </Space>
-        );
-      },
-    }, {
-      title: "反馈批注材料",
-      dataIndex: "feedback-material",
-      key: "feedback-material",
-      align: "center",
-      render: (text, record) => {
-        return (
-          <Space size="middle">
-            <span>无</span>
-          </Space>
-        );
-      },
-    }],
-    ]
+    }]
 
     dateFilter(time) {
       let date = new Date(time);
       return `${date.getFullYear()}-${date.getMonth().toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
-    }
-
-    downLoadFile(file_id) {
-      message.info(`开始下载文件：${file_id}！`);
-      // request({
-      //     url:baseURL+`/review/file/${file_id}`,
-      //     // url:`http://49.232.73.36:8081/review/file/${file_id}`,
-      //     method: "GET",
-      //     responseType:"blob"
-      // }).then(res => {
-      //     const filename = res.headers["content-disposition"];
-      //     const blob = new Blob([res.data]);
-      //     var downloadElement = document.createElement("a");
-      //     var href = window.URL.createObjectURL(blob);
-      //     downloadElement.href = href;
-      //     downloadElement.download = decodeURIComponent(filename.split("filename*=")[1].replace("utf-8''", ""));
-      //     document.body.appendChild(downloadElement);
-      //     downloadElement.click();
-      //     document.body.removeChild(downloadElement);
-      //     window.URL.revokeObjectURL(href);
-      //     message.success("文件下载成功！");
-      // }).catch(err => {
-      //     message.error("文件下载失败！");
-      // });
     }
 
     loadClumsIndex = () => {
@@ -308,27 +135,34 @@ export default class index extends Component {
       this.setState({
         loadingState: true,
       });
-      var res = {
-        "operation_code": 1000,
-        "message": "",
-        "data": null,
-      };
-      this.setState({
-        data: res.data,
-        loadingState: false,
+      let pid = this.props.projectId.split("_").join("/");
+      ProjectBackend.GetAllSubmit(pid).then(res => {
+        let data = res.data.filter(item => {
+          return item.step_id == this.props.stepId;
+        });
+        this.setState({
+          data,
+          loadingState: false,
+        });
+        let userList = this.state.data ? this.state.data.map(item => {
+          return item.submitter;
+        }) : [];
+        ProjectBackend.GetUserList(userList).then(res => {
+          let newData = this.state.data ? this.state.data.map((item, index) => {
+            return Object.assign(item, {user_name: res.data[item.submitter].displayName, key: index});
+          }) : [];
+          this.setState({
+            data: newData,
+          });
+        }).catch(err => {
+          message.error(err.message);
+        });
+      }).catch(err => {
+        message.error(err.message || "审查材料加载失败！");
+        this.setState({
+          loadingState: false,
+        });
       });
-      // request({method:"GET", url:baseURL+`/review/proj/submits/${this.props.stepId}`}).then(res => {
-      // // request({ method:'GET', url:`http://49.232.73.36:8081/review/proj/submits/${this.props.stepId}`}).then(res=>{
-      //     this.setState({
-      //         data:res.data,
-      //         loadingState:false
-      //     });
-      // }).catch(err => {
-      //     message.error(err.message||"审查材料加载失败！");
-      //     this.setState({
-      //         loadingState:false
-      //     });
-      // });
     }
 
     render() {
@@ -337,9 +171,9 @@ export default class index extends Component {
           <div className="data-table-box" data-component="data-table-box">
             <Table
               dataSource={this.state.data}
-              columns={this.colums[this.loadClumsIndex()]}
+              columns={this.columns}
               size="small"
-              rowKey="Id"
+              rowKey="key"
               pagination={false}
               scroll={{y: "5.8rem"}}
               loading={this.state.loadingState}
@@ -354,6 +188,22 @@ export default class index extends Component {
               />
             </div>
           </div>
+          <Modal
+            title="点击下载审核文件"
+            visible={this.state.showFiles}
+            closable={true}
+            onCancel={() => {
+              this.setState({
+                showFiles: false,
+              });
+            }}
+            footer={null}
+          >
+            {this.state.file ? this.state.file.map((item, index) => {
+              return <p key={index + ""}><span>{`材料${index + 1}`}</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href={item}>点击下载</a></p>;
+            })
+              : <></>}
+          </Modal>
           <Modal title="评审意见" visible={this.state.reviewResultsVisible}
             cancelText="关闭"
             okText="审核"
@@ -362,31 +212,26 @@ export default class index extends Component {
             maskClosable={!this.state.statusChangeLoading}
             keyboard={!this.state.statusChangeLoading}
             onOk={() => {
-              // this.setState({
-              //     statusChangeLoading:true
-              // });
-              // request({
-              //     url:baseURL+"/review/proj/submit",
-              //     // url:`http://49.232.73.36:8081/review/proj/submit`,
-              //     method: "PUT",
-              //     data:{
-              //         new_status:this.state.statusChangeParams.value,
-              //         submit_id:this.state.statusChangeParams.submitId
-              //     }
-              // }).then(res => {
-              //     this.setState({
-              //         statusChangeLoading:false,
-              //         reviewResultsVisible:false
-              //     });
-              //     this.getDataList();
-              //     message.success("审核成功");
-
-              // }).catch(err => {
-              //     this.setState({
-              //         statusChangeLoading:false
-              //     });
-              //     message.error(err.message||"审核失败");
-              // });
+              this.setState({
+                statusChangeLoading: true,
+              });
+              let data = {
+                new_status: this.state.statusChangeParams.value,
+                submit_id: this.state.statusChangeParams.submitId,
+              };
+              ProjectBackend.AlterOneSubmit(data).then(res => {
+                this.setState({
+                  statusChangeLoading: false,
+                  reviewResultsVisible: false,
+                });
+                this.getDataList();
+                message.success("审核成功");
+              }).catch(err => {
+                message.error(err.message);
+                this.setState({
+                  statusChangeLoading: false,
+                });
+              });
             }}
             onCancel={() => {
               if (this.state.statusChangeLoading) {
@@ -407,9 +252,9 @@ export default class index extends Component {
                 statusChangeParams,
               });
             }}>
-              <Radio value={1}>通过</Radio>
-              <Radio value={2}>再修改</Radio>
-              <Radio value={3}>驳回</Radio>
+              <Radio value="未审核">未审核</Radio>
+              <Radio value="通过">通过</Radio>
+              <Radio value="驳回">驳回</Radio>
             </Radio.Group>
           </Modal>
           <ModifyRecordModal

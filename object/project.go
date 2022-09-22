@@ -210,7 +210,7 @@ func CreateTemplateProject(req *Project) (string, error) {
 
 	_, err = adapter.engine.Insert(&assign)
 	if err != nil {
-		log.Printf("[Mongo] Create project's assignment error: %s\n", err.Error())
+		log.Printf("Create project's assignment error: %s\n", err.Error())
 		// delete project
 		adapter.engine.ID(core.PK{newProject.Owner, newProject.Name}).Delete(&Project{})
 		return "", err

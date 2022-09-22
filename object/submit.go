@@ -17,6 +17,7 @@ type Submit struct {
 	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
 	StepId      string    `json:"step_id"`
+	TestpaperId string    `json:"testpaper_id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Submitter   string    `json:"submitter"`
@@ -130,6 +131,7 @@ func MakeOneSubmit(req *Submit) (*Submit, error) {
 		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
 
 		StepId:      req.StepId,
+		TestpaperId: req.TestpaperId,
 		Title:       req.Title,
 		Description: req.Description,
 		Submitter:   req.Submitter,

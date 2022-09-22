@@ -117,3 +117,56 @@ export function GetOneTpAssignment(tid) {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function GetOneStepInfo(stepId) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/step/?:stepId=${stepId}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function UploadStepAttachment(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/step/attachment`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function MakeOneSubmit(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/submit`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function AlterOneSubmit(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/submit`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function AppendContentInStep(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/submit/content`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function GetAllSubmit(pid) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/submit/getall?:pid=${pid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function GetUserByName(name) {
+  return fetch(`${Setting.ServerUrl}/api/get-user?:name=${name}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}

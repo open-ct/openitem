@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Descriptions, Modal, Select, Space, Spin, Table, Tag, message} from "antd";
+import {Descriptions, Modal, Popconfirm, Select, Space, Spin, Table, Tag, message} from "antd";
 import ModulaCard from "./ModulaCard.js";
 import * as ProjectBackend from "./backend/ProjectBackend";
 
@@ -153,8 +153,30 @@ export default class ProcessManagement extends Component {
           key: "action",
           render: (_, record) => (
             <Space size="middle">
-              <a>同意 {record.name}</a>
-              <a>拒绝</a>
+              <Popconfirm
+                title="Are you sure to through this stage?"
+                onConfirm={() => {
+                  let data = this.state.testPaperData.map(item => {
+                    if(item.uuid === record.uuid) {
+                      let num = this.state.steps.indexOf(record.state[0]) + 1;
+                      return Object.assign(item, {state: [this.state.steps[num]]});
+                    }
+                    return item;
+                  });
+                  this.setState({
+                    testPaperData: data,
+                  });
+                }}
+                onCancel={() => {
+
+                }}
+                okText="Yes"
+                cancelText="No"
+              >
+                <a>下一阶段</a>
+              </Popconfirm>
+              <a>重置</a>
+              <a>删除</a>
             </Space>
           ),
         },

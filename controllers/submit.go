@@ -249,3 +249,29 @@ func (c *ApiController) UpdateSubmitFile() {
 
 	c.ResponseOk(true)
 }
+
+// GetProjectSubmit
+// @Title GetProjectSubmit
+// @Description 获取项目所有submit
+// @Param   pid path string true "项目id"
+// @Success 200 true
+// @Failure 400 "invalid submit id"
+// @router /api/review/proj/submit/getall/:pid [get]
+func (c *ApiController) GetProjectSubmit() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	pid := c.GetString(":pid")
+	if pid == "" {
+		c.ResponseError("invalid id")
+		return
+	}
+	resp, err := object.GetProjectSubmit(pid)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(resp)
+}

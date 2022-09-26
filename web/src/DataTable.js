@@ -5,6 +5,7 @@ import ModulaCard from "./ModulaCard";
 import ModifyRecordModal from "./ModifyRecordModal";
 import "./DataTable.less";
 import * as ProjectBackend from "./backend/ProjectBackend";
+import i18next from "i18next";
 
 export default class index extends Component {
     state = {
@@ -24,7 +25,7 @@ export default class index extends Component {
     modifyRecordRef = React.createRef()
 
     columns=[{
-      title: "上传时间",
+      title: i18next.t("step:Upload time"),
       dataIndex: "create_at",
       key: "create_at",
       align: "center",
@@ -33,23 +34,23 @@ export default class index extends Component {
         <span>{this.dateFilter(record.create_at)}</span>
       ),
     }, {
-      title: "上传用户",
+      title: i18next.t("step:Upload user"),
       dataIndex: "user_name",
       key: "user_name",
       align: "center",
       width: 120,
     }, {
-      title: "所属试卷",
+      title: i18next.t("step:Testpaper"),
       dataIndex: "testpaper_id",
       key: "testpaper_id",
       align: "center",
     }, {
-      title: "材料标题",
+      title: i18next.t("step:Material title"),
       dataIndex: "name",
       key: "name",
       align: "center",
     }, {
-      title: "评审材料",
+      title: i18next.t("step:Material review"),
       key: "file",
       dataIndex: "file",
       align: "center",
@@ -62,13 +63,13 @@ export default class index extends Component {
                   showFiles: true,
                   file: record.file,
                 });
-              }}>点击查看<FileTextTwoTone /></span>
+              }}>{i18next.t("step:Click to view")}<FileTextTwoTone /></span>
             ) : "无"
           }
         </Space>
       ),
     }, {
-      title: "评审",
+      title: i18next.t("step:Review"),
       key: "status",
       dataIndex: "status",
       align: "center",
@@ -99,12 +100,12 @@ export default class index extends Component {
         );
       },
     }, {
-      title: "反馈批注材料",
+      title: i18next.t("step:Notation materials"),
       dataIndex: "description",
       key: "description",
       align: "center",
       render: (text, record) => {
-        return (<div>反馈批注材料</div>);
+        return (<div>{i18next.t("step:Notation materials")}</div>);
       },
     }]
 
@@ -158,7 +159,7 @@ export default class index extends Component {
           message.error(err.message);
         });
       }).catch(err => {
-        message.error(err.message || "审查材料加载失败！");
+        message.error(err.message || i18next.t("general:Fail"));
         this.setState({
           loadingState: false,
         });
@@ -189,7 +190,7 @@ export default class index extends Component {
             </div>
           </div>
           <Modal
-            title="点击下载审核文件"
+            title={i18next.t("step:Download the audit file")}
             visible={this.state.showFiles}
             closable={true}
             onCancel={() => {
@@ -200,13 +201,13 @@ export default class index extends Component {
             footer={null}
           >
             {this.state.file ? this.state.file.map((item, index) => {
-              return <p key={index + ""}><span>{`材料${index + 1}`}</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href={item}>点击下载</a></p>;
+              return <p key={index + ""}><span>{`${i18next.t("step:Material")}${index + 1}`}</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href={item}>{i18next.t("step:Click to download")}</a></p>;
             })
               : <></>}
           </Modal>
-          <Modal title="评审意见" visible={this.state.reviewResultsVisible}
-            cancelText="关闭"
-            okText="审核"
+          <Modal title={i18next.t("step:Review")} visible={this.state.reviewResultsVisible}
+            cancelText={i18next.t("general:Cancel")}
+            okText={i18next.t("general:Confirm")}
             confirmLoading={this.state.statusChangeLoading}
             closable={!this.state.statusChangeLoading}
             maskClosable={!this.state.statusChangeLoading}
@@ -225,7 +226,7 @@ export default class index extends Component {
                   reviewResultsVisible: false,
                 });
                 this.getDataList();
-                message.success("审核成功");
+                message.success(i18next.t("general:Success"));
               }).catch(err => {
                 message.error(err.message);
                 this.setState({
@@ -235,7 +236,7 @@ export default class index extends Component {
             }}
             onCancel={() => {
               if (this.state.statusChangeLoading) {
-                message.warning("请等待");
+                message.warning(i18next.t("general:Please wait"));
               } else {
                 this.setState({
                   reviewResultsVisible: false,
@@ -243,7 +244,7 @@ export default class index extends Component {
               }
             }}
           >
-            <span>材料评审结果：</span>
+            <span>{i18next.t("step:Review Results")}&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <Radio.Group name="radiogroup" value={this.state.statusChangeParams.value} onChange={(e) => {
               let statusChangeParams = Object.assign(this.state.statusChangeParams, {
                 value: e.target.value,
@@ -252,9 +253,9 @@ export default class index extends Component {
                 statusChangeParams,
               });
             }}>
-              <Radio value="未审核">未审核</Radio>
-              <Radio value="通过">通过</Radio>
-              <Radio value="驳回">驳回</Radio>
+              <Radio value="未审核">{i18next.t("step:Audit")}</Radio>
+              <Radio value="通过">{i18next.t("step:Pass")}</Radio>
+              <Radio value="驳回">{i18next.t("step:Reject")}</Radio>
             </Radio.Group>
           </Modal>
           <ModifyRecordModal

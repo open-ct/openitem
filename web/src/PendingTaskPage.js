@@ -4,6 +4,7 @@ import {DownOutlined, PlusCircleOutlined} from "@ant-design/icons";
 import * as ProjectBackend from "./backend/ProjectBackend";
 import ChangeTags from "./ChangeTags";
 import "./PendingTaskPage.less";
+import i18next from "i18next";
 
 const {Header, Footer, Content} = Layout;
 const {Search, TextArea} = Input;
@@ -41,7 +42,7 @@ export default class PeddingTasks extends Component {
 
   columns = [
     {
-      title: "项目名称",
+      title: i18next.t("project:Project name"),
       key: "name",
       align: "center",
       width: 210,
@@ -50,7 +51,7 @@ export default class PeddingTasks extends Component {
       ),
     },
     {
-      title: "学科",
+      title: i18next.t("project:Subject"),
       key: "subject",
       dataIndex: "subject",
       align: "center",
@@ -70,7 +71,7 @@ export default class PeddingTasks extends Component {
       ),
     },
     {
-      title: "学段",
+      title: i18next.t("project:Grade"),
       key: "period",
       align: "center",
       render: (text, record) => (
@@ -88,7 +89,7 @@ export default class PeddingTasks extends Component {
       ),
     },
     {
-      title: "试卷",
+      title: i18next.t("project:Test paper"),
       key: "paper",
       align: "center",
       width: 142,
@@ -97,7 +98,7 @@ export default class PeddingTasks extends Component {
       ),
     },
     {
-      title: "试题",
+      title: i18next.t("project:Test questions"),
       key: "questions",
       align: "center",
       width: 121,
@@ -106,7 +107,7 @@ export default class PeddingTasks extends Component {
       ),
     },
     {
-      title: "创建时间",
+      title: i18next.t("project:Creation time"),
       dataIndex: "created_time",
       key: "create-time",
       align: "center",
@@ -116,13 +117,13 @@ export default class PeddingTasks extends Component {
       ),
     },
     {
-      title: "操作",
+      title: i18next.t("general:Action"),
       key: "title",
       align: "center",
       render: (text, record) => (
         <Space size="middle">
-          <Button type="link" onClick={this.seekProjectManagement.bind(this, record)}>访问项目</Button>
-          <Button type="link" danger>删除</Button>
+          <Button type="link" onClick={this.seekProjectManagement.bind(this, record)}>{i18next.t("project:Visit")}</Button>
+          <Button type="link" danger>{i18next.t("general:Delete")}</Button>
         </Space>
       ),
     },
@@ -171,9 +172,7 @@ export default class PeddingTasks extends Component {
           loadingState: false,
         });
       }).catch(err => {
-        message.error(err || "请求错误！");
-      }).catch(err => {
-        message.error(err || "请求错误！");
+        message.error(err || i18next.t("general:Error"));
       });
     });
   }
@@ -182,17 +181,17 @@ export default class PeddingTasks extends Component {
     return (
       <Layout className="pending-tasks-page" data-component="pending-tasks-page">
         <Header>
-          <span className="title">项目列表/待处理任务</span>
+          <span className="title">{i18next.t("project:Project list") + "/" + i18next.t("project:Pending tasks")}</span>
           <div className="right-box">
             <Search placeholder="input search text" style={{width: "2.64rem", height: ".32rem"}} />
             <Dropdown overlay={this.pendingTaskMenu()}>
-              <span>待处理任务<DownOutlined /></span>
+              <span>{i18next.t("project:Project list")}<DownOutlined /></span>
             </Dropdown>
             <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => {
               this.setState({
                 isCreateProjectVisible: true,
               });
-            }}>添加项目</Button>
+            }}>{i18next.t("project:Add project")}</Button>
           </div>
         </Header>
         <Content>
@@ -214,10 +213,10 @@ export default class PeddingTasks extends Component {
             showQuickJumper
           />
           <Modal
-            title="创建项目"
+            title={i18next.t("project:Create project")}
             visible={this.state.isCreateProjectVisible}
-            cancelText="取消创建"
-            okText="创建项目"
+            cancelText={i18next.t("general:Cancel")}
+            okText={i18next.t("general:Confirm")}
             closable={!this.state.createLoading}
             confirmLoading={this.state.createLoading}
             maskClosable={!this.state.createLoading}
@@ -230,11 +229,11 @@ export default class PeddingTasks extends Component {
                 });
                 ProjectBackend.CreatTemplateProject(data).then(res => {
                   if (res.status == "ok") {
-                    message.success("项目创建成功！");
+                    message.success(i18next.t("general:Success"));
                     this.createFormRef.current.resetFields();
                     this.getProjectList(this.state.classes.account);
                   } else {
-                    message.error("项目创建失败！");
+                    message.error(i18next.t("general:Fail"));
                   }
                   this.setState({
                     createLoading: false,
@@ -244,15 +243,15 @@ export default class PeddingTasks extends Component {
                   this.setState({
                     createLoading: false,
                   });
-                  message.error(err.message || "未知错误");
+                  message.error(err.message || i18next.t("general:Error"));
                 });
               }).catch(err => {
-                message.warning("请按要求填写表单项！");
+                message.warning(i18next.t("project:Please fill in the form as required"));
               });
             }}
             onCancel={() => {
               if (this.state.createLoading) {
-                message.error("项目创建中，不可阻断！");
+                message.error(i18next.t("general:Operation uninterruptible"));
               } else {
                 this.createFormRef.current.resetFields();
                 this.setState({
@@ -261,12 +260,12 @@ export default class PeddingTasks extends Component {
               }
             }}
           >
-            <Spin spinning={this.state.createLoading} tip="项目创建中，请等待！">
+            <Spin spinning={this.state.createLoading} tip={i18next.t("project:Please wait")}>
               <Form labelCol={{span: 4}} wrapperCol={{span: 20}} ref={this.createFormRef} name="createForm" initialValues={this.state.createForm}>
-                <Form.Item name="name" label="项目名称" rules={[{required: true, message: "项目名称不能为空！"}]}>
-                  <Input placeholder="请输入项目名称" />
+                <Form.Item name="name" label={i18next.t("general:Name")} rules={[{required: true, message: i18next.t("general:This item cannot be empty")}]}>
+                  <Input placeholder={i18next.t("project:Please enter a project name")} />
                 </Form.Item>
-                <Form.Item name="grade_range" label="年级范围" rules={[{required: true, message: "请至少创建一个年级"}]}>
+                <Form.Item name="grade_range" label={i18next.t("general:Grade")} rules={[{required: true, message: i18next.t("project:Please create at least one grade")}]}>
                   <ChangeTags onChange={grade_range => {
                     let createForm = Object.assign(this.state.createForm, {
                       grade_range,
@@ -276,7 +275,7 @@ export default class PeddingTasks extends Component {
                     });
                   }}></ChangeTags>
                 </Form.Item>
-                <Form.Item name="subjects" label="涉及学科" rules={[{required: true, message: "请至少创建一个学科！"}]}>
+                <Form.Item name="subjects" label={i18next.t("general:Subject")} rules={[{required: true, message: i18next.t("project:Please create at least one subject")}]}>
                   <ChangeTags onChange={subjects => {
                     let createForm = Object.assign(this.state.createForm, {
                       subjects,
@@ -286,27 +285,27 @@ export default class PeddingTasks extends Component {
                     });
                   }}></ChangeTags>
                 </Form.Item>
-                <Form.Item name="target" label="目标说明" rules={[{required: true, message: "目标说明不能为空！"}]}>
+                <Form.Item name="target" label={i18next.t("item:Explain")} rules={[{required: true, message: i18next.t("general:This item cannot be empty")}]}>
                   <TextArea
-                    placeholder="请输入项目目标说明，若无，请填写无"
+                    placeholder={i18next.t("general:Please enter this item. If not, please enter No")}
                     autoSize={{minRows: 3, maxRows: 5}}
                   />
                 </Form.Item>
-                <Form.Item name="summary" label="项目摘要" rules={[{required: true, message: "项目摘要不能为空！"}]}>
+                <Form.Item name="summary" label={i18next.t("item:Abstract")} rules={[{required: true, message: i18next.t("general:This item cannot be empty")}]}>
                   <TextArea
-                    placeholder="请输入项目摘要，若无，请填写无"
+                    placeholder={i18next.t("general:Please enter this item. If not, please enter No")}
                     autoSize={{minRows: 3, maxRows: 5}}
                   />
                 </Form.Item>
-                <Form.Item name="description" label="项目描述" rules={[{required: true, message: "项目描述不能为空！"}]}>
+                <Form.Item name="description" label={i18next.t("item:Describe")} rules={[{required: true, message: i18next.t("general:This item cannot be empty")}]}>
                   <TextArea
-                    placeholder="请输入项目描述，若无，请填写无"
+                    placeholder={i18next.t("general:Please enter this item. If not, please enter No")}
                     autoSize={{minRows: 3, maxRows: 5}}
                   />
                 </Form.Item>
-                <Form.Item name="requirement" label="项目要求" rules={[{required: true, message: "项目要求不能为空！"}]}>
+                <Form.Item name="requirement" label={i18next.t("item:Request")} rules={[{required: true, message: i18next.t("general:This item cannot be empty")}]}>
                   <TextArea
-                    placeholder="请输入项目要求，若无，请填写无"
+                    placeholder={i18next.t("general:Please enter this item. If not, please enter No")}
                     autoSize={{minRows: 3, maxRows: 5}}
                   />
                 </Form.Item>

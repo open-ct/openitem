@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Input, Tag, Tooltip} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import "./ChangeTags.less";
+import i18next from "i18next";
 
 export default class index extends Component {
   state = {
@@ -134,7 +135,7 @@ export default class index extends Component {
         )}
         {!inputVisible && (
           <Tag className="site-tag-plus" onClick={this.showInput}>
-            <PlusOutlined /> 添加
+            <PlusOutlined />{i18next.t("general:Add")}
           </Tag>
         )}
       </>

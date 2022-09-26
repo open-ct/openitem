@@ -6,6 +6,7 @@ import {InboxOutlined} from "@ant-design/icons";
 import "./UpLoadModal.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 import * as ProjectBackend from "./backend/ProjectBackend";
+import i18next from "i18next";
 
 const {Option} = Select;
 
@@ -71,7 +72,7 @@ export default class index extends Component {
     this.setState({
       upLoadState: true,
     });
-    message.info("开始上传文件：" + info.file.name);
+    message.info(i18next.t("step:Start uploading files") + info.file.name);
     const formData = new FormData();
     formData.append("file", info.file);
     formData.append("source_project", this.props.projectId.split("_").join("/"));
@@ -86,7 +87,7 @@ export default class index extends Component {
         upLoadFileList,
         upLoadState: false,
       });
-      message.success("文件上传成功");
+      message.success(i18next.t("general:Success"));
     }).catch(err => {
       let upLoadFileList = Object.assign(this.state.upLoadFileList, {});
       upLoadFileList[upLoadFileList.length - 1].status = "error";
@@ -95,24 +96,24 @@ export default class index extends Component {
         upLoadFileList,
         upLoadState: false,
       });
-      message.error("文件上传失败");
-      message.warn("可能存在非法文件名");
+      message.error(i18next.t("general:Fail"));
+      message.warn(i18next.t("step:File name is too Long"));
     });
   }
 
   render() {
     return (
-      <Modal title="上传材料"
+      <Modal title={i18next.t("step:Upload Material")}
         width="6.26rem"
-        okText="确认创建"
-        cancelText="放弃创建"
+        okText={i18next.t("general:Confirm")}
+        cancelText={i18next.t("general:Cancel")}
         visible={this.props.show}
         closable={!this.state.createLoading}
         keyboard={!this.state.createLoading}
         confirmLoading={this.state.createLoading}
         onCancel={() => {
           if (this.state.createLoading) {
-            message.info("请等待");
+            message.info(i18next.t("general:Please wait"));
           } else {
             this.upLoadFormRef.current.resetFields();
             this.setState({
@@ -123,18 +124,18 @@ export default class index extends Component {
         }}
         onOk={() => {
           if (!this.upLoadFormRef.current.getFieldValue("testpaper_id")) {
-            message.warn("请输入所属试卷");
+            message.warn(i18next.t("step:Please select your test paper"));
             return;
           }
           if (!this.upLoadFormRef.current.getFieldValue("title")) {
-            message.warn("请输入材料组标题");
+            message.warn(i18next.t("step:Please enter material title"));
             return;
           }
           let file = this.state.upLoadFileList.filter(item => {
             return item.status === "done";
           });
           if (this.state.upLoadFileList.length === 0 || file.length === 0) {
-            message.warning("请至少上传一个文件");
+            message.warning(i18next.t("general:This item cannot be empty"));
             return;
           } else {
             this.setState({
@@ -155,7 +156,7 @@ export default class index extends Component {
               contents: [],
             };
             ProjectBackend.MakeOneSubmit(data).then(res => {
-              message.success("提交成功");
+              message.success(i18next.t("general:Success"));
               this.setState({
                 createLoading: false,
                 upLoadFileList: [],
@@ -166,7 +167,7 @@ export default class index extends Component {
               this.setState({
                 createLoading: false,
               });
-              message.error("提交失败");
+              message.error(i18next.t("general:Fail"));
             });
           }
         }}
@@ -181,10 +182,10 @@ export default class index extends Component {
           >
             <Form.Item
               name="testpaper_id"
-              label="试卷"
-              rules={[{required: true, message: "请选择所属试卷"}]}
+              label={i18next.t("step:Testpaper")}
+              rules={[{required: true, message: i18next.t("step:Please select your test paper")}]}
             >
-              <Select placeholder="选择所属试卷" loading={this.state.selectLoading} onFocus={this.getTestPaperList}>
+              <Select placeholder={i18next.t("step:Please select your test paper")} loading={this.state.selectLoading} onFocus={this.getTestPaperList}>
                 {
                   this.state.selectLoading ? (
                     <></>
@@ -196,7 +197,7 @@ export default class index extends Component {
             </Form.Item>
 
             <Form.Item
-              label="材料标题"
+              label={i18next.t("step:Material title")}
               name="title"
               className="title"
               rules={[{required: true}]}
@@ -205,9 +206,9 @@ export default class index extends Component {
               <Input />
             </Form.Item>
             <Form.Item
-              label="上传"
+              label={i18next.t("step:Upload")}
               rules={[{required: true}]}
-              labelCol={{span: 4}}
+              // labelCol={{span: 4}}
               required={true}
             >
               <Upload.Dragger
@@ -216,7 +217,7 @@ export default class index extends Component {
                 fileList={this.state.upLoadFileList}
                 beforeUpload={(e) => {
                   if (this.state.upLoadState || this.state.createLoading) {
-                    message.warning("当前存在上传中文件，请等待");
+                    message.warning(i18next.t("general:Please wait"));
                     return false;
                   } else {
                     let upLoadFileList = [...this.state.upLoadFileList];
@@ -242,8 +243,8 @@ export default class index extends Component {
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined />
                 </p>
-                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                <p className="ant-upload-hint" style={{fontSize: ".1rem"}}>Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+                <p className="ant-upload-text">{i18next.t("step:Click or drag file to this area to upload")}</p>
+                <p className="ant-upload-hint" style={{fontSize: ".1rem"}}>{i18next.t("step:Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files")}</p>
               </Upload.Dragger>
 
             </Form.Item>

@@ -6,6 +6,7 @@ import {FieldTimeOutlined, LinkOutlined} from "@ant-design/icons";
 import "./TaskRequirements.less";
 import * as ProjectBackend from "./backend/ProjectBackend";
 import * as PropositionBackend from "./backend/PropositionBackend";
+import i18next from "i18next";
 
 export default class index extends Component {
 
@@ -19,7 +20,8 @@ export default class index extends Component {
       this.setState({
         upLoadState: true,
       });
-      message.info("开始上传文件：" + info.file.name);
+      console.log(this.props.projectId);
+      message.info(i18next.t("step:Start uploading files") + info.file.name);
       const formData = new FormData();
       formData.append("name", info.file.name);
       formData.append("file", info.file);
@@ -36,33 +38,33 @@ export default class index extends Component {
             upLoadState: false,
           });
           this.getStepInfo();
-          message.success("文件上传成功");
+          message.success(i18next.t("general:Success"));
         }).catch(err => {
           this.setState({
             upLoadState: false,
           });
-          message.error("文件上传失败");
+          message.error(i18next.t("general:Fail"));
         });
       }).catch(err => {
         this.setState({
           upLoadState: false,
         });
-        message.error("文件上传失败");
+        message.error(i18next.t("general:Fail"));
       });
     }
 
     // 根据不同身份加载不同操作情况
     operationRender = () => {
       return (<div className="choice-box">
-        <CalendarButton label="截止时间：2021年8月20日" icon={<FieldTimeOutlined />} onDateChange={(date) => {
-          message.error("改操作暂不可用");
+        <CalendarButton label={i18next.t("step:Deadline：2021/8/20")} icon={<FieldTimeOutlined />} onDateChange={(date) => {
+          message.error(i18next.t("step:Operation is temporarily unavailable"));
         }} />
         <Upload
           name="filename"
           showUploadList={false}
           beforeUpload={() => {
             if (this.state.upLoadState) {
-              message.error("当前存在上传中文件，请勿频繁上传！");
+              message.error(i18next.t("step:Do not upload files frequently"));
               return false;
             }
             return true;
@@ -70,7 +72,7 @@ export default class index extends Component {
           customRequest={this.upLoadFile.bind(this)}
         >
           <Button size="small" icon={<LinkOutlined />} style={{marginLeft: ".1246rem"}}>{
-            this.state.stepInfo.attachments ? "覆盖文件" : "上传文件"
+            this.state.stepInfo.attachments ? i18next.t("step:Overwrite file") : i18next.t("step:Upload file")
           }</Button>
         </Upload>
       </div>);
@@ -136,7 +138,7 @@ export default class index extends Component {
 
     render() {
       return (
-        <ModulaCard title="任务要求">
+        <ModulaCard title={i18next.t("step:Task request")}>
           {
             this.state.loadingState ? (
               <></>
@@ -147,7 +149,7 @@ export default class index extends Component {
                     <a href={this.state.stepInfo.attachments ? this.state.stepInfo.attachments[0] : "*"}>{this.state.stepInfo.attachments ? "任务要求文件(点击下载)" : "无"}</a>
                   </div>
                   <div className="btn-box">
-                    {this.props.role == 1 ? (<Button type="link">删除</Button>) : ""}
+                    {this.props.role == 1 ? (<Button type="link">{i18next.t("general:Delete")}</Button>) : ""}
                   </div>
                 </div>
                 {this.operationRender()}

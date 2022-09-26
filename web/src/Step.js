@@ -5,6 +5,7 @@ import CompletionStatus from "./CompletionStatus";
 import MaterialWarehouse from "./MaterialWarehouse";
 import DataTable from "./DataTable";
 import "./Step.less";
+import i18next from "i18next";
 
 export default class index extends Component {
   dataRef = React.createRef();
@@ -29,7 +30,7 @@ export default class index extends Component {
             </Row>
             <Row style={{height: "1.9rem", marginBottom: ".12rem"}}>
               <CompletionStatus
-                title="自项目创建截止今日情况"
+                title={i18next.t("step:Since its creation")}
                 stepId = {this.props.match.params.step_id}
               />
             </Row>
@@ -47,7 +48,7 @@ export default class index extends Component {
           </Col>
           <Col span={15}>
             <DataTable
-              title="材料评审"
+              title={i18next.t("step:Material review")}
               stepName={this.props.location.pathname.split("/")[this.props.location.pathname.split("/").length - 2]}
               role={this.props.match.params.role}
               stepId={this.props.match.params.step_id}

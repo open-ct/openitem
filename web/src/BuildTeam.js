@@ -5,6 +5,7 @@ import * as ProjectBackend from "./backend/ProjectBackend";
 import ModalCard from "./ModulaCard";
 import "./BuildTeam.less";
 import {WarningTwoTone} from "@ant-design/icons";
+import i18next from "i18next";
 
 const {Search, TextArea} = Input;
 const {confirm} = Modal;
@@ -43,42 +44,42 @@ class index extends Component {
     };
   }
   columns = [{
-    title: "姓名",
+    title: i18next.t("buildteam:Name"),
     align: "center",
     key: "name",
     render: (text, record) => (
       <span>{record.info.name}</span>
     ),
   }, {
-    title: "年龄",
+    title: i18next.t("buildteam:Age"),
     align: "center",
     key: "age",
     render: (text, record) => (
       <span>{record.info.birthday}</span>
     ),
   }, {
-    title: "性别",
+    title: i18next.t("buildteam:Gender"),
     align: "center",
     key: "gender",
     render: (text, record) => (
-      <span>{record.info.gender ? "男" : "女"}</span>
+      <span>{record.info.gender ? i18next.t("buildteam:Male") : i18next.t("buildteam:Female")}</span>
     ),
   }, {
-    title: "专业",
+    title: i18next.t("buildteam:Job"),
     align: "center",
     key: "specialty",
     render: (text, record) => (
       <Tag color="processing">{record.info.owner}</Tag>
     ),
   }, {
-    title: "职位",
+    title: i18next.t("buildteam:Position"),
     align: "center",
     key: "post",
     render: (text, record) => (
       <span>{record.info.type}</span>
     ),
   }, {
-    title: "邮箱",
+    title: i18next.t("buildteam:Email"),
     align: "center",
     key: "email",
     render: (text, record) => (
@@ -91,53 +92,53 @@ class index extends Component {
       </Button>
     ),
   }, {
-    title: "组织",
+    title: i18next.t("buildteam:Organization"),
     align: "center",
     key: "organization",
     render: (text, record) => (
       <span>{record.info.signupApplication}</span>
     ),
   }, {
-    title: "位置",
+    title: i18next.t("buildteam:Address"),
     align: "center",
     key: "position",
     render: (text, record) => (
       <span>{record.info.region}</span>
     ),
   }, {
-    title: "电话",
+    title: i18next.t("buildteam:Phone"),
     align: "center",
     key: "phone",
     render: (text, record) => (
       <span>{record.info.phone}</span>
     ),
   }, {
-    title: "项目角色",
+    title: i18next.t("buildteam:Role"),
     align: "center",
     key: "role",
     render: (text, record) => {
-      let roleList = ["管理员", "专家", "学科助理", "教师", "外审专家"];
+      let roleList = [i18next.t("buildteam:Admin"), i18next.t("buildteam:Expert"), i18next.t("buildteam:Subject assistant"), i18next.t("buildteam:Teacher"), i18next.t("buildteam:External personnel")];
       return (
         <Tag color="green">{roleList[record.role - 1]}</Tag>
       );
     },
   }, {
-    title: "状态",
+    title: i18next.t("buildteam:State"),
     align: "center",
     key: "state",
     render: (text, record) => (
       <>
         {
           record.info.isOnline ? (
-            <Tag color="#87d068">已确认 √</Tag>
+            <Tag color="#87d068">{i18next.t("buildteam:Confirmed")}</Tag>
           ) : (
-            <Tag color="#f50">未确认 ×</Tag>
+            <Tag color="#f50">{i18next.t("buildteam:Unconfirmed")}</Tag>
           )
         }
       </>
     ),
   }, {
-    title: "管理",
+    title: i18next.t("general:Action"),
     align: "center",
     key: "management",
     render: (text, record) => (
@@ -150,13 +151,13 @@ class index extends Component {
               show: true,
             }),
           });
-        }}>更改角色</Button>
+        }}>{i18next.t("buildteam:Change role")}</Button>
         <Button type="link" danger onClick={() => {
           confirm({
             icon: <WarningTwoTone />,
-            content: "该删除操作不可逆，是否继续？",
-            okText: "确认移除",
-            cancelText: "取消移除",
+            content: i18next.t("buildteam:The deletion cannot be reversed. Whether to continue?"),
+            okText: i18next.t("buildteam:Confirm to remove"),
+            cancelText: i18next.t("buildteam:Cancel to remove"),
             onOk: () => {
               this.setState({
                 loadingState: true,
@@ -165,20 +166,20 @@ class index extends Component {
                 this.setState({
                   loadingState: false,
                 });
-                message.success("删除成功！");
+                message.success(i18next.t("general:Successfully delete"));
                 this.getProjectMember();
               }).catch(err => {
-                message.error(err.message || "请求错误！");
+                message.error(err.message || i18next.t("general:Fail to delete"));
                 this.setState({
                   loadingState: false,
                 });
               });
             },
             onCancel() {
-              message.info("已取消移除");
+              message.info(i18next.t("buildteam:Canceld"));
             },
           });
-        }}>移除人员</Button>
+        }}>{i18next.t("buildteam:Remove member")}</Button>
       </Space>
     ),
   }]
@@ -231,13 +232,13 @@ class index extends Component {
     return (
       <div className="build-team-page" data-component="build-team-page">
         <ModalCard
-          title="项目成员"
+          title={i18next.t("buildteam:Member")}
           right={(
             <Button type="primary" size="small" onClick={() => {
               this.setState({
                 addMemberForm: Object.assign(this.state.addMemberForm, {show: true}),
               });
-            }}>添加成员</Button>
+            }}>{i18next.t("general:Add")}</Button>
           )}
         >
           <div className="member-list">
@@ -251,10 +252,10 @@ class index extends Component {
           </div>
         </ModalCard>
         <Modal
-          title="角色分配修改"
+          title={i18next.t("buildteam:Change role")}
           visible={this.state.roleChangeForm.show}
-          okText="确认修改"
-          cancelText="取消修改"
+          okText={i18next.t("general:Confirm")}
+          cancelText={i18next.t("general:Cancel")}
           closable={!this.state.roleChangeForm.updateLoading}
           keyboard={!this.state.roleChangeForm.updateLoading}
           maskClosable={!this.state.roleChangeForm.updateLoading}
@@ -272,9 +273,9 @@ class index extends Component {
                 roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false, show: false}),
               });
               this.getProjectMember();
-              message.success("修改成功！");
+              message.success(i18next.t("general:Success"));
             }).catch(err => {
-              message.error(err.message || "请求错误！");
+              message.error(err.message || i18next.t("general:Error"));
               this.setState({
                 roleChangeForm: Object.assign(this.state.roleChangeForm, {updateLoading: false}),
               });
@@ -282,7 +283,7 @@ class index extends Component {
           }}
           onCancel={() => {
             if (this.state.roleChangeForm.updateLoading) {
-              message.error("修改中，操作不可中断！");
+              message.error(i18next.t("general:Operation uninterruptible"));
             } else {
               this.setState({
                 roleChangeForm: Object.assign(this.state.roleChangeForm, {show: false}),
@@ -290,24 +291,24 @@ class index extends Component {
             }
           }}
         >
-          <label style={{lineHeight: ".6rem"}}>新的角色：</label>
+          <label style={{lineHeight: ".6rem"}}>{i18next.t("buildteam:New roles") + ":"}</label>
           <Select value={this.state.roleChangeForm.new_role} style={{width: "100%"}} onChange={(e) => {
             this.setState({
               roleChangeForm: Object.assign(this.state.roleChangeForm, {new_role: e}),
             });
           }}>
-            <Option value={1}>管理员</Option>
-            <Option value={2}>专家</Option>
-            <Option value={3}>学科助理</Option>
-            <Option value={4}>教师</Option>
-            <Option value={5}>外审人员</Option>
+            <Option value={1}>{i18next.t("buildteam:Admin")}</Option>
+            <Option value={2}>{i18next.t("buildteam:Expert")}</Option>
+            <Option value={3}>{i18next.t("buildteam:Subject assistant")}</Option>
+            <Option value={4}>{i18next.t("buildteam:Teacher")}</Option>
+            <Option value={5}>{i18next.t("buildteam:External personnel")}</Option>
           </Select>
         </Modal>
         <Modal
-          title="添加成员"
+          title={i18next.t("general:Add")}
           visible={this.state.addMemberForm.show}
-          okText="确认添加"
-          cancelText="取消添加"
+          okText={i18next.t("general:Confirm")}
+          cancelText={i18next.t("general:Cancel")}
           closable={!this.state.addMemberForm.loadingState}
           keyboard={!this.state.addMemberForm.loadingState}
           maskClosable={!this.state.addMemberForm.loadingState}
@@ -330,7 +331,7 @@ class index extends Component {
           }}
           onCancel={() => {
             if (this.state.addMemberForm.loadingState) {
-              message.error("添加中，操作不可中断！");
+              message.error(i18next.t("general:Operation uninterruptible"));
             } else {
               this.setState({
                 addMemberForm: Object.assign(this.state.addMemberForm, {show: false}),
@@ -338,8 +339,8 @@ class index extends Component {
             }
           }}
         >
-          <label style={{lineHeight: ".6rem"}}>查找用户：</label>
-          <Search placeholder="请输入被添加用户账号" onSearch={(e) => {
+          <label style={{lineHeight: ".6rem"}}>{i18next.t("buildteam:Search user")}</label>
+          <Search placeholder={i18next.t("buildteam:Please enter the user account to be added")} onSearch={(e) => {
             this.setState({
               addMemberForm: Object.assign(this.state.addMemberForm, {loadingState: true}),
             });
@@ -350,7 +351,7 @@ class index extends Component {
                   addMemberForm: Object.assign(this.state.addMemberForm, {user_id: userInfo.id, userInfo: userInfo, loadingState: false}),
                 });
               }else{
-                message.warn("查无此人！");
+                message.warn(i18next.t("buildteam:Not found"));
                 this.setState({
                   addMemberForm: Object.assign(this.state.addMemberForm, {loadingState: false}),
                 });
@@ -361,28 +362,28 @@ class index extends Component {
           {
             this.state.addMemberForm.userInfo != null ? (
               <>
-                <label style={{lineHeight: ".6rem"}}>用户名</label>
+                <label style={{lineHeight: ".6rem"}}>{i18next.t("buildteam:User name")}</label>
                 <div>{this.state.addMemberForm.userInfo.displayName}</div>
-                <label style={{lineHeight: ".6rem"}}>角色分配：</label>
+                <label style={{lineHeight: ".6rem"}}>{i18next.t("buildteam:Change role")}</label>
                 <Select value={this.state.addMemberForm.role} style={{width: "100%"}} onChange={(e) => {
                   this.setState({
                     addMemberForm: Object.assign(this.state.addMemberForm, {role: e}),
                   });
                 }}>
-                  <Option value={2}>专家</Option>
-                  <Option value={3}>学科助理</Option>
-                  <Option value={4}>教师</Option>
-                  <Option value={5}>外审人员</Option>
+                  <Option value={2}>{i18next.t("buildteam:Expert")}</Option>
+                  <Option value={3}>{i18next.t("buildteam:Subject assistant")}</Option>
+                  <Option value={4}>{i18next.t("buildteam:Teacher")}</Option>
+                  <Option value={5}>{i18next.t("buildteam:External personnel")}</Option>
                 </Select>
               </>
             ) : (<></>)
           }
         </Modal>
         <Modal
-          title="发送邮件"
+          title={i18next.t("buildteam:Send email")}
           visible={this.state.emailForm.show}
-          okText="确认发送"
-          cancelText="取消发送"
+          okText={i18next.t("general:Confirm")}
+          cancelText={i18next.t("general:Cancel")}
           closable={!this.state.emailForm.loadingState}
           keyboard={!this.state.emailForm.loadingState}
           maskClosable={!this.state.emailForm.loadingState}
@@ -426,7 +427,7 @@ class index extends Component {
           onOk={() => { }}
           onCancel={() => {
             if (this.state.emailForm.loadingState) {
-              message.error("发送中，操作不可中断！");
+              message.error(i18next.t("general:Operation uninterruptible"));
             } else {
               this.emailFormRef.current.resetFields();
               this.setState({
@@ -444,19 +445,19 @@ class index extends Component {
             ref={this.emailFormRef}
           >
             <Form.Item
-              label="邮件主题"
+              label={i18next.t("buildteam:Email topic")}
               name="subject"
-              rules={[{required: true, message: "请输入邮件主题"}]}
+              rules={[{required: true, message: "Please enter the subject of your email"}]}
             >
-              <Input placeholder="请输入邮件主题" />
+              <Input placeholder="Please enter the subject of your email" />
             </Form.Item>
 
             <Form.Item
-              label="邮件内容"
+              label={i18next.t("buildteam:Email topic")}
               name="message"
-              rules={[{required: true, message: "请输入邮件内容"}]}
+              rules={[{required: true, message: "Please enter the content of your email"}]}
             >
-              <TextArea placeholder="请输入邮件内容" autoSize={{minRows: 2, maxRows: 6}} />
+              <TextArea placeholder="Please enter the content of your email" autoSize={{minRows: 2, maxRows: 6}} />
             </Form.Item>
           </Form>
         </Modal>

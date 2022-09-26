@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Descriptions, Modal, Popconfirm, Select, Space, Spin, Table, Tag, message} from "antd";
 import ModulaCard from "./ModulaCard.js";
 import * as ProjectBackend from "./backend/ProjectBackend";
+import i18next from "i18next";
 
 const {Option} = Select;
 
@@ -25,9 +26,10 @@ export default class ProcessManagement extends Component {
       lodingModal: false,
       openState: false,
       steps: ["组建团队", "测试框架与论证报告", "6人访谈", "30人测试", "试题外审", "300人测试", "定稿审查"],
+      // steps: [i18next.t("item:Build team"), i18next.t("item:Test framework and demonstration report"), i18next.t("item:Interviewed by 6 people"), i18next.t("item:Test for 30 people"), i18next.t("item:Careful outside questions"), i18next.t("item:Test for 300 people"), i18next.t("item:Finalized reviews")],
       columns: [
         {
-          title: "试卷id",
+          title: i18next.t("processmanagement:Testpaper ID"),
           // dataIndex: "testpaper_id",
           dataIndex: "uuid",
           key: "testpaper_id",
@@ -35,20 +37,20 @@ export default class ProcessManagement extends Component {
           //   render: (_, {testpaper_id}) => <Paragraph ellipsis={true}>{testpaper_id}</Paragraph>,
         },
         {
-          title: "试卷标题",
+          title: i18next.t("processmanagement:Testpaper title"),
           // dataIndex: "testpaper_title",
           dataIndex: "title",
           key: "testpaper_title",
           width: "300px",
         },
         {
-          title: "命题人",
+          title: i18next.t("processmanagement:creator"),
           dataIndex: "authorName",
           key: "author",
           width: "160px",
         },
         {
-          title: "流程阶段",
+          title: i18next.t("processmanagement:Process stages"),
           dataIndex: "state",
           key: "state",
           width: "120px",
@@ -77,7 +79,7 @@ export default class ProcessManagement extends Component {
           ),
         },
         {
-          title: "下一阶段",
+          title: i18next.t("processmanagement:Next Stage"),
           dataIndex: "next_state",
           key: "next_state",
           width: "120px",
@@ -107,7 +109,7 @@ export default class ProcessManagement extends Component {
           ),
         },
         {
-          title: "试卷详情",
+          title: i18next.t("processmanagement:Testpaper detail"),
           dataIndex: "detail",
           key: "detail",
           width: "150px",
@@ -117,12 +119,12 @@ export default class ProcessManagement extends Component {
                 this.setState({
                   testpaperVisible: Object.assign(this.state.testpaperVisible, {show: true, testPaperData: record, testpaperDetailData: record.info}),
                 });
-              }}>试卷详情</a>
+              }}>{i18next.t("processmanagement:Testpaper detail")}</a>
             );
           },
         },
         {
-          title: "审核员",
+          title: i18next.t("processmanagement:Auditor"),
           dataIndex: "role",
           width: "150px",
           key: "role",
@@ -143,12 +145,12 @@ export default class ProcessManagement extends Component {
                     testpaper_id: record.uuid,
                   });
                 });
-              }}>分配审核人</a>
+              }}>{i18next.t("processmanagement:Allocate Auditor")}</a>
             );
           },
         },
         {
-          title: "操作",
+          title: i18next.t("general:Action"),
           dataIndex: "action",
           key: "action",
           render: (_, record) => (
@@ -173,10 +175,10 @@ export default class ProcessManagement extends Component {
                 okText="Yes"
                 cancelText="No"
               >
-                <a>下一阶段</a>
+                <a>{i18next.t("processmanagement:Next stage")}</a>
               </Popconfirm>
-              <a>重置</a>
-              <a>删除</a>
+              <a>{i18next.t("processmanagement:Reset")}</a>
+              <a>{i18next.t("general:Delete")}</a>
             </Space>
           ),
         },
@@ -275,7 +277,7 @@ export default class ProcessManagement extends Component {
     return (
       <div className="process-management-page" data-component="process-management-page" >
         <ModulaCard
-          title="流程管理"
+          title={i18next.t("item:Process management")}
         >
           <div>
             <Table
@@ -296,7 +298,7 @@ export default class ProcessManagement extends Component {
           </div>
         </ModulaCard>
         <Modal
-          title="请分配审核人员"
+          title={i18next.t("processmanagement:Allocate Auditor")}
           visible={this.state.openState}
           onOk={() => {
             this.setState({
@@ -330,7 +332,7 @@ export default class ProcessManagement extends Component {
                       roleData: data,
                     });
                     ProjectBackend.MakeOneTpAssignment(itemData).then(res => {
-                      message.success("分配成功！");
+                      message.success(i18next.t("general:Success"));
                       this.setState({
                       });
                     }).catch(err => {
@@ -356,7 +358,7 @@ export default class ProcessManagement extends Component {
         </Modal>
 
         <Modal
-          title="试卷详情"
+          title={i18next.t("processmanagement:Testpaper detail")}
           visible={this.state.testpaperVisible.show}
           width="80%"
           onOk={() => {
@@ -370,17 +372,17 @@ export default class ProcessManagement extends Component {
             });
           }}
         >
-          <Spin spinning={this.state.testpaperVisible.loadingState} tip="加载中">
+          <Spin spinning={this.state.testpaperVisible.loadingState} tip={i18next.t("general:Loadding")}>
             {
               this.state.testpaperVisible.loadingState ? "" : (
                 <>
-                  <Descriptions title="试卷相关信息">
-                    <Descriptions.Item label="唯一标识">{this.state.testpaperVisible.testPaperData.uuid}</Descriptions.Item>
-                    <Descriptions.Item label="标题">{this.state.testpaperVisible.testPaperData.title}</Descriptions.Item>
-                    <Descriptions.Item label="作者">{this.state.testpaperVisible.testPaperData.authorName}</Descriptions.Item>
-                    <Descriptions.Item label="创建时间">{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.create_at))}</Descriptions.Item>
-                    <Descriptions.Item label="更新时间">{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.updated_at))}</Descriptions.Item>
-                    <Descriptions.Item label="批注信息">{this.state.testpaperVisible.testPaperData.comment_record}</Descriptions.Item>
+                  <Descriptions title={i18next.t("processmanagement:Testpaper infomation")}>
+                    <Descriptions.Item label={i18next.t("processmanagement:Testpaper ID")}>{this.state.testpaperVisible.testPaperData.uuid}</Descriptions.Item>
+                    <Descriptions.Item label={i18next.t("processmanagement:Testpaper title")}>{this.state.testpaperVisible.testPaperData.title}</Descriptions.Item>
+                    <Descriptions.Item label={i18next.t("processmanagement:creator")}>{this.state.testpaperVisible.testPaperData.authorName}</Descriptions.Item>
+                    <Descriptions.Item label={i18next.t("project:Creation time")}>{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.create_at))}</Descriptions.Item>
+                    <Descriptions.Item label={i18next.t("processmanagement:Update time")}>{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.updated_at))}</Descriptions.Item>
+                    <Descriptions.Item label={i18next.t("processmanagement:Comment")}>{this.state.testpaperVisible.testPaperData.comment_record}</Descriptions.Item>
                   </Descriptions>
                   {/* <hr />
                   {

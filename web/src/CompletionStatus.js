@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Col, Row, Statistic} from "antd";
 import ModulaCard from "./ModulaCard";
 import "./CompletionStatus.less";
+import i18next from "i18next";
 
 export default class index extends Component {
 
@@ -53,7 +54,7 @@ export default class index extends Component {
 
     render() {
       return (
-        <ModulaCard title="完成情况">
+        <ModulaCard title={i18next.t("step:Performance")}>
           {
             this.state.loadingState ? (
               <></>
@@ -66,31 +67,31 @@ export default class index extends Component {
                   <div className="value-list">
                     <Row gutter={16}>
                       <Col span={12}>
-                        <Statistic title="材料总计" value={this.state.status.total} />
+                        <Statistic title={i18next.t("step:Total")} value={this.state.status.total} />
                       </Col>
                       <Col span={12}>
-                        <Statistic title="通过率" value={this.state.status.pass_rate} suffix="%" />
+                        <Statistic title={i18next.t("step:Rate")} value={this.state.status.pass_rate} suffix="%" />
                       </Col>
                     </Row>
                   </div>
                 </div>
                 <div className="right-box">
                   <Row gutter={16} style={{width: "4.2rem"}}>
-                    <Col span={4}>
-                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#87D068"}}></div>通过</div>} value={this.state.status.pass} />
+                    <Col span={8}>
+                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#87D068"}}></div>{i18next.t("step:Pass")}</div>} value={this.state.status.pass} />
                     </Col>
-                    <Col span={4}>
-                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#FF5500"}}></div>驳回</div>} value={this.state.status.return} />
+                    <Col span={8}>
+                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#FF5500"}}></div>{i18next.t("step:Reject")}</div>} value={this.state.status.return} />
                     </Col>
-                    <Col span={5}>
-                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#FF5500"}}></div>未上传</div>} value={this.state.status.to_upload} />
+                    {/* <Col span={5}>
+                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#FF5500"}}></div>{i18next.t("step:Not uploaded")}</div>} value={this.state.status.to_upload} />
+                    </Col> */}
+                    <Col span={8}>
+                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#2DB7F5"}}></div>{i18next.t("step:Audit")}</div>} value={this.state.status.to_audit} />
                     </Col>
-                    <Col span={5}>
-                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#2DB7F5"}}></div>待审核</div>} value={this.state.status.to_audit} />
-                    </Col>
-                    <Col span={5}>
-                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#2DB7F5"}}></div>再修改</div>} value={this.state.status.to_correct} />
-                    </Col>
+                    {/* <Col span={5}>
+                      <Statistic title={<div className="statistic-item-title"><div className="circle" style={{backgroundColor: "#2DB7F5"}}></div>{i18next.t("step:Modified")}</div>} value={this.state.status.to_correct} />
+                    </Col> */}
                   </Row>
                 </div>
               </div>

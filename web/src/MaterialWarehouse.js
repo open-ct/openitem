@@ -1,10 +1,11 @@
 // 封装的材料仓库组件
 import React, {Component} from "react";
-import {Empty, Input, Pagination, Upload} from "antd";
+import {Empty, Input, Upload} from "antd";
 import ModulaCard from "./ModulaCard";
 import UpLoadModal from "./UpLoadModal";
 import {FileExcelFilled, FileMarkdownFilled, FilePptFilled, FileTextFilled, FileZipFilled, PlusOutlined} from "@ant-design/icons";
 import "./MaterialWarehouse.less";
+import i18next from "i18next";
 
 const {Search} = Input;
 
@@ -80,7 +81,7 @@ export default class inedx extends Component {
 
     render() {
       return (
-        <ModulaCard title="材料仓库" right={<Search placeholder="input search text" size="small" style={{width: 200}} />}>
+        <ModulaCard title={i18next.t("step:Material warehouse")} right={<Search placeholder="input search text" size="small" style={{width: 200}} />}>
           <div className="material-warehouse-box" data-component="material-warehouse-box">
             <div className="container">
               {
@@ -105,7 +106,7 @@ export default class inedx extends Component {
                         });
                       }}>
                         <PlusOutlined />
-                        <div style={{marginTop: 8, width: "100%"}}>上传</div>
+                        <div style={{marginTop: 8, width: "100%"}}>{i18next.t("step:Upload")}</div>
                       </div>
                     </Upload>
                   </div>
@@ -131,13 +132,13 @@ export default class inedx extends Component {
               ></UpLoadModal>
             </div>
             <div className="footer">
-              <Pagination
+              {/* <Pagination
                 total={85}
                 showTotal={total => `Total ${total} items`}
                 defaultPageSize={20}
                 defaultCurrent={1}
                 size="small"
-              />
+              /> */}
             </div>
           </div>
         </ModulaCard>

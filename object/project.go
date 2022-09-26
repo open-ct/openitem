@@ -48,7 +48,7 @@ type ProjectMaterials struct {
 	Files      []string `json:"files" bson:"files"`
 }
 
-// ProjectTimeTable: describe the time line of a project
+// ProjectTimeTable describe the timeline of a project
 type ProjectTimeTable struct {
 	TimePoints []ProjectTimePoint `json:"time_points" bson:"time_points"`
 }
@@ -226,13 +226,18 @@ func CreateTemplateProject(req *Project) (string, error) {
 			"组建团队", "测试框架与论证报告", "6人访谈", "30人测试", "试题外审", "300人测试", "定稿审查",
 		}
 		for i := 0; i < 7; i++ {
+			statusString := "未开始"
+			if i == 0 {
+				statusString = "未通过"
+			}
+
 			step := Step{
 				Uuid: util.GenUuidV4(),
 				Name: stepName[i],
 
 				ProjectId: fmt.Sprintf("%s/%s", newProject.Owner, newProject.Name),
 				Index:     i,
-				Status:    0,
+				Status:    statusString,
 				Creator:   req.Owner,
 			}
 

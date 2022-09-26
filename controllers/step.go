@@ -172,6 +172,32 @@ func (c *ApiController) SetStepStatus() {
 	c.ResponseOk(true)
 }
 
+// NextStep
+// @Title NextStep
+// @Description 进入下一流程
+// @Param   json body object.NextStepRequest true "项目信息"
+// @Success 200 true
+// @Failure 400 "invalid json body"
+// @router /api/review/proj/step/nextstep [post]
+func (c *ApiController) NextStep() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	var req object.NextStepRequest
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	err = object.NextStep(&req)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	c.ResponseOk(true)
+}
+
 // SetStepTimePoint
 // @Title SetStepTimePoint
 // @Description 为step设置时间点

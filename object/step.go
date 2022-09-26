@@ -1,6 +1,7 @@
 package object
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -15,7 +16,7 @@ type Step struct {
 	Index       int                `json:"index"`
 	Description string             `json:"description"`
 	Requirement string             `json:"requirement"`
-	Status      int                `json:"status"`
+	Status      string             `json:"status"`
 	Deadline    int64              `json:"deadline"`
 	Timetable   []ProjectTimePoint `xorm:"mediumtext" json:"timetable"`
 	Creator     string             `json:"creator"`
@@ -61,6 +62,10 @@ type StepDataStatistic struct {
 	ToCorrect float64 `json:"to_correct"`
 }
 
+type NextStepRequest struct {
+	Pid string `json:"pid"`
+}
+
 func AddStep(step *Step) error {
 	_, err := adapter.engine.Insert(step)
 	if err != nil {
@@ -79,7 +84,7 @@ func CreateOneStep(req *Step) (string, error) {
 		Description: req.Description,
 		Requirement: req.Requirement,
 		Deadline:    req.Deadline,
-		Status:      0,
+		Status:      "未开始",
 		Creator:     req.Creator,
 	}
 
@@ -276,4 +281,45 @@ func DeleteStep(stepId string) error {
 		return err
 	}
 	return nil
+}
+
+func NextStep(req *NextStepRequest) error {
+	var step Step
+	_, err := adapter.engine.Where(builder.Eq{"project_id": req.Pid, "status": "未通过"}).Get(&step)
+	if err != nil {
+		return err
+	}
+
+	var tempTestpapers []TempTestpaper
+	adapter.engine.Where(builder.Eq{"source_project": req.Pid}).Find(&tempTestpapers)
+
+	flag := true
+
+	for _, v := range tempTestpapers {
+		var submit Submit
+		get, err := adapter.engine.Where(builder.Eq{"testpaper_id": v.Uuid}).Get(&submit)
+		if err != nil {
+			return err
+		}
+		if !get || submit.Status != "审核通过" {
+			flag = false
+			break
+		}
+	}
+
+	if flag {
+		index := step.Index
+
+		if index == 6 {
+			// 最后一个步骤
+			adapter.engine.Where(builder.Eq{"project_id": req.Pid, "index": index}).Update(&Step{Status: "已通过"})
+		} else {
+			adapter.engine.Where(builder.Eq{"project_id": req.Pid, "index": index}).Update(&Step{Status: "已通过"})
+			adapter.engine.Where(builder.Eq{"project_id": req.Pid, "index": index + 1}).Update(&Step{Status: "未通过"})
+		}
+
+		return nil
+	} else {
+		return errors.New("试卷审核未全部通过")
+	}
 }

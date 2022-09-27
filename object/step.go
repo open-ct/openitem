@@ -13,7 +13,7 @@ type Step struct {
 	Uuid        string             `xorm:"varchar(100) notnull pk" json:"uuid"`
 	Name        string             `json:"name"`
 	ProjectId   string             `json:"project_id"`
-	Index       int                `json:"index"`
+	StepIndex   int                `json:"step_index"`
 	Description string             `json:"description"`
 	Requirement string             `json:"requirement"`
 	Status      string             `json:"status"`
@@ -80,7 +80,7 @@ func CreateOneStep(req *Step) (string, error) {
 		Uuid:        util.GenUuidV4(),
 		Name:        req.Name,
 		ProjectId:   req.ProjectId,
-		Index:       req.Index,
+		StepIndex:   req.StepIndex,
 		Description: req.Description,
 		Requirement: req.Requirement,
 		Deadline:    req.Deadline,
@@ -285,7 +285,7 @@ func DeleteStep(stepId string) error {
 
 func NextStep(req *NextStepRequest) error {
 	var step Step
-	_, err := adapter.engine.Where(builder.Eq{"project_id": req.Pid, "status": "未通过"}).Get(&step)
+	_, err := adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"status": "未通过"})).Get(&step)
 	if err != nil {
 		return err
 	}
@@ -308,14 +308,14 @@ func NextStep(req *NextStepRequest) error {
 	}
 
 	if flag {
-		index := step.Index
+		index := step.StepIndex
 
 		if index == 6 {
 			// 最后一个步骤
-			adapter.engine.Where(builder.Eq{"project_id": req.Pid, "index": index}).Update(&Step{Status: "已通过"})
+			adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index})).Update(&Step{Status: "已通过"})
 		} else {
-			adapter.engine.Where(builder.Eq{"project_id": req.Pid, "index": index}).Update(&Step{Status: "已通过"})
-			adapter.engine.Where(builder.Eq{"project_id": req.Pid, "index": index + 1}).Update(&Step{Status: "未通过"})
+			adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index})).Cols("status").Update(&Step{Status: "已通过"})
+			adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index + 1})).Cols("status").Update(&Step{Status: "未通过"})
 		}
 
 		return nil

@@ -236,7 +236,7 @@ func CreateTemplateProject(req *Project) (string, error) {
 				Name: stepName[i],
 
 				ProjectId: fmt.Sprintf("%s/%s", newProject.Owner, newProject.Name),
-				Index:     i,
+				StepIndex: i,
 				Status:    statusString,
 				Creator:   req.Owner,
 			}

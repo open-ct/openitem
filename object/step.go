@@ -323,3 +323,18 @@ func NextStep(req *NextStepRequest) error {
 		return errors.New("试卷审核未全部通过")
 	}
 }
+
+func getProjectStep(pid string) (string, error) {
+	var step Step
+
+	_, err := adapter.engine.Where(builder.Eq{"project_id": pid, "status": "未通过"}).Get(&step)
+	if err != nil {
+		return "", err
+	}
+
+	stepName := []string{
+		"组建团队", "测试框架与论证报告", "6人访谈", "30人测试", "试题外审", "300人测试", "定稿审查",
+	}
+
+	return stepName[step.StepIndex], nil
+}

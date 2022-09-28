@@ -58,6 +58,7 @@ func initAPI() {
 	beego.Router("/api/review/proj/step/timepoint", &controllers.ApiController{}, "DELETE:DeleteStepTimePoint")
 	beego.Router("/api/review/proj/step/stat", &controllers.ApiController{}, "GET:GetStepStatisticData")
 	beego.Router("/api/review/proj/step", &controllers.ApiController{}, "DELETE:DeleteStep")
+	beego.Router("/api/review/proj/next", &controllers.ApiController{}, "POST:NextStep")
 
 	// submit
 	beego.Router("/api/review/proj/submit", &controllers.ApiController{}, "GET:GetOneSubmit")

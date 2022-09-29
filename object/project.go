@@ -335,7 +335,7 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 	// get steps & all references
 	var projectSteps []Step
 
-	err = adapter.engine.Where(builder.Eq{"project_id": pid}).Asc("index").Find(&projectSteps)
+	err = adapter.engine.Where(builder.Eq{"project_id": pid}).Asc("step_index").Find(&projectSteps)
 	if err != nil {
 		return nil, err
 	}

@@ -366,6 +366,9 @@ func GetProjectDetailedInfo(pid string) (map[string]interface{}, error) {
 	}
 	projectInfo["materials"] = projectMaterials
 
+	nowStep, _ := getProjectStep(pid)
+	projectInfo["now_step"] = nowStep
+
 	return projectInfo, nil
 }
 

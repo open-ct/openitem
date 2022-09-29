@@ -16,14 +16,14 @@ type Submit struct {
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
 	CreatedTime string `xorm:"varchar(100)" json:"created_time"`
 
-	StepId      string    `json:"step_id"`
-	TestpaperId string    `json:"testpaper_id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Submitter   string    `json:"submitter"`
-	Contents    []Content `xorm:"mediumtext" json:"contents"`
-	Status      string    `json:"status"`
-	File        []string  `json:"file"`
+	StepId      string       `json:"step_id"`
+	TestpaperId string       `json:"testpaper_id"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	Submitter   string       `json:"submitter"`
+	Contents    []Content    `xorm:"mediumtext" json:"contents"`
+	Status      string       `json:"status"`
+	File        []FileRecord `json:"file"`
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
@@ -63,8 +63,13 @@ type SetSubmitStatusRequest struct {
 }
 
 type UpdateFileRequest struct {
-	SubmitId   string   `json:"submit_id"`
-	NewFileUrl []string `json:"new_file_url"`
+	SubmitId   string       `json:"submit_id"`
+	NewFileUrl []FileRecord `json:"new_file_url"`
+}
+
+type FileRecord struct {
+	FileName string `json:"file_name"`
+	FileUrl  string `json:"file_url"`
 }
 
 func getSubmit(owner string, name string) *Submit {
@@ -135,7 +140,7 @@ func MakeOneSubmit(req *Submit) (*Submit, error) {
 		Title:       req.Title,
 		Description: req.Description,
 		Submitter:   req.Submitter,
-		Status:      fmt.Sprintf("%s", "未通过"),
+		Status:      fmt.Sprintf("%s", "未审核"),
 		File:        req.File,
 	}
 
@@ -221,7 +226,7 @@ func SetSubmitStatus(req *SetSubmitStatusRequest) error {
 
 	_, err := adapter.engine.ID(core.PK{owner, name}).Cols("status").Update(&Submit{Status: req.NewStatus})
 	if err != nil {
-		log.Printf("delete content error: %s\n" + err.Error())
+		log.Printf("set submit status error: %s\n" + err.Error())
 		return err
 	}
 	return nil

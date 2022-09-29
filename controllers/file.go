@@ -61,13 +61,13 @@ func (c *ApiController) UploadFile() {
 		Description:   fileDescription,
 		Tags:          fileTags,
 	}
-	fileUrl, objectKey := object.UploadFileToStorage(&uploadRequest, fileBytes)
+	fileUrl, _ := object.UploadFileToStorage(&uploadRequest, fileBytes)
 	if fileUrl == "" {
 		c.ResponseError("upload file error")
 		return
 	}
 
-	c.ResponseOk(fileUrl, objectKey)
+	c.ResponseOk(fileUrl, fileName)
 }
 
 // GetFileInfo

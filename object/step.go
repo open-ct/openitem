@@ -20,16 +20,16 @@ type Step struct {
 	Deadline    int64              `json:"deadline"`
 	Timetable   []ProjectTimePoint `xorm:"mediumtext" json:"timetable"`
 	Creator     string             `json:"creator"`
-	Attachments []string           `xorm:"mediumtext" json:"attachments"` // uuid of files
+	Attachments []FileRecord       `xorm:"mediumtext" json:"attachments"` // uuid of files
 
 	CreateAt  time.Time `xorm:"created" json:"create_at"`
 	UpdatedAt time.Time `xorm:"updated" json:"updated_at"`
 }
 
 type AddStepAttachment struct {
-	StepId   string   `json:"step_id"`
-	FilesIds []string `json:"files_ids"`
-	Uploader string   `json:"uploader"`
+	StepId   string       `json:"step_id"`
+	FilesIds []FileRecord `json:"files_ids"`
+	Uploader string       `json:"uploader"`
 }
 
 type SetStepTimePointRequest struct {

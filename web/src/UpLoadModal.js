@@ -81,7 +81,8 @@ export default class index extends Component {
       let upLoadFileList = Object.assign(this.state.upLoadFileList, {});
       upLoadFileList[upLoadFileList.length - 1].status = "done";
       upLoadFileList[upLoadFileList.length - 1].uid = this.uuid(32, 36);
-      upLoadFileList[upLoadFileList.length - 1].url = res.data;
+      upLoadFileList[upLoadFileList.length - 1].file_url = res.data;
+      upLoadFileList[upLoadFileList.length - 1].file_name = res.data2;
       this.setState({
         upLoadFileList,
         upLoadState: false,
@@ -140,9 +141,9 @@ export default class index extends Component {
             this.setState({
               createLoading: true,
             });
-            let urls = file.map(item => {
-              return item.url;
-            });
+            // let files = file.map(item => {
+            //   return item.url;
+            // });
             let data = {
               owner: this.props.account.id,
               name: this.upLoadFormRef.current.getFieldValue("title"),
@@ -151,7 +152,7 @@ export default class index extends Component {
               title: "title",
               description: "description",
               submitter: this.props.account.id,
-              file: [].concat(urls),
+              file: [].concat(file),
               contents: [],
             };
             ProjectBackend.MakeOneSubmit(data).then(res => {
@@ -188,9 +189,9 @@ export default class index extends Component {
                 {
                   this.state.selectLoading ? (
                     <></>
-                  ) : this.state.testPaperList.map(item => (
-                    <Option key={item.uuid} value={item.title}>{item.title}</Option>
-                  ))
+                  ) : (this.state.testPaperList ? this.state.testPaperList.map(item => (
+                    <Option key={item.uuid} value={item.uuid}>{item.title}</Option>
+                  )) : <></>)
                 }
               </Select>
             </Form.Item>
@@ -207,7 +208,7 @@ export default class index extends Component {
             <Form.Item
               label="上传"
               rules={[{required: true}]}
-              labelCol={{span: 4}}
+              // labelCol={{span: 4}}
               required={true}
             >
               <Upload.Dragger

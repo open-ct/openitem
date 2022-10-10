@@ -1,15 +1,16 @@
 import React, {Component} from "react";
-import {Descriptions, Modal, Popconfirm, Select, Space, Spin, Table, Tag, message} from "antd";
+import {Col, Descriptions, Modal, Popconfirm, Row, Select, Space, Spin, Table, message} from "antd";
 import ModulaCard from "./ModulaCard.js";
 import * as ProjectBackend from "./backend/ProjectBackend";
 
 const {Option} = Select;
 
+import * as PropositionBackend from "./backend/PropositionBackend";
+
 export default class ProcessManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // roles: ["第一阶段审核员", "第二阶段审核员", "第三阶段审核员", "第四阶段审核员", "第五阶段审核员", "第六阶段审核员", "第七阶段审核员"],
       memberList: [],
       testpaperVisible: {
         show: false,
@@ -28,95 +29,34 @@ export default class ProcessManagement extends Component {
       columns: [
         {
           title: "试卷id",
-          // dataIndex: "testpaper_id",
           dataIndex: "uuid",
           key: "testpaper_id",
-          width: "200px",
-          //   render: (_, {testpaper_id}) => <Paragraph ellipsis={true}>{testpaper_id}</Paragraph>,
+          align: "center",
         },
         {
           title: "试卷标题",
-          // dataIndex: "testpaper_title",
           dataIndex: "title",
           key: "testpaper_title",
-          width: "300px",
+          align: "center",
         },
         {
           title: "命题人",
           dataIndex: "authorName",
           key: "author",
-          width: "160px",
-        },
-        {
-          title: "流程阶段",
-          dataIndex: "state",
-          key: "state",
-          width: "120px",
-          render: (_, {state}) => (
-            <>
-              {state.map((tag, index) => {
-                let color = "green";
-                // switch(tag) {
-                // case "组建团队": {color = "#8B4513"; break;}
-                // case "测试框架与论证报告": {color = "#FFB7DD"; break;}
-                // case "6人访谈": {color = "#BBFFEE"; break;}
-                // case "30人测试": {color = "#CCBBFF"; break;}
-                // case "试题外审": {color = "#FF3EFF"; break;}
-                // case "300人测试": {color = "#FFFF33"; break;}
-                // case "已完成": {color = "orangered "; break;}
-                // case "未开始": {color = "green"; break;}
-                // default: {color = "red";}
-                // }
-                return (
-                  <Tag color={color} key={index}>
-                    {tag.toUpperCase()}
-                  </Tag>
-                );
-              })}
-            </>
-          ),
-        },
-        {
-          title: "下一阶段",
-          dataIndex: "next_state",
-          key: "next_state",
-          width: "120px",
-          render: (_, {state}) => (
-            <>
-              {state.map((tag, index) => {
-                let color;
-                tag = this.state.steps[(this.state.steps.indexOf(tag)) + 1];
-                switch (tag) {
-                // case "组建团队": {color = "#8B4513"; break;}
-                // case "测试框架与论证报告": {color = "#FFB7DD"; break;}
-                // case "6人访谈": {color = "#BBFFEE"; break;}
-                // case "30人测试": {color = "#CCBBFF"; break;}
-                // case "试题外审": {color = "#FF3EFF"; break;}
-                // case "300人测试": {color = "#FFFF33"; break;}
-                case "已完成": {color = "orangered "; break;}
-                case "未开始": {color = "green"; break;}
-                default: {color = "volcano";}
-                }
-                return (
-                  <Tag color={color} key={index}>
-                    {tag}
-                  </Tag>
-                );
-              })}
-            </>
-          ),
+          align: "center",
         },
         {
           title: "试卷详情",
           dataIndex: "detail",
           key: "detail",
-          width: "150px",
+          align: "center",
           render: (_, record) => {
             return (
               <a onClick={() => {
                 this.setState({
                   testpaperVisible: Object.assign(this.state.testpaperVisible, {show: true, testPaperData: record, testpaperDetailData: record.info}),
                 });
+                this.getTestpaperRecord(record.uuid);
               }}>试卷详情</a>
             );
           },
@@ -124,11 +64,15 @@ export default class ProcessManagement extends Component {
         {
           title: "审核员",
           dataIndex: "role",
-          width: "150px",
+          align: "center",
           key: "role",
           render: (_, record) => {
             return (
               <a onClick={() => {
+                if(this.props.match.params.role !== "1") {
+                  message.warn("暂无权限");
+                  return;
+                }
                 ProjectBackend.GetOneTpAssignment(record.uuid).then(res => {
                   let keys = Object.keys(res.data);
                   let data = Object.assign({}, {"组建团队": {}, "测试框架与论证报告": {}, "6人访谈": {}, "30人测试": {}, "试题外审": {}, "300人测试": {}, "定稿审查": {}});
@@ -151,20 +95,34 @@ export default class ProcessManagement extends Component {
           title: "操作",
           dataIndex: "action",
           key: "action",
+          align: "center",
           render: (_, record) => (
             <Space size="middle">
               <Popconfirm
-                title="Are you sure to through this stage?"
+                title="Are you sure to delete this testpaper?"
                 onConfirm={() => {
-                  let data = this.state.testPaperData.map(item => {
-                    if(item.uuid === record.uuid) {
-                      let num = this.state.steps.indexOf(record.state[0]) + 1;
-                      return Object.assign(item, {state: [this.state.steps[num]]});
-                    }
-                    return item;
-                  });
+                  if(this.props.match.params.role !== "1") {
+                    message.warn("暂无权限");
+                    return;
+                  }
                   this.setState({
-                    testPaperData: data,
+                    loadingState: true,
+                  });
+                  PropositionBackend.DeleteTempTestpaper(record.uuid).then(res => {
+                    if (res.status == "ok") {
+                      message.success("删除成功！");
+                      this.setState({
+                        loadingState: false,
+                      });
+                    } else {
+                      message.success("删除失败");
+                      this.setState({
+                        loadingState: false,
+                      });
+                    }
+                    let pid = this.props.match.params.project_id.split("_").join("/");
+                    this.getTestpaperList(pid);
+                    this.getProjectMember(pid);
                   });
                 }}
                 onCancel={() => {
@@ -173,10 +131,8 @@ export default class ProcessManagement extends Component {
                 okText="Yes"
                 cancelText="No"
               >
-                <a>下一阶段</a>
+                <a>删除</a>
               </Popconfirm>
-              <a>重置</a>
-              <a>删除</a>
             </Space>
           ),
         },
@@ -188,14 +144,14 @@ export default class ProcessManagement extends Component {
       loadingState: true,
     });
     ProjectBackend.GetProjectTempTestpaper(pid).then(res => {
-      let users_id = res.data.map(item => {
+      let users_id = res.data ? res.data.map(item => {
         return item.author;
-      });
+      }) : [];
       let resData = res.data;
       ProjectBackend.GetUserList(users_id).then(res => {
-        resData.map((item, index) => {
+        resData ? resData.map((item, index) => {
           return Object.assign(item, {authorName: res.data[item.author].displayName, state: this.state.steps[Math.floor(Math.random() * 7)].split(" "), key: index});
-        });
+        }) : [];
         this.setState({
           loadingState: false,
           testPaperData: resData,
@@ -255,7 +211,7 @@ export default class ProcessManagement extends Component {
     this.getTestpaperList(pid);
     this.getProjectMember(pid);
   }
-  dateFtt=(fmt, date) => { // author: meizz   
+  dateFtt=(fmt, date) => {
     var o = {
       "M+": date.getMonth() + 1,                 // 月份   
       "d+": date.getDate(),                    // 日   
@@ -271,11 +227,29 @@ export default class ProcessManagement extends Component {
     }
     return fmt;
   }
+  getTestpaperRecord = (tid) => {
+    this.setState({
+      loadingState: true,
+      testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: true}),
+    });
+    PropositionBackend.GetTempTestpaperDetail(tid).then(res => {
+      this.setState({
+        loadingState: false,
+        testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, testpaperDetailData: res.data.info}),
+      });
+    }).catch(err => {
+      this.setState({
+        loadingState: false,
+        testpaperVisible: Object.assign(this.state.testpaperVisible, {loadingState: false, show: false}),
+      });
+      message.error(err.message || "请求错误");
+    });
+  }
   render() {
     return (
       <div className="process-management-page" data-component="process-management-page" >
         <ModulaCard
-          title="流程管理"
+          title="试卷管理"
         >
           <div>
             <Table
@@ -290,24 +264,20 @@ export default class ProcessManagement extends Component {
                 pageSize: 4,
                 defaultCurrent: 1,
                 showQuickJumper: true,
-                total: this.state.testPaperData.length,
+                total: this.state.testPaperData ? this.state.testPaperData.length : 0,
               }}
             />
           </div>
         </ModulaCard>
         <Modal
-          title="请分配审核人员"
+          title="请分配审核人员  (管理员永远拥有最高权限)"
           visible={this.state.openState}
-          onOk={() => {
-            this.setState({
-              openState: false,
-            });
-          }}
           onCancel={() => {
             this.setState({
               openState: false,
             });
           }}
+          footer={null}
         >
           {this.state.steps.map((item, index) => {
             return (
@@ -354,7 +324,6 @@ export default class ProcessManagement extends Component {
             );
           })}
         </Modal>
-
         <Modal
           title="试卷详情"
           visible={this.state.testpaperVisible.show}
@@ -374,15 +343,25 @@ export default class ProcessManagement extends Component {
             {
               this.state.testpaperVisible.loadingState ? "" : (
                 <>
-                  <Descriptions title="试卷相关信息">
-                    <Descriptions.Item label="唯一标识">{this.state.testpaperVisible.testPaperData.uuid}</Descriptions.Item>
-                    <Descriptions.Item label="标题">{this.state.testpaperVisible.testPaperData.title}</Descriptions.Item>
-                    <Descriptions.Item label="作者">{this.state.testpaperVisible.testPaperData.authorName}</Descriptions.Item>
-                    <Descriptions.Item label="创建时间">{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.create_at))}</Descriptions.Item>
-                    <Descriptions.Item label="更新时间">{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.updated_at))}</Descriptions.Item>
-                    <Descriptions.Item label="批注信息">{this.state.testpaperVisible.testPaperData.comment_record}</Descriptions.Item>
-                  </Descriptions>
-                  {/* <hr />
+                  <Spin spinning={this.state.testpaperVisible.loadingState} tip="加载中">
+                    {
+                      this.state.testpaperVisible.loadingState ? "" : (
+                        <>
+                          <Descriptions title="试卷相关信息">
+                            <Descriptions.Item label="唯一标识">{this.state.testpaperVisible.testPaperData.uuid}</Descriptions.Item>
+                            <Descriptions.Item label="标题">{this.state.testpaperVisible.testPaperData.title}</Descriptions.Item>
+                            <Descriptions.Item label="作者">{this.state.testpaperVisible.testPaperData.authorName}</Descriptions.Item>
+                            <Descriptions.Item label="创建时间">{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.create_at))}</Descriptions.Item>
+                            <Descriptions.Item label="更新时间">{this.dateFtt("yyyy年MM月dd日  hh:mm", new Date(this.state.testpaperVisible.testPaperData.updated_at))}</Descriptions.Item>
+                            <Descriptions.Item label="批注信息">{this.state.testpaperVisible.testPaperData.comment_record}</Descriptions.Item>
+                          </Descriptions>
+                        </>
+                      )
+                    }
+                  </Spin>
+                  <br></br>
+                  <hr></hr>
+                  <Descriptions title="试卷内容"></Descriptions>
                   {
                     this.state.testpaperVisible.testpaperDetailData.map((question_stem, index) => (
                       <div className="paper-question-stem" key={index}>
@@ -391,9 +370,42 @@ export default class ProcessManagement extends Component {
                             <span style={{fontWeight: "bold"}}>{question_stem.title}{question_stem.description}</span>
                           </Col>
                         </Row>
+                        <div>
+                          <>
+                            {question_stem.question_list.map((question_item, index) => {
+                              return (
+                                <div className="paper-question-item" key={index}>
+                                  <Row className="header">
+                                    <Col span="4">
+                                      <span>序号：<span style={{fontWeight: "bold", color: "red"}}>{index + 1}</span></span>
+                                    </Col>
+                                    <Col span="6">
+                                      <span>
+                                        测试年份：<span style={{fontWeight: "bold", color: "green"}}>{question_item.question.apply_record.test_year}</span>
+                                      </span>
+                                    </Col>
+                                    <Col span="4">
+                                      <span>
+                                        试题难度：<span style={{fontWeight: "bold", color: "blue"}}>{question_item.question.advanced_props.irt_level}</span>
+                                      </span>
+                                    </Col>
+                                    <Col span="4">
+                                      <span>
+                                        试题类型：{question_item.question.info.type}
+                                      </span>
+                                    </Col>
+                                  </Row>
+                                  <div className="body" dangerouslySetInnerHTML={{__html: question_item.question.info.body}}></div>
+                                  <br />
+                                  <br />
+                                </div>
+                              );
+                            })}
+                          </>
+                        </div>
                       </div>
                     ))
-                  } */}
+                  }
                 </>
               )
             }

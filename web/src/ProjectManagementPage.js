@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Redirect, Route, Switch} from "react-router-dom";
-import {Button, Descriptions, Form, Input, Modal, PageHeader, Spin, Tabs, message} from "antd";
+import {Button, Descriptions, Form, Input, Modal, PageHeader, Popconfirm, Spin, Tabs, Tag, message} from "antd";
 import * as ProjectBackend from "./backend/ProjectBackend";
 import ChangeTags from "./ChangeTags";
 import Step from "./Step";
@@ -20,6 +20,8 @@ export default class ProjectManagementPage extends Component {
       loadingState: true,
       isCreateProjectVisible: false,
       createLoading: false,
+      steps: ["试卷管理", "组建团队", "测试框架与论证报告", "6人访谈", "30人测试", "试题外审", "300人测试", "定稿审查", "项目流程结束"],
+      testpapers: [],
     };
   }
   createFormRef = React.createRef();
@@ -33,17 +35,40 @@ export default class ProjectManagementPage extends Component {
       loadingState: true,
     });
     ProjectBackend.GetDetailedInfo(this.props.match.params.project_id.split("_").join("/")).then(res => {
+      let currentStep = res.data.steps.filter(item => {return item.status == "未通过";});
+      let endStep = "";
+      if(currentStep.length === 0) {
+        currentStep = "定稿审查";
+        endStep = "项目流程结束";
+      }else{
+        currentStep = currentStep[0].name;
+      }
       this.setState({
         projectBaseInfo: res.data,
         ProjectInfo: res.data.basic_info.basic_info,
+        currentStep: currentStep,
+        endStep: endStep,
         loadingState: false,
       });
+      let index = this.state.steps.indexOf(currentStep);
+      if(endStep) {
+        this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/试卷管理`, {account: this.props.account});
+        return;
+      }
+      this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[index - 1].uuid}/${this.state.projectBaseInfo.steps[index - 1].name}`, this.state.classes.account);
     }).catch(err => {
       this.props.history.push("/home");
       message.error(err.message || "项目信息加载失败，请重试！");
       this.setState({
         loadingState: false,
       });
+    });
+    ProjectBackend.GetProjectTempTestpaper(this.props.match.params.project_id.split("_").join("/")).then(res => {
+      this.setState({
+        testpapers: res.data,
+      });
+    }).catch(err => {
+      message.error(err.message);
     });
   }
 
@@ -54,10 +79,72 @@ export default class ProjectManagementPage extends Component {
 
   tabCruuent = () => {
     let path_list = this.props.location.pathname.split("/");
-    if(path_list[path_list.length - 1] == "流程管理") {return "流程管理";}
+    if(path_list[path_list.length - 1] == "试卷管理") {return "试卷管理";}
     return `${path_list[path_list.length - 1]}_${path_list[path_list.length - 2]}`;
   }
-
+  nextStep=() => {
+    if(this.props.match.params.role != 1) {
+      message.warn("暂无权限");
+      return;
+    }
+    if(!this.state.testpapers) {
+      message.warn("请至少创建一张试卷");
+      return;
+    }
+    if(this.state.endStep) {
+      message.warning("项目已经结束");
+      return;
+    }
+    if(this.state.currentStep == "组建团队") {
+      let name = "buildTeam" + Date.now();
+      let data = {
+        owner: this.props.match.params.project_id.split("_")[0],
+        name: name,
+        step_id: this.state.projectBaseInfo.steps[0].uuid,
+        testpaper_id: this.state.testpapers[0].uuid,
+        title: "title",
+        descriptions: "description",
+        submittter: this.props.account.id,
+        file: [],
+        contents: [],
+      };
+      ProjectBackend.MakeOneSubmit(data).then(res => {
+        message.success("提交成功");
+        let data1 = {
+          new_status: "审核通过",
+          submit_id: this.props.match.params.project_id.split("_")[0] + "/" + name,
+        };
+        ProjectBackend.AlterOneSubmit(data1).then(res => {
+          message.success("确认提交");
+          ProjectBackend.SetProjectNextStep(Object.assign({}, {pid: this.props.match.params.project_id.split("_").join("/")})).then(res => {
+            if(res.status == "ok") {
+              this.getProjectBaseInfo();
+              message.success("进入下一阶段");
+            }else{
+              message.warning(res.msg);
+            }
+          }).catch(err => {
+            message.error(err.message);
+          });
+        }).catch(err => {
+          message.error(err.message);
+        });
+      }).catch(err => {
+        message.error(err.message);
+      });
+    }else{
+      ProjectBackend.SetProjectNextStep(Object.assign({}, {pid: this.props.match.params.project_id.split("_").join("/")})).then(res => {
+        if(res.status == "ok") {
+          this.getProjectBaseInfo();
+          message.success("进入下一阶段");
+        }else{
+          message.warning(res.msg);
+        }
+      }).catch(err => {
+        message.error(err.message);
+      });
+    }
+  }
   render() {
     return (
       <div className="project-management-page" data-component="project-management-page" key="project-management-page">
@@ -72,21 +159,26 @@ export default class ProjectManagementPage extends Component {
                 isCreateProjectVisible: true,
               });
             }}>编辑项目</Button>,
-            <Button key="1">导出成员</Button>,
+            <Button key="1"><Popconfirm title="Are you sure you want to take this next step ?" onConfirm={this.nextStep}>下一步</Popconfirm></Button>,
           ]
           }
           footer = {
             this.state.loadingState ? (
               <Spin spinning={this.state.loadingState} tip="加载中" />
             ) : (
-              <Tabs defaultActiveKey={`${this.state.projectBaseInfo.steps[0].uuid}_${this.state.projectBaseInfo.steps[0].name}`} type="card" activeKey={this.tabCruuent()} onChange={(e) => {
-                if(e === "流程管理") {
+              <Tabs defaultActiveKey={`${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].uuid}_${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].name}`} type="card" activeKey={this.tabCruuent()} onChange={(e) => {
+                if(e === "试卷管理") {
                   this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e}`, {account: this.props.account});
                 } else {
-                  this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`, this.state.classes.account);
+                  if(this.state.steps.indexOf(e.split("_")[1]) > this.state.steps.indexOf(this.state.currentStep)) {
+                    message.warning("暂未到达这个阶段！");
+                    return;
+                  }else{
+                    this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e.split("_")[1]}/${e.split("_")[0]}`, this.state.classes.account);
+                  }
                 }
               }}>
-                <TabPane key="流程管理" tab="流程管理"></TabPane>
+                <TabPane key="试卷管理" tab="试卷管理"></TabPane>
                 {
                   this.state.projectBaseInfo.steps.map(item => (
                     <TabPane key={`${item.uuid}_${item.name}`} tab={item.name}></TabPane>
@@ -118,6 +210,7 @@ export default class ProjectManagementPage extends Component {
                 </Descriptions.Item>
                 <Descriptions.Item label="试卷">0</Descriptions.Item>
                 <Descriptions.Item label="试题">0</Descriptions.Item>
+                <Descriptions.Item label="当前阶段"><Tag color="#00a2ae">{this.state.endStep ? this.state.endStep : this.state.currentStep}</Tag></Descriptions.Item>
               </Descriptions>
             )
           }
@@ -126,14 +219,13 @@ export default class ProjectManagementPage extends Component {
           {
             this.state.loadingState ? (<></>) : (
               <Switch>
-                <Route path={"/project-management/:project_id/:role/流程管理"} component={ProcessManagement} key="流程管理"></Route>
+                <Route path={"/project-management/:project_id/:role/试卷管理"} component={ProcessManagement} key="试卷管理"></Route>
                 {
                   this.state.projectBaseInfo.steps.map(item => (
-                    <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.uuid}></Route>
+                    <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} key={item.uuid}></Route>
                   ))
                 }
-                <Redirect from={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[0].name}/${this.state.projectBaseInfo.steps[0].uuid}`}></Redirect>
-                {/* <Route component={NotFound} key="404"></Route> */}
+                <Redirect from={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].name}/${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].uuid}`}></Redirect>
               </Switch>
             )
           }

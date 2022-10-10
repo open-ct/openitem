@@ -67,7 +67,7 @@ export default class index extends Component {
             }
             return true;
           }}
-          customRequest={this.upLoadFile.bind(this)}
+          // customRequest={this.upLoadFile.bind(this)}
         >
           <Button size="small" icon={<LinkOutlined />} style={{marginLeft: ".1246rem"}}>{
             this.state.stepInfo.attachments ? "覆盖文件" : "上传文件"
@@ -144,7 +144,7 @@ export default class index extends Component {
               <div className="task-requirements-box" data-component="task-requirements-box">
                 <div className="describe-box">
                   <div className="context">
-                    <a href={this.state.stepInfo.attachments ? this.state.stepInfo.attachments[0] : "*"}>{this.state.stepInfo.attachments ? "任务要求文件(点击下载)" : "无"}</a>
+                    <a href={this.state.stepInfo.attachments ? this.state.stepInfo.attachments[0].file_url : "*"}>{this.state.stepInfo.attachments ? "任务要求文件(点击下载)" : "无"}</a>
                   </div>
                   <div className="btn-box">
                     {this.props.role == 1 ? (<Button type="link">删除</Button>) : ""}

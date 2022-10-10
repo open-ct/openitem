@@ -606,11 +606,6 @@ export default class PropositionPaperHome extends Component {
                                       试题类型：{question_item.question.info.type}
                                       </span>
                                     </Col>
-                                    {/* <Col span="4">
-                                    <span>
-                                    题目答案：{question_item.question.info.answer || "无"}
-                                    </span>
-                                  </Col> */}
                                   </Row>
                                   <div className="body" dangerouslySetInnerHTML={{__html: question_item.question.info.body}}></div>
                                   <div className="footer">

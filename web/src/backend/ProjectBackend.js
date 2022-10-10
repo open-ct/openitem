@@ -170,3 +170,25 @@ export function GetUserByName(name) {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function SetProjectNextStep(data) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/next`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function getProjectAllSteps(pid) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/steps?:pid=${pid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
+
+export function getAllTpassign(tid) {
+  return fetch(`${Setting.ServerUrl}/api/review/proj/tpassign?:tid=${tid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}

@@ -43,18 +43,18 @@ class index extends Component {
     };
   }
   columns = [{
-    title: "姓名",
+    title: "用户名",
     align: "center",
     key: "name",
     render: (text, record) => (
       <span>{record.info.name}</span>
     ),
   }, {
-    title: "年龄",
+    title: "姓名",
     align: "center",
-    key: "age",
+    key: "displayName",
     render: (text, record) => (
-      <span>{record.info.birthday}</span>
+      <span>{record.info.displayName}</span>
     ),
   }, {
     title: "性别",
@@ -71,9 +71,9 @@ class index extends Component {
       <Tag color="processing">{record.info.owner}</Tag>
     ),
   }, {
-    title: "职位",
+    title: "用户类型",
     align: "center",
-    key: "post",
+    key: "type",
     render: (text, record) => (
       <span>{record.info.type}</span>
     ),
@@ -98,7 +98,7 @@ class index extends Component {
       <span>{record.info.signupApplication}</span>
     ),
   }, {
-    title: "位置",
+    title: "国家/地区",
     align: "center",
     key: "position",
     render: (text, record) => (
@@ -121,28 +121,18 @@ class index extends Component {
         <Tag color="green">{roleList[record.role - 1]}</Tag>
       );
     },
-  }, {
-    title: "状态",
-    align: "center",
-    key: "state",
-    render: (text, record) => (
-      <>
-        {
-          record.info.isOnline ? (
-            <Tag color="#87d068">已确认 √</Tag>
-          ) : (
-            <Tag color="#f50">未确认 ×</Tag>
-          )
-        }
-      </>
-    ),
-  }, {
+  },
+  {
     title: "管理",
     align: "center",
     key: "management",
     render: (text, record) => (
       <Space size="middle">
         <Button type="link" onClick={() => {
+          if(this.props.match.params.role != 1) {
+            message.warn("暂无权限");
+            return;
+          }
           this.setState({
             roleChangeForm: Object.assign(this.state.roleChangeForm, {
               assignment_id: record.uuid,
@@ -158,6 +148,10 @@ class index extends Component {
             okText: "确认移除",
             cancelText: "取消移除",
             onOk: () => {
+              if(this.props.match.params.role != 1) {
+                message.warn("暂无权限");
+                return;
+              }
               this.setState({
                 loadingState: true,
               });
@@ -234,6 +228,10 @@ class index extends Component {
           title="项目成员"
           right={(
             <Button type="primary" size="small" onClick={() => {
+              if(this.props.match.params.role != 1) {
+                message.warn("暂无权限");
+                return;
+              }
               this.setState({
                 addMemberForm: Object.assign(this.state.addMemberForm, {show: true}),
               });
@@ -387,42 +385,6 @@ class index extends Component {
           keyboard={!this.state.emailForm.loadingState}
           maskClosable={!this.state.emailForm.loadingState}
           confirmLoading={this.state.emailForm.loadingState}
-          // onOk={() => {
-          //   this.emailFormRef.current.validateFields().then(formData => {
-          //     let data = {
-          //       body: {
-          //         message: formData.message,
-          //         send_time: this.state.emailForm.send_time,
-          //         sender: this.state.emailForm.sender
-          //       },
-          //       destination: this.state.emailForm.destination,
-          //       subject: formData.subject
-          //     };
-          //     this.setState({
-          //       emailForm: Object.assign(this.state.emailForm, {loadingState: true})
-          //     });
-          //     request({
-          //       url: baseURL + "/review/noticer/email",
-          //       // url:"http://49.232.73.36:8081/review/noticer/email",
-          //       method: "POST",
-          //       data
-          //     }).then(res => {
-          //       this.setState({
-          //         emailForm: Object.assign(this.state.emailForm, {loadingState: false, show: false})
-          //       });
-          //       this.emailFormRef.current.resetFields();
-          //       message.success("发送成功");
-          //     }).catch(err => {
-          //       this.setState({
-          //         emailForm: Object.assign(this.state.emailForm, {loadingState: false})
-          //       });
-          //       message.error(err.message || "请求错误");
-          //     });
-          //   }).catch(err => {
-          //     message.warning("请正确填写邮件内容");
-          //   });
-          // }}
-
           onOk={() => { }}
           onCancel={() => {
             if (this.state.emailForm.loadingState) {

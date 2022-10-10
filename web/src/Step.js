@@ -52,6 +52,7 @@ export default class index extends Component {
               role={this.props.match.params.role}
               stepId={this.props.match.params.step_id}
               projectId = {this.props.match.params.project_id}
+              account={this.props.location.state}
               ref={this.dataRef}
             >
             </DataTable>

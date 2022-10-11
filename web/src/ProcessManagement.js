@@ -133,6 +133,44 @@ export default class ProcessManagement extends Component {
               >
                 <a>删除</a>
               </Popconfirm>
+              <Popconfirm
+                title="Are you sure to finish this testpaper?"
+                onConfirm={() => {
+                  this.setState({
+                    loadingState: false,
+                  });
+                  ProjectBackend.GetDetailedInfo(this.props.match.params.project_id.split("_").join("/")).then(res => {
+                    let currentStep = res.data.steps.filter(item => {return item.status == "未通过";});
+                    if(currentStep.length === 0) {
+                      ProjectBackend.finishTempTestpaper(record.uuid).then(res => {
+                        this.setState({
+                          loadingState: false,
+                        });
+                        if(res.status == "ok") {
+                          message.success("试卷完成入库");
+                        }else{
+                          message.warn(res.msg);
+                        }
+                      });
+                    }else{
+                      this.setState({
+                        loadingState: false,
+                      });
+                      message.warn("项目流程未结束");
+                    }
+                  }).catch(err => {
+                    this.setState({
+                      loadingState: true,
+                    });
+                    message.warn(err.message);
+                  });
+                }}
+                onCancel={() => {
+
+                }}
+              >
+                <a>完成</a>
+              </Popconfirm >
             </Space>
           ),
         },

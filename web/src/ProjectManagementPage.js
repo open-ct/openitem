@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 import {Button, Descriptions, Form, Input, Modal, PageHeader, Popconfirm, Spin, Tabs, Tag, message} from "antd";
 import * as ProjectBackend from "./backend/ProjectBackend";
 import ChangeTags from "./ChangeTags";
@@ -40,6 +40,7 @@ export default class ProjectManagementPage extends Component {
       if(currentStep.length === 0) {
         currentStep = "定稿审查";
         endStep = "项目流程结束";
+        message.success("项目流程结束");
       }else{
         currentStep = currentStep[0].name;
       }
@@ -55,7 +56,7 @@ export default class ProjectManagementPage extends Component {
         this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/试卷管理`, {account: this.props.account});
         return;
       }
-      this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[index - 1].uuid}/${this.state.projectBaseInfo.steps[index - 1].name}`, this.state.classes.account);
+      this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[index - 1].name}/${this.state.projectBaseInfo.steps[index - 1].uuid}`, this.state.classes.account);
     }).catch(err => {
       this.props.history.push("/home");
       message.error(err.message || "项目信息加载失败，请重试！");
@@ -222,10 +223,10 @@ export default class ProjectManagementPage extends Component {
                 <Route path={"/project-management/:project_id/:role/试卷管理"} component={ProcessManagement} key="试卷管理"></Route>
                 {
                   this.state.projectBaseInfo.steps.map(item => (
-                    <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} key={item.uuid}></Route>
+                    <Route path={`/project-management/:project_id/:role/${item.name}/:step_id`} component={item.name === "组建团队" ? BuildTeam : Step} exact key={item.uuid}></Route>
                   ))
                 }
-                <Redirect from={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].name}/${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].uuid}`}></Redirect>
+                {/* <Redirect from={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}`} to={`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].name}/${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].uuid}`}></Redirect> */}
               </Switch>
             )
           }

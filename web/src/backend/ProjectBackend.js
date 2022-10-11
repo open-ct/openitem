@@ -192,3 +192,10 @@ export function getAllTpassign(tid) {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function finishTempTestpaper(tid) {
+  return fetch(`${Setting.ServerUrl}/api/qbank/testpaper/finish?:tid=${tid}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}

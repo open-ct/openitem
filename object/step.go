@@ -293,35 +293,39 @@ func NextStep(req *NextStepRequest) error {
 	var tempTestpapers []TempTestpaper
 	adapter.engine.Where(builder.Eq{"source_project": req.Pid}).Find(&tempTestpapers)
 
-	flag := true
+	if len(tempTestpapers) == 0 {
+		return errors.New("项目下没有试卷")
+	}
 
 	for _, v := range tempTestpapers {
-		var submit Submit
-		get, err := adapter.engine.Where(builder.Eq{"testpaper_id": v.Uuid}).Get(&submit)
+		var submit []Submit
+		err := adapter.engine.Where(builder.Eq{"testpaper_id": v.Uuid}.And(builder.Eq{"step_id": step.Uuid})).Find(&submit)
 		if err != nil {
 			return err
 		}
-		if !get || submit.Status != "审核通过" {
-			flag = false
-			break
+
+		if len(submit) == 0 {
+			return errors.New("部分试卷未提交审核")
+		}
+		for _, v := range submit {
+			if v.Status != "审核通过" {
+				return errors.New("试卷审核未全部通过")
+			}
 		}
 	}
 
-	if flag {
-		index := step.StepIndex
+	index := step.StepIndex
 
-		if index == 6 {
-			// 最后一个步骤
-			adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index})).Update(&Step{Status: "已通过"})
-		} else {
-			adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index})).Cols("status").Update(&Step{Status: "已通过"})
-			adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index + 1})).Cols("status").Update(&Step{Status: "未通过"})
-		}
-
-		return nil
+	if index == 6 {
+		// 最后一个步骤
+		adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index})).Update(&Step{Status: "已通过"})
 	} else {
-		return errors.New("试卷审核未全部通过")
+		adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index})).Cols("status").Update(&Step{Status: "已通过"})
+		adapter.engine.Where(builder.Eq{"project_id": req.Pid}.And(builder.Eq{"step_index": index + 1})).Cols("status").Update(&Step{Status: "未通过"})
 	}
+
+	return nil
+
 }
 
 func getProjectStep(pid string) (string, error) {

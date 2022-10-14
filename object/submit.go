@@ -136,7 +136,7 @@ func MakeOneSubmit(req *Submit) (*Submit, error) {
 		CreatedTime: time.Now().Format("2006-01-02 15:04:05"),
 
 		StepId:      req.StepId,
-		TestpaperId: req.TestpaperId,
+		TestpaperId: fmt.Sprintf("%s", "测试试卷"),
 		Title:       req.Title,
 		Description: req.Description,
 		Submitter:   req.Submitter,

@@ -53,7 +53,7 @@ export default class ProjectManagementPage extends Component {
       });
       let index = this.state.steps.indexOf(currentStep);
       if(endStep) {
-        this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/试卷管理`, {account: this.props.account});
+        this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/试卷管理`, {account: this.props.account, endStep: this.state.endStep});
         return;
       }
       this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${this.state.projectBaseInfo.steps[index - 1].name}/${this.state.projectBaseInfo.steps[index - 1].uuid}`, this.state.classes.account);
@@ -88,10 +88,6 @@ export default class ProjectManagementPage extends Component {
       message.warn("暂无权限");
       return;
     }
-    if(!this.state.testpapers) {
-      message.warn("请至少创建一张试卷");
-      return;
-    }
     if(this.state.endStep) {
       message.warning("项目已经结束");
       return;
@@ -102,7 +98,7 @@ export default class ProjectManagementPage extends Component {
         owner: this.props.match.params.project_id.split("_")[0],
         name: name,
         step_id: this.state.projectBaseInfo.steps[0].uuid,
-        testpaper_id: this.state.testpapers[0].uuid,
+        testpaper_id: "",
         title: "title",
         descriptions: "description",
         submittter: this.props.account.id,
@@ -169,7 +165,12 @@ export default class ProjectManagementPage extends Component {
             ) : (
               <Tabs defaultActiveKey={`${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].uuid}_${this.state.projectBaseInfo.steps[this.state.steps.indexOf(this.state.currentStep) - 1].name}`} type="card" activeKey={this.tabCruuent()} onChange={(e) => {
                 if(e === "试卷管理") {
-                  this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e}`, {account: this.props.account});
+                  if(this.state.endStep == "项目流程结束") {
+                    this.props.history.push(`/project-management/${this.props.match.params.project_id}/${this.props.match.params.role}/${e}`, {account: this.props.account, endStep: this.state.endStep});
+                  } else{
+                    message.warn("项目流程未结束");
+                    return;
+                  }
                 } else {
                   if(this.state.steps.indexOf(e.split("_")[1]) > this.state.steps.indexOf(this.state.currentStep)) {
                     message.warning("暂未到达这个阶段！");

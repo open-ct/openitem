@@ -61,36 +61,36 @@ export default class ProcessManagement extends Component {
             );
           },
         },
-        {
-          title: "审核员",
-          dataIndex: "role",
-          align: "center",
-          key: "role",
-          render: (_, record) => {
-            return (
-              <a onClick={() => {
-                if(this.props.match.params.role !== "1") {
-                  message.warn("暂无权限");
-                  return;
-                }
-                ProjectBackend.GetOneTpAssignment(record.uuid).then(res => {
-                  let keys = Object.keys(res.data);
-                  let data = Object.assign({}, {"组建团队": {}, "测试框架与论证报告": {}, "6人访谈": {}, "30人测试": {}, "试题外审": {}, "300人测试": {}, "定稿审查": {}});
-                  if (keys.length > 0) {
-                    keys.map(item => {
-                      data[item] = {name: res.data[item].name, displayName: res.data[item].displayName};
-                    });
-                  }
-                  this.setState({
-                    roleData: data,
-                    openState: true,
-                    testpaper_id: record.uuid,
-                  });
-                });
-              }}>分配审核人</a>
-            );
-          },
-        },
+        // {
+        //   title: "审核员",
+        //   dataIndex: "role",
+        //   align: "center",
+        //   key: "role",
+        //   render: (_, record) => {
+        //     return (
+        //       <a onClick={() => {
+        //         if(this.props.match.params.role !== "1") {
+        //           message.warn("暂无权限");
+        //           return;
+        //         }
+        //         ProjectBackend.GetOneTpAssignment(record.uuid).then(res => {
+        //           let keys = Object.keys(res.data);
+        //           let data = Object.assign({}, {"组建团队": {}, "测试框架与论证报告": {}, "6人访谈": {}, "30人测试": {}, "试题外审": {}, "300人测试": {}, "定稿审查": {}});
+        //           if (keys.length > 0) {
+        //             keys.map(item => {
+        //               data[item] = {name: res.data[item].name, displayName: res.data[item].displayName};
+        //             });
+        //           }
+        //           this.setState({
+        //             roleData: data,
+        //             openState: true,
+        //             testpaper_id: record.uuid,
+        //           });
+        //         });
+        //       }}>分配审核人</a>
+        //     );
+        //   },
+        // },
         {
           title: "操作",
           dataIndex: "action",

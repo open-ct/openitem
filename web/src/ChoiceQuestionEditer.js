@@ -193,6 +193,9 @@ class ChoiceQuestionEditer extends Component {
                 }}
                 onSave={() => {
                 }}
+                media={{
+                  uploadFn: this.myUploadFn,
+                }}
               />
             </TabPane>
             <TabPane tab={<span><BulbOutlined />解析</span>} key="3">
@@ -202,6 +205,9 @@ class ChoiceQuestionEditer extends Component {
                   this.setState({editorState: Object.assign(this.state.editorState, {solution: value})});
                 }}
                 onSave={() => {
+                }}
+                media={{
+                  uploadFn: this.myUploadFn,
                 }}
               />
             </TabPane>
@@ -267,7 +273,7 @@ class ChoiceQuestionEditer extends Component {
               </Col>
               <Col span="20" className="value">
                 <div className="tag-list">
-                  <TextArea allowClear onChange={(e) => {
+                  <TextArea style={{resize: "none", width: "100%"}} onChange={(e) => {
                     let questionParams = Object.assign(this.state.questionParams, {description: e.currentTarget.value});
                     this.setState({
                       questionParams,

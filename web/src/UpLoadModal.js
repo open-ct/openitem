@@ -1,13 +1,13 @@
 // 上传文件弹出框组件
 
 import React, {Component} from "react";
-import {Form, Input, Modal, Select, Upload, message} from "antd";
+import {Form, Input, Modal, Upload, message} from "antd";
 import {InboxOutlined} from "@ant-design/icons";
 import "./UpLoadModal.less";
 import * as PropositionBackend from "./backend/PropositionBackend";
 import * as ProjectBackend from "./backend/ProjectBackend";
 
-const {Option} = Select;
+// const {Option} = Select;
 
 export default class index extends Component {
   constructor(props) {
@@ -123,10 +123,6 @@ export default class index extends Component {
           }
         }}
         onOk={() => {
-          if (!this.upLoadFormRef.current.getFieldValue("testpaper_id")) {
-            message.warn("请输入所属试卷");
-            return;
-          }
           if (!this.upLoadFormRef.current.getFieldValue("title")) {
             message.warn("请输入材料组标题");
             return;
@@ -141,9 +137,6 @@ export default class index extends Component {
             this.setState({
               createLoading: true,
             });
-            // let files = file.map(item => {
-            //   return item.url;
-            // });
             let data = {
               owner: this.props.account.id,
               name: this.upLoadFormRef.current.getFieldValue("title"),
@@ -180,7 +173,7 @@ export default class index extends Component {
             initialValues={this.state.submitForm}
             ref={this.upLoadFormRef}
           >
-            <Form.Item
+            {/* <Form.Item
               name="testpaper_id"
               label="试卷"
               rules={[{required: true, message: "请选择所属试卷"}]}
@@ -194,7 +187,7 @@ export default class index extends Component {
                   )) : <></>)
                 }
               </Select>
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item
               label="材料标题"

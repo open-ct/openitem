@@ -90,10 +90,10 @@ export default class index extends Component {
         record ? <Space size="middle">
           <Tag color={levelList.filter(item => {return item.mode == record.status;})[0].color} onClick={() => {
             ProjectBackend.getAllTpassign(record.testpaper_id).then(res => {
-              this.setState({
-                auth: (res.data[this.props.stepName] ? res.data[this.props.stepName].id : null) == this.props.account.id ? true : false,
-              });
-              if(this.state.auth || this.props.role == 1) {
+              // this.setState({
+              //   auth: (res.data[this.props.stepName] ? res.data[this.props.stepName].id : null) == this.props.account.id ? true : false,
+              // });
+              if(this.props.role == 2 || this.props.role == 1) {
                 this.setState({
                   reviewResultsVisible: true,
                   statusChangeParams: {
